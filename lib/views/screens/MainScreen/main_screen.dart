@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:ship_link/views/screens/Home/home_screen.dart';
@@ -7,7 +9,7 @@ import 'package:ship_link/views/screens/searchScreen/search.dart';
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
   static String routName = '/mainScreen';
   @override
   _MainScreenState createState() => _MainScreenState();

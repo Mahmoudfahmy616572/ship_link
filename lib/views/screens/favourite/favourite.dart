@@ -1,8 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 
-import 'Components/button_navBar.dart';
+import 'Components/button_nav_bar.dart';
 import 'Components/cart.dart';
 import 'Components/product_card.dart';
 
@@ -60,8 +62,7 @@ class Favourite extends StatelessWidget {
                     direction: DismissDirection.endToStart,
                     background: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      decoration:
-                          const BoxDecoration(color: Color(0xFFFFE6E6)),
+                      decoration: const BoxDecoration(color: Color(0xFFFFE6E6)),
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
