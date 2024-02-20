@@ -3,13 +3,13 @@ import 'package:ship_link/views/screens/delivered/delivered.dart';
 
 class Order extends StatefulWidget {
   const Order({super.key});
-static String routName = '/order';
+  static String routName = '/order';
   @override
   State<Order> createState() => _OrderState();
 }
 
 class _OrderState extends State<Order> {
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
 
   final List<Widget> _tabs = [
     const Delivered(),
