@@ -43,6 +43,9 @@ class Body extends StatelessWidget {
                                   appStyle(20, FontWeight.w600, Colors.black),
                               text: "Your favorite brands",
                             ),
+                            const SizedBox(
+                              height: 20,
+                            ),
                             const FavouriteBrands(),
                             const SizedBox(
                               height: 20,
@@ -59,12 +62,9 @@ class Body extends StatelessWidget {
                             const SizedBox(
                               height: 20,
                             ),
-                            const ProductTextTitle(
-                              textStyle: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 24,
-                                  color: Colors.black,
-                                  letterSpacing: 1),
+                            ProductTextTitle(
+                              textStyle:
+                                  appStyle(20, FontWeight.w700, Colors.black),
                               text: 'Category',
                             ),
                             const SizedBox(
@@ -76,7 +76,7 @@ class Body extends StatelessWidget {
                             ),
                             ProductTextTitle(
                               textStyle:
-                                  appStyle(22, FontWeight.w700, Colors.white),
+                                  appStyle(24, FontWeight.w800, Colors.white),
                               text: "Popular Products",
                             ),
                             const SizedBox(

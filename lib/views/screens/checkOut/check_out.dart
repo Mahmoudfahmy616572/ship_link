@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/screens/cart/components/check_out_button.dart';
+import 'package:ship_link/views/shared/build_elevation_button.dart';
 import 'package:ship_link/views/screens/congrats/congrates.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 
@@ -17,7 +17,6 @@ class CheckOut extends StatelessWidget {
       backgroundColor: const Color(0xFFCDCDCD),
       appBar: AppBar(
         backgroundColor: const Color(0xFFCDCDCD),
-        centerTitle: true,
         title: Text(
           "Check Out",
           style: appStyle(18, FontWeight.w700, Colors.black),

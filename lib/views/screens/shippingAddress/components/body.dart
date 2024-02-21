@@ -29,7 +29,6 @@ class _BodyState extends State<Body> {
       backgroundColor: const Color(0xFFD7D7D7),
       appBar: AppBar(
         backgroundColor: const Color(0xFFD7D7D7),
-        centerTitle: true,
         title: Text(
           "Shipping address",
           style: appStyle(18, FontWeight.w700, Colors.black),

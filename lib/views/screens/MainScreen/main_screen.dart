@@ -49,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
         bottomNavigationBar: SlidingClippedNavBar.colorful(
           backgroundColor: Colors.black,
           onButtonPressed: onButtonPressed,
-          iconSize: 30,
+          iconSize: 28,
           selectedIndex: selectedIndex,
           barItems: <BarItem>[
             BarItem(

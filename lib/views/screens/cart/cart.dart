@@ -1,9 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/screens/cart/components/body.dart';
 
 import '../../shared/app_style.dart';
+import 'components/body.dart';
 import 'components/buttom_nav_bar.dart';
 
 class Cart extends StatelessWidget {
@@ -16,13 +16,13 @@ class Cart extends StatelessWidget {
       bottomNavigationBar: const ButtomNavBar(),
       backgroundColor: const Color(0xFFCDCDCD),
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: const Color(0xFFD9D9D9),
-        centerTitle: true,
         title: Text(
           "My Cart",
           style: appStyle(20, FontWeight.w700, Colors.black),
         ),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
       ),
       body: const Body(),
     );

@@ -32,7 +32,7 @@ class _BodyState extends State<Body> {
       ),
       appBar: AppBar(
         backgroundColor: const Color(0xFFD7D7D7),
-        centerTitle: true,
+        // centerTitle: true,
         title: Text(
           "Payment Method",
           style: appStyle(18, FontWeight.w700, Colors.black),

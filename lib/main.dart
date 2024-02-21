@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/theme/theme.dart';
 import 'package:ship_link/views/screens/splash/splash_screen.dart';
 
 import 'routs.dart';
@@ -15,11 +16,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      themeMode: ThemeMode.system,
+      darkTheme: ThemeData.dark(),
+      theme: TAppTheme.lightMode,
       home: const Splash(),
       routes: routes,
     );

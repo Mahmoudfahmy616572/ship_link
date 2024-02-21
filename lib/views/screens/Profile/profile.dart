@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:ship_link/views/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 
 class Profile extends StatelessWidget {
@@ -14,26 +13,17 @@ class Profile extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF2F2F2F),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2F2F2F),
         title: Text(
-          "Home",
-          style: appStyle(18, FontWeight.w600, Colors.white),
+          "Profile",
+          style: appStyle(25, FontWeight.bold, Colors.white),
         ),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.pushReplacementNamed(context, MainScreen.routName);
-          },
-        ),
+        backgroundColor: const Color(0xFF2F2F2F),
+        automaticallyImplyLeading: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(children: [
-          const SettingText(),
+          // const SettingText(),
           const Space(),
           const ImgProfile(),
           const Space(),

@@ -32,7 +32,7 @@ class Favourite extends StatelessWidget {
               ),
             )
           ],
-          centerTitle: true,
+          // centerTitle: true,
           title: Text(
             "Favourite",
             style: appStyle(20, FontWeight.w700, Colors.black),

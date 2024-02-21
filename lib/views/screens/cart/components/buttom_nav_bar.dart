@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ship_link/views/screens/checkOut/check_out.dart';
 
 import '../../../shared/app_style.dart';
-import 'check_out_button.dart';
+import '../../../shared/build_elevation_button.dart';
 
 class ButtomNavBar extends StatelessWidget {
   const ButtomNavBar({

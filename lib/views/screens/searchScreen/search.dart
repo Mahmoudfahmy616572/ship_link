@@ -15,10 +15,10 @@ class Search extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFCDCDCD),
         title: Text(
-          "Home",
+          "Search",
           style: appStyle(18, FontWeight.w600, Colors.black),
         ),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),

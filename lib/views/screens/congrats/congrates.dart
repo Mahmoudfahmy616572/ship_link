@@ -7,11 +7,9 @@ class Congrates extends StatelessWidget {
   static String routName = '/congrates';
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
-      child: Scaffold(
-        backgroundColor: Color(0xFFCDCDCD),
-        body: Body(),
-      ),
+    return const Scaffold(
+      backgroundColor: Color(0xFFCDCDCD),
+      body: Body(),
     );
   }
 }

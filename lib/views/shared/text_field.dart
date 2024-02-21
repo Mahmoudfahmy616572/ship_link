@@ -33,11 +33,19 @@ class BuildTextField extends StatelessWidget {
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
-              borderSide: BorderSide.none),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          errorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 1),
+          ),
+          focusedErrorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue, width: 1),
+          ),
           hintText: hintText,
           hintStyle: const TextStyle(color: Color(0xFFCDCDCD), fontSize: 13.5),
           suffixIcon: suffixIcon,
+          suffixIconColor: Colors.white,
+          prefixIconColor: Colors.white,
           filled: true,
           fillColor: const Color(0xFF151516)),
     );

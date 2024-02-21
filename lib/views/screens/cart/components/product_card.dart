@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:ship_link/views/screens/favourite/Components/button_shopping.dart';
+import 'package:ship_link/views/screens/favourite/Components/cart.dart';
 
-import '../../favourite/Components/cart.dart';
 import '../../favourite/Components/name_and_price.dart';
 import '../../favourite/Components/product_image.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
-    super.key, required this.cart,
+    super.key,
+    required this.cart,
   });
   final Cart cart;
   @override

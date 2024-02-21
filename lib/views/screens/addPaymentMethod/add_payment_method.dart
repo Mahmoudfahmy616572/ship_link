@@ -10,7 +10,6 @@ class AddPaymentMethod extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
         title: Text(
           "Add payment method",
           style: appStyle(18, FontWeight.w700, Colors.black),

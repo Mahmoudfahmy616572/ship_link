@@ -3,7 +3,7 @@ import 'package:ship_link/views/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/screens/order/order.dart';
 
 import '../../../shared/app_style.dart';
-import '../../cart/components/check_out_button.dart';
+import '../../../shared/build_elevation_button.dart';
 
 class Body extends StatelessWidget {
   const Body({

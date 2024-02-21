@@ -17,8 +17,8 @@ class _AddShippingAddressState extends State<AddShippingAddress> {
     return Scaffold(
       backgroundColor: const Color(0xFFCDCDCD),
       appBar: AppBar(
+          elevation: 0,
           backgroundColor: const Color(0xFFCDCDCD),
-          centerTitle: true,
           title: Text(
             "Add shipping address",
             style: appStyle(18, FontWeight.w700, Colors.black),
