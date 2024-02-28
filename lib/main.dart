@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ship_link/views/screens/MainScreen/main_screen.dart';
+import 'package:ship_link/views/screens/splash/splash_screen.dart';
 
 import 'routs.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       // themeMode: ThemeMode.system,
       // darkTheme: ThemeData.dark(),
       // theme: TAppTheme.lightMode,
-      home: const MainScreen(),
+      home: const Splash(),
       routes: routes,
     );
   }
