@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
       selectedIndex = index;
     });
     _pageController.animateToPage(selectedIndex,
-        duration: const Duration(milliseconds: 400), curve: Curves.easeOutQuad);
+        duration: const Duration(milliseconds: 200), curve: Curves.easeOutQuad);
   }
 
   @override

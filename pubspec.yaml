@@ -42,6 +42,7 @@ dependencies:
   http: ^1.2.0
   shared_preferences: ^2.2.2
   ionicons: ^0.2.2
+  rive: 0.12.4
   
 
 dev_dependencies:
@@ -70,6 +71,8 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/fonts/
+    - assets/RiveAssets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

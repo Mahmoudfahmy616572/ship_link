@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/theme/theme.dart';
-import 'package:ship_link/views/screens/splash/splash_screen.dart';
+import 'package:ship_link/views/screens/MainScreen/main_screen.dart';
 
 import 'routs.dart';
 
@@ -16,10 +15,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
-      darkTheme: ThemeData.dark(),
-      theme: TAppTheme.lightMode,
-      home: const Splash(),
+      // themeMode: ThemeMode.system,
+      // darkTheme: ThemeData.dark(),
+      // theme: TAppTheme.lightMode,
+      home: const MainScreen(),
       routes: routes,
     );
   }

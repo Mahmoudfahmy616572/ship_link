@@ -24,9 +24,10 @@ class Body extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 20,
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.11,
             ),
+
             // const LogoAndIconTopScreen(),
             const BuildTextFeild(),
 
