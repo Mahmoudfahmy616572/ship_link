@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
-import 'package:ship_link/views/screens/Home/home_screen.dart';
-import 'package:ship_link/views/screens/MainScreen/main_screen.dart';
-import 'package:ship_link/views/screens/Profile/profile.dart';
-import 'package:ship_link/views/screens/favourite/favourite.dart';
+import 'package:ship_link/views/user/screens/Home/home_screen.dart';
+import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
+import 'package:ship_link/views/user/screens/Profile/profile.dart';
+import 'package:ship_link/views/user/screens/favourite/favourite.dart';
 import 'package:ship_link/views/shared/build%20Side%20Bar/components/rive_assets.dart';
 
 import '../../app_style.dart';

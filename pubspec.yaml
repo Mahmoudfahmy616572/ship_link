@@ -42,7 +42,8 @@ dependencies:
   http: ^1.2.0
   shared_preferences: ^2.2.2
   ionicons: ^0.2.2
-  rive: 0.12.4
+  rive: ^0.13.0
+  flutter_credit_card: ^4.0.1
   
 
 dev_dependencies:

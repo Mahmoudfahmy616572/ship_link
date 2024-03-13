@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/screens/MainScreen/main_screen.dart';
-import 'package:ship_link/views/screens/splash/splash_screen.dart';
+import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 
 import 'routs.dart';
 
