@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
-import 'package:ship_link/views/user/screens/signup/register/Driver/driver.dart';
-import 'package:ship_link/views/user/screens/signup/register/Provider/provider.dart';
-import 'package:ship_link/views/user/screens/signup/register/User/user.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/button_sign.dart';
+import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
+import 'package:ship_link/views/driver/screens/DriverRegister/driver.dart';
+import 'package:ship_link/views/user/screens/signup/register/Provider/provider.dart';
+import 'package:ship_link/views/user/screens/signup/register/User/user.dart';
 
 List<String> list = <String>['User', 'Driver', 'Provider'];
 

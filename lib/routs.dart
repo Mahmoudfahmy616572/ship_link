@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/views/driver/screens/DriverHome/driver_home.dart';
 import 'package:ship_link/views/user/screens/ForgotPassword/forgot_password.dart';
 import 'package:ship_link/views/user/screens/Home/home_screen.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
@@ -16,7 +17,7 @@ import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 
 import 'views/user/screens/addPaymentMethod/add_payment_method.dart';
 import 'views/user/screens/product/product_screen.dart';
-import 'views/user/screens/signup/register/Driver/driver.dart';
+import 'views/driver/screens/DriverRegister/driver.dart';
 import 'views/user/screens/signup/register/Provider/provider.dart';
 import 'views/user/screens/signup/register/User/user.dart';
 import 'views/user/screens/signup/sign_up.dart';
@@ -42,6 +43,7 @@ final Map<String, WidgetBuilder> routes = {
   AddShippingAddress.routName: (context) => const AddShippingAddress(),
   AddPaymentMethod.routName: (context) => const AddPaymentMethod(),
   Profile.routName: (context) => const Profile(),
+  DriverHome.routName: (context) => const DriverHome(),
 };
 
 final otpInputDecoration = InputDecoration(

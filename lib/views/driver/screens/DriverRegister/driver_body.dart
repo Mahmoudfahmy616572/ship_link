@@ -1,14 +1,15 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:ship_link/views/driver/screens/DriverHome/driver_home.dart';
 
-import '../../../../../shared/app_style.dart';
-import '../../../../../shared/text_field.dart';
-import '../../../addShippingAddress/components/build_button.dart';
-import '../User/components/link_text.dart';
-import '../User/components/space.dart';
-import '../User/components/title_text_field.dart';
-import '../User/components/top_logo.dart';
+import '../../../shared/app_style.dart';
+import '../../../shared/text_field.dart';
+import '../../../user/screens/addShippingAddress/components/build_button.dart';
+import '../../../user/screens/signup/register/User/components/link_text.dart';
+import '../../../user/screens/signup/register/User/components/space.dart';
+import '../../../user/screens/signup/register/User/components/title_text_field.dart';
+import '../../../user/screens/signup/register/User/components/top_logo.dart';
 
 List<String> list = <String>['Bike', 'Motorcycle', 'car'];
 
@@ -145,7 +146,9 @@ class _DriverBodyState extends State<DriverBody> {
                       text: 'Sign up',
                       color: Colors.white,
                       textStyle: appStyle(17, FontWeight.w700, Colors.black),
-                      ontap: () {},
+                      ontap: () {
+                        Navigator.pushNamed(context, DriverHome.routName);
+                      },
                     ),
                   ),
                   const Space(),
