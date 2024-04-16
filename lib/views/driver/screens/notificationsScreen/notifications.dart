@@ -7,6 +7,7 @@ import 'components/notified_bell.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
+  static String routName = '/NotificationScreen';
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();

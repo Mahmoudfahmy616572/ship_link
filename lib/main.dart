@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
+
 import 'routs.dart';
-import 'views/driver/screens/MainScreen/main_screen_driver.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       // themeMode: ThemeMode.system,
       // darkTheme: ThemeData.dark(),
       // theme: TAppTheme.lightMode,
-      home: const MainScreenDriver(),
+      home: const Splash(),
       routes: routes,
     );
   }

@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/driver/screens/DriverHome/driver_home.dart';
+import 'package:ship_link/views/driver/screens/MainScreen/main_screen_driver.dart';
 
 import '../../../shared/app_style.dart';
 import '../../../shared/text_field.dart';
@@ -147,7 +147,7 @@ class _DriverBodyState extends State<DriverBody> {
                       color: Colors.white,
                       textStyle: appStyle(17, FontWeight.w700, Colors.black),
                       ontap: () {
-                        Navigator.pushNamed(context, DriverHome.routName);
+                        Navigator.pushNamed(context, MainScreenDriver.routName);
                       },
                     ),
                   ),
