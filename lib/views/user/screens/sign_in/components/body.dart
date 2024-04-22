@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/views/shared/app_style.dart';
+import 'package:ship_link/views/shared/text_field.dart';
 import 'package:ship_link/views/user/screens/ForgotPassword/forgot_password.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/user/screens/sign_in/components/signup_row.dart';
 import 'package:ship_link/views/user/screens/sign_in/components/top_screen_logo.dart';
-import 'package:ship_link/views/shared/app_style.dart';
-import 'package:ship_link/views/shared/text_field.dart';
 
 import '../../../../shared/button_sign.dart';
 import 'divider_row.dart';
@@ -89,9 +89,9 @@ class _BodyState extends State<Body> {
                                   return null;
                                 }
                               },
-                              obscureText: isVisable ? true : false,
                               hintText: 'Enter your email',
                               suffixIcon: const Icon(Icons.email),
+                              obscureText: false,
                             ),
                             const SizedBox(
                               height: 25,

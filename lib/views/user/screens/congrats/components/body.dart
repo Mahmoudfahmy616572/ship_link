@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/user/screens/order/order.dart';
 
@@ -29,22 +30,26 @@ class Body extends StatelessWidget {
                 color: Colors.black),
           ),
         ),
-        Image.asset(
-          "assets/images/congrats.png",
-        ),
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.02,
         ),
+        Lottie.asset(
+          "assets/json/deleivery.json",
+          fit: BoxFit.fill,
+        ),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.1,
+        ),
         Text.rich(
           TextSpan(
-              style: appStyle(15, FontWeight.normal, Colors.black),
+              style: appStyle(16, FontWeight.normal, Colors.black),
               children: const [
                 TextSpan(text: "Your order will be delivered soon.\n"),
                 TextSpan(text: "Thank you for choosing our app!")
               ]),
         ),
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.15,
+          height: MediaQuery.of(context).size.height * 0.1,
         ),
         CheckoutButton(
           text: "Track your orders",

@@ -11,6 +11,7 @@ class BuildTextFeild extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: TextFormField(
         keyboardType: TextInputType.text,
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
             hintText: "Search",
             hintStyle: const TextStyle(color: Color(0xFFCDCDCD)),

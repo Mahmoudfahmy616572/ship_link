@@ -9,6 +9,7 @@ class BuildTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       keyboardType: TextInputType.text,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
           hintText: "Search",
           hintStyle: const TextStyle(color: Color(0xFFCDCDCD)),
@@ -21,7 +22,6 @@ class BuildTextField extends StatelessWidget {
               borderSide:
                   const BorderSide(color: Colors.transparent, width: 2.0),
               borderRadius: BorderRadius.circular(5)),
-          // InputBorder.none,
           focusedBorder: OutlineInputBorder(
               borderSide: const BorderSide(color: Colors.white, width: 2.0),
               borderRadius: BorderRadius.circular(5)),

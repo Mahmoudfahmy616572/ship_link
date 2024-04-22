@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
-import 'package:ship_link/views/user/screens/Home/home_screen.dart';
+import 'package:ship_link/views/shared/build%20Side%20Bar/components/rive_assets.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/user/screens/Profile/profile.dart';
 import 'package:ship_link/views/user/screens/favourite/favourite.dart';
-import 'package:ship_link/views/shared/build%20Side%20Bar/components/rive_assets.dart';
 
+import '../../../user/screens/chat/chat_screen.dart';
 import '../../app_style.dart';
 
 class SideMenuTitle extends StatelessWidget {
@@ -79,12 +79,15 @@ void selectedItem(BuildContext context, int index) {
       Navigator.of(context).pushNamed(Profile.routName);
       break;
     case 2:
-      Navigator.of(context).pushNamed(HomeScreen.routName);
+      Navigator.of(context).pushNamed(Chat.routName);
       break;
     case 3:
-      Navigator.of(context).pushNamed(HomeScreen.routName);
+      Navigator.of(context).pushNamed(Profile.routName);
       break;
     case 4:
+      Navigator.of(context).pushNamed(Favourite.routName);
+      break;
+    case 5:
       Navigator.of(context).pushNamed(Favourite.routName);
       break;
   }

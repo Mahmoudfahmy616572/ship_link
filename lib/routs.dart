@@ -9,6 +9,7 @@ import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/user/screens/Profile/profile.dart';
 import 'package:ship_link/views/user/screens/addShippingAddress/add_shipping_address.dart';
 import 'package:ship_link/views/user/screens/cart/cart.dart';
+import 'package:ship_link/views/user/screens/chat/chat_screen.dart';
 import 'package:ship_link/views/user/screens/checkOut/check_out.dart';
 import 'package:ship_link/views/user/screens/congrats/congrates.dart';
 import 'package:ship_link/views/user/screens/delivered/delivered.dart';
@@ -50,6 +51,7 @@ final Map<String, WidgetBuilder> routes = {
   MainScreenDriver.routName: (context) => const MainScreenDriver(),
   NotificationScreen.routName: (context) => const NotificationScreen(),
   DriverProfile.routName: (context) => const DriverProfile(),
+  Chat.routName: (context) => const Chat(),
 };
 
 final otpInputDecoration = InputDecoration(
