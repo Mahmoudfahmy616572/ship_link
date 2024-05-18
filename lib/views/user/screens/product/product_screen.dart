@@ -7,7 +7,7 @@ import 'components/rating_row.dart';
 
 class ProductScreen extends StatelessWidget {
   const ProductScreen({super.key});
-static String routName = '/productScreen';
+  static String routName = '/productScreen';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
