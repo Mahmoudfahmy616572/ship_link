@@ -19,10 +19,9 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => ProductCubit()..getProductFormCart(),
-        ),
-        BlocProvider(
-          create: (context) => ProductCubit()..products(),
+          create: (context) => ProductCubit()
+            ..products()
+            ..getProductFormCart(),
         ),
         BlocProvider(
           create: (context) => AuthCubit(),

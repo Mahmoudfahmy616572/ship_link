@@ -7,12 +7,14 @@ import 'package:ship_link/models/Cart/cart.dart';
 import 'package:ship_link/models/allProducts/all_products.dart';
 
 import '../constant/constant.dart';
+import '../models/SingleProduct/single_product.dart';
 
 class ProductCubit extends Cubit<ProductState> {
   ProductCubit() : super(InitialState());
   static ProductCubit get(context) => BlocProvider.of<ProductCubit>(context);
   AllProducts allProducts = AllProducts();
   CartProducts getCart = CartProducts();
+  SingleProduct getSingleProduct = SingleProduct();
 
   products() async {
     try {
@@ -50,6 +52,7 @@ class ProductCubit extends Cubit<ProductState> {
         var res = jsonDecode(response.body);
 
         print('===========');
+        getProductFormCart();
         emit(AddSuccess(res['success']));
       } else {
         print(response.body);
@@ -64,15 +67,12 @@ class ProductCubit extends Cubit<ProductState> {
     try {
       emit(GetCartLoading());
 
-      var response = await http.get(Uri.parse("$baseurl$getCart"), headers: {
-        "Accept": "application/json",
-        "Authorization": 'Bearer $token'
-      });
+      var response =
+          await http.get(Uri.parse("$baseurl$getfromCart"), headers: header);
       if (response.statusCode == 200 || response.statusCode == 201) {
         var res = jsonDecode(response.body);
         getCart = CartProducts.fromJson(res);
         print('===========');
-        print(getCart);
         emit(GetCartSuccess());
         print(getCart);
 
@@ -81,6 +81,27 @@ class ProductCubit extends Cubit<ProductState> {
     } catch (e) {
       print(e);
       emit(GetCartFaild());
+    }
+  }
+
+  singleProduct(int id) async {
+    try {
+      emit(GetSingleProductLoading());
+      var response = await http.get(Uri.parse("$baseurl$singleProductpath/$id"),
+          headers: header);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        var res = jsonDecode(response.body);
+        getSingleProduct = SingleProduct.fromJson(res);
+        print(getSingleProduct);
+        emit(GetSingleProductSuccess());
+      } else {
+        print(response.body);
+        emit(GetSingleProductFaild());
+      }
+    } catch (e) {
+      print(e);
+
+      emit(GetSingleProductFaild());
     }
   }
 }

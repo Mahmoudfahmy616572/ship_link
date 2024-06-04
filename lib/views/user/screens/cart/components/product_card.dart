@@ -49,7 +49,7 @@ class ProductCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${cart?[index].product?.name ?? ""}",
+                          cart?[index].product?.name ?? "",
                           style: appStyle(
                               17, FontWeight.w500, const Color(0xFF606060)),
                         ),

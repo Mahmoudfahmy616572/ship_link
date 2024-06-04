@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:ship_link/views/user/screens/product/product_screen.dart';
 
 import '../../../../../cubitallProducts/cubit.dart';
 import '../../../../../cubitallProducts/product_stat.dart';
 import '../../../../../models/allProducts/all_products.dart';
 import '../../../../shared/app_style.dart';
+import '../../product/product_screen.dart';
 
 class DesignGridCard extends StatelessWidget {
   const DesignGridCard({
@@ -23,6 +23,7 @@ class DesignGridCard extends StatelessWidget {
       listener: (context, state) {
         if (state is AddSuccess) {
           final snackBar = SnackBar(
+            duration: const Duration(milliseconds: 1000),
             content: Text(state.success),
             action: SnackBarAction(
               label: 'Undo',
@@ -31,12 +32,21 @@ class DesignGridCard extends StatelessWidget {
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
+
+        if (state is GetSingleProductSuccess) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const ProductScreen()));
+        }
+        if (state is GetCartSuccess) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const ProductScreen()));
+        }
       },
       builder: (context, state) {
         var cubit = ProductCubit.get(context);
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, ProductScreen.routName);
+            cubit.singleProduct(model?[index].id ?? 0);
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

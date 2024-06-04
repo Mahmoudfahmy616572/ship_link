@@ -31,7 +31,7 @@ class _BodyState extends State<Body> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) async {
         var cubit = AuthCubit.get(context);
-        if (cubit.userSignIn.message == "Logged In successfully") {
+        if (cubit.userSignIn.message != null) {
           Navigator.pushReplacementNamed(context, MainScreen.routName);
           final snackBar = SnackBar(
             content: Text('${cubit.userSignIn.message}'),
@@ -42,7 +42,7 @@ class _BodyState extends State<Body> {
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         } else {
-          final snackBar =SnackBar(
+          final snackBar = SnackBar(
             content: Text('${cubit.userSignIn.message}'),
             action: SnackBarAction(
               label: 'Undo',

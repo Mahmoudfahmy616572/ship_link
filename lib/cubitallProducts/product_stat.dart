@@ -24,3 +24,10 @@ class GetCartLoading extends ProductState {}
 class GetCartSuccess extends ProductState {}
 
 class GetCartFaild extends ProductState {}
+
+//============getSingleProduct State============
+class GetSingleProductLoading extends ProductState {}
+
+class GetSingleProductSuccess extends ProductState {}
+
+class GetSingleProductFaild extends ProductState {}

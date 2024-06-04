@@ -21,7 +21,6 @@ import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 
 import 'views/driver/screens/DriverRegister/driver.dart';
 import 'views/user/screens/addPaymentMethod/add_payment_method.dart';
-import 'views/user/screens/product/product_screen.dart';
 import 'views/user/screens/signup/register/Provider/provider.dart';
 import 'views/user/screens/signup/register/User/user.dart';
 import 'views/user/screens/signup/sign_up.dart';
@@ -38,7 +37,7 @@ final Map<String, WidgetBuilder> routes = {
   MainScreen.routName: (context) => const MainScreen(),
   Order.routName: (context) => const Order(),
   OtpScreen.routName: (context) => const OtpScreen(),
-  ProductScreen.routName: (context) => const ProductScreen(),
+  // ProductScreen.routName: (context) => const ProductScreen(),
   SignIn.routName: (context) => const SignIn(),
   SignUp.routName: (context) => const SignUp(),
   ProviderRegister.routName: (context) => const ProviderRegister(),
