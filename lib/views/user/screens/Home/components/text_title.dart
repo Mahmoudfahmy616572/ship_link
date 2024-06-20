@@ -25,4 +25,3 @@ class ProductTextTitle extends StatelessWidget {
     );
   }
 }
-

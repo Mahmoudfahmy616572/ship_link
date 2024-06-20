@@ -13,8 +13,7 @@ class ProductImage extends StatelessWidget {
       width: 100,
       height: 100,
       child: ClipRRect(
-          borderRadius: BorderRadius.circular(13),
-          child: Image.asset(image)),
+          borderRadius: BorderRadius.circular(13), child: Image.asset(image)),
     );
   }
 }

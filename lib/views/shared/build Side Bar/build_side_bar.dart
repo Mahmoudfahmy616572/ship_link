@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rive/rive.dart';
-import 'package:ship_link/auth/cubit/auth_cubit.dart';
-import 'package:ship_link/auth/cubit/auth_stat.dart';
+import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
+import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/build%20Side%20Bar/components/rive_utiles.dart';
 

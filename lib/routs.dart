@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ship_link/constant/serveices_locators.dart';
+import 'package:ship_link/cubits/addToCart/add_to_cart_cubit.dart';
+import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
 import 'package:ship_link/views/driver/screens/DriverHome/driver_home.dart';
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
 import 'package:ship_link/views/driver/screens/MainScreen/main_screen_driver.dart';
@@ -21,6 +26,7 @@ import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 
 import 'views/driver/screens/DriverRegister/driver.dart';
 import 'views/user/screens/addPaymentMethod/add_payment_method.dart';
+import 'views/user/screens/product/product_screen.dart';
 import 'views/user/screens/signup/register/Provider/provider.dart';
 import 'views/user/screens/signup/register/User/user.dart';
 import 'views/user/screens/signup/sign_up.dart';
@@ -37,7 +43,6 @@ final Map<String, WidgetBuilder> routes = {
   MainScreen.routName: (context) => const MainScreen(),
   Order.routName: (context) => const Order(),
   OtpScreen.routName: (context) => const OtpScreen(),
-  // ProductScreen.routName: (context) => const ProductScreen(),
   SignIn.routName: (context) => const SignIn(),
   SignUp.routName: (context) => const SignUp(),
   ProviderRegister.routName: (context) => const ProviderRegister(),
@@ -66,3 +71,107 @@ OutlineInputBorder outlineInputBorder() {
   return OutlineInputBorder(
       borderRadius: BorderRadius.circular(11), borderSide: BorderSide.none);
 }
+
+// abstract class RouteApp {
+//   static final router = GoRouter(
+//     routes: [
+//       GoRoute(
+//         path: '/',
+//         builder: (context, state) => const Splash(),
+//       ),
+//       GoRoute(
+//         path: '/Cart',
+//         builder: (context, state) => const Cart(),
+//       ),
+//       GoRoute(
+//         path: '/CheckOut',
+//         builder: (context, state) => const CheckOut(),
+//       ),
+//       GoRoute(
+//         path: '/Congrates',
+//         builder: (context, state) => const Congrates(),
+//       ),
+//       GoRoute(
+//         path: '/Delivered',
+//         builder: (context, state) => const Delivered(),
+//       ),
+//       GoRoute(
+//         path: '/Favourite',
+//         builder: (context, state) => const Favourite(),
+//       ),
+//       GoRoute(
+//         path: '/ForgotPassword',
+//         builder: (context, state) => const ForgotPassword(),
+//       ),
+//       GoRoute(
+//         path: '/HomeScreen',
+//         builder: (context, state) => const HomeScreen(),
+//       ),
+//       GoRoute(
+//         path: '/MainScreen',
+//         builder: (context, state) => const MainScreen(),
+//       ),
+//       GoRoute(
+//         path: '/Order',
+//         builder: (context, state) => const Order(),
+//       ),
+//       GoRoute(
+//         path: '/OtpScreen',
+//         builder: (context, state) => const OtpScreen(),
+//       ),
+//       // GoRoute(
+//       //   path: '/ProductScreen',
+//       //   builder: (context, state) => ProductScreen(
+//       //     index: state.extra as int,
+//       //   ),
+//       // ),
+//       // GoRoute(
+//       //     path: '/ProductScreen',
+//       //     builder: (context, state) => BlocProvider(
+//       //           create: (context) =>
+//       //               AddToCartCubit(getIt.get<CartServeicesImpl>()),
+//       //           child: ProductScreen(index:,),
+//       //         )),
+//       GoRoute(
+//         path: '/SignIn',
+//         builder: (context, state) => const SignIn(),
+//       ),
+//       GoRoute(
+//         path: '/SignUp',
+//         builder: (context, state) => const SignUp(),
+//       ),
+//       GoRoute(
+//         path: '/ProviderRegister',
+//         builder: (context, state) => const ProviderRegister(),
+//       ),
+//       GoRoute(
+//         path: '/UserRegister',
+//         builder: (context, state) => const UserRegister(),
+//       ),
+//       GoRoute(
+//         path: '/AddShippingAddress',
+//         builder: (context, state) => const AddShippingAddress(),
+//       ),
+//       GoRoute(
+//         path: '/AddPaymentMethod',
+//         builder: (context, state) => const AddPaymentMethod(),
+//       ),
+//       GoRoute(
+//         path: '/DriverHome',
+//         builder: (context, state) => const DriverHome(),
+//       ),
+//       GoRoute(
+//         path: '/MainScreenDriver',
+//         builder: (context, state) => const MainScreenDriver(),
+//       ),
+//       GoRoute(
+//         path: '/NotificationScreen',
+//         builder: (context, state) => const NotificationScreen(),
+//       ),
+//       GoRoute(
+//         path: '/Chat',
+//         builder: (context, state) => const Chat(),
+//       ),
+//     ],
+//   );
+// }

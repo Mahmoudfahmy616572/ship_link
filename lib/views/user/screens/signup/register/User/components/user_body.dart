@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ship_link/auth/cubit/auth_cubit.dart';
-import 'package:ship_link/auth/cubit/auth_stat.dart';
+import 'package:motion_toast/motion_toast.dart';
+import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
+import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
+import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 
 import '../../../../../../shared/app_style.dart';
 import '../../../../../../shared/text_field.dart';
-import '../../../../MainScreen/main_screen.dart';
 import '../../../../addShippingAddress/components/build_button.dart';
 import 'link_text.dart';
 import 'space.dart';
@@ -40,10 +41,10 @@ class _UserBodyState extends State<UserBody> {
       listener: (context, state) {
         var cubit = AuthCubit.get(context);
         if (cubit.userRegister.message == "User registered successfully") {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const MainScreen()));
+          Navigator.pushReplacementNamed(context, MainScreen.routName);
+          displaySuccessMotionToast("${cubit.userRegister.message}");
         } else {
-          const SnackBar(content: Text("Error"));
+          displayErrorMotionToast("Something error");
         }
       },
       builder: (context, state) {
@@ -339,5 +340,34 @@ class _UserBodyState extends State<UserBody> {
         );
       },
     );
+  }
+
+  displayErrorMotionToast(String err) {
+    MotionToast.error(
+      title: const Text(
+        'Error',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      description: Text(err),
+      position: MotionToastPosition.top,
+      barrierColor: Colors.black.withOpacity(0.3),
+      width: 300,
+      height: 80,
+      dismissable: false,
+    ).show(context);
+  }
+
+  void displaySuccessMotionToast(String description) {
+    MotionToast toast = MotionToast.success(
+      description: Text(
+        description,
+        style: const TextStyle(fontSize: 12),
+      ),
+      dismissable: true,
+      opacity: .5,
+    );
+    toast.show(context);
   }
 }

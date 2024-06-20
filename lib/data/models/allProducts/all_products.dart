@@ -1,21 +1,21 @@
 // To parse this JSON data, do
 //
-//     final singleProduct = singleProductFromJson(jsonString);
+//     final allProducts = allProductsFromJson(jsonString);
 
 import 'dart:convert';
 
-SingleProduct singleProductFromJson(String str) => SingleProduct.fromJson(json.decode(str));
+AllProducts allProductsFromJson(String str) => AllProducts.fromJson(json.decode(str));
 
-String singleProductToJson(SingleProduct data) => json.encode(data.toJson());
+String allProductsToJson(AllProducts data) => json.encode(data.toJson());
 
-class SingleProduct {
+class AllProducts {
     Products? products;
 
-    SingleProduct({
+    AllProducts({
         this.products,
     });
 
-    factory SingleProduct.fromJson(Map<String, dynamic> json) => SingleProduct(
+    factory AllProducts.fromJson(Map<String, dynamic> json) => AllProducts(
         products: json["Products"] == null ? null : Products.fromJson(json["Products"]),
     );
 
@@ -25,6 +25,26 @@ class SingleProduct {
 }
 
 class Products {
+    int? productscount;
+    List<Product>? products;
+
+    Products({
+        this.productscount,
+        this.products,
+    });
+
+    factory Products.fromJson(Map<String, dynamic> json) => Products(
+        productscount: json["Productscount"],
+        products: json["Products"] == null ? [] : List<Product>.from(json["Products"]!.map((x) => Product.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "Productscount": productscount,
+        "Products": products == null ? [] : List<dynamic>.from(products!.map((x) => x.toJson())),
+    };
+}
+
+class Product {
     int? id;
     String? name;
     String? description;
@@ -38,7 +58,7 @@ class Products {
     DateTime? createdAt;
     DateTime? updatedAt;
 
-    Products({
+    Product({
         this.id,
         this.name,
         this.description,
@@ -53,7 +73,7 @@ class Products {
         this.updatedAt,
     });
 
-    factory Products.fromJson(Map<String, dynamic> json) => Products(
+    factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json["id"],
         name: json["name"],
         description: json["description"],

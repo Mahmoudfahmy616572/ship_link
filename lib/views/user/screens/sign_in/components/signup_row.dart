@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ship_link/views/user/screens/signup/sign_up.dart';
 
 import '../../../../shared/app_style.dart';
@@ -19,7 +20,7 @@ class SignUpRow extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, SignUp.routName);
+            GoRouter.of(context).push("/SignUp");
           },
           child: Text(
             "SignUp ",

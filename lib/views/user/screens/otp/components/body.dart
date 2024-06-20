@@ -123,7 +123,7 @@ class _BodyState extends State<Body> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height*0.67,
+                  height: MediaQuery.of(context).size.height * 0.67,
                   decoration: const BoxDecoration(
                       image: DecorationImage(
                           image:

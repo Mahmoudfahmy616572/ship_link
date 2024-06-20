@@ -33,7 +33,6 @@ class ProfileInfo extends StatelessWidget {
               'Phone Number : +20**********',
               style: appStyle(17, FontWeight.normal, const Color(0xFF000000)),
             ),
-            
           ],
         )
       ],

@@ -2,11 +2,10 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../../models/cities_models.dart';
-import '../../../../../models/contry_state_model.dart' as cs_model;
+import '../../../../../data/models/cities_models.dart';
+import '../../../../../data/models/contry_state_model.dart' as cs_model;
 import '../../../../../repositories/country_state_city_repo.dart';
 import '../../../../shared/app_style.dart';
-
 
 class DropDownContry extends StatefulWidget {
   const DropDownContry({super.key});

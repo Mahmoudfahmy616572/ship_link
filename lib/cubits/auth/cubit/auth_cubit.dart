@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
-import 'package:ship_link/auth/cubit/auth_stat.dart';
 import 'package:ship_link/constant/constant.dart';
-import 'package:ship_link/models/register/user_register.dart';
-import 'package:ship_link/models/signout/sign_out.dart';
-import 'package:ship_link/models/singIn/sign_in.dart';
+import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
+import 'package:ship_link/data/models/register/user_register.dart';
+import 'package:ship_link/data/models/signout/sign_out.dart';
+import 'package:ship_link/data/models/singIn/sign_in.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(InitialState());
@@ -63,8 +63,8 @@ class AuthCubit extends Cubit<AuthState> {
     required String email,
     required String password,
   }) async {
+    emit(SignInLoading());
     try {
-      emit(SignInLoading());
       var response = await http.post(Uri.parse("$baseurl$singin"),
           body: {
             "email": email,
@@ -76,8 +76,10 @@ class AuthCubit extends Cubit<AuthState> {
         userSignIn = SignIn.fromJson(res);
         token = userSignIn.token ?? '';
         print(token);
+        print(userSignIn.user!.id);
         emit(SignInSuccess());
       } else {
+        emit(SignInFaild());
         print(response.body);
       }
     } catch (e) {

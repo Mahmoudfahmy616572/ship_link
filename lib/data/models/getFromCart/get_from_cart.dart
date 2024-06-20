@@ -1,23 +1,23 @@
 // To parse this JSON data, do
 //
-//     final cartProducts = cartProductsFromJson(jsonString);
+//     final getFromCart = getFromCartFromJson(jsonString);
 
 import 'dart:convert';
 
-CartProducts cartProductsFromJson(String str) => CartProducts.fromJson(json.decode(str));
+GetFromCart getFromCartFromJson(String str) => GetFromCart.fromJson(json.decode(str));
 
-String cartProductsToJson(CartProducts data) => json.encode(data.toJson());
+String getFromCartToJson(GetFromCart data) => json.encode(data.toJson());
 
-class CartProducts {
+class GetFromCart {
     Cart? cart;
     List<Detail>? details;
 
-    CartProducts({
+    GetFromCart({
         this.cart,
         this.details,
     });
 
-    factory CartProducts.fromJson(Map<String, dynamic> json) => CartProducts(
+    factory GetFromCart.fromJson(Map<String, dynamic> json) => GetFromCart(
         cart: json["cart"] == null ? null : Cart.fromJson(json["cart"]),
         details: json["details"] == null ? [] : List<Detail>.from(json["details"]!.map((x) => Detail.fromJson(x))),
     );

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motion_toast/motion_toast.dart';
+import 'package:ship_link/constant/constant.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/text_field.dart';
 import 'package:ship_link/views/user/screens/ForgotPassword/forgot_password.dart';
+import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/user/screens/sign_in/components/signup_row.dart';
 import 'package:ship_link/views/user/screens/sign_in/components/top_screen_logo.dart';
 
-import '../../../../../auth/cubit/auth_cubit.dart';
-import '../../../../../auth/cubit/auth_stat.dart';
+import '../../../../../cubits/auth/cubit/auth_cubit.dart';
+import '../../../../../cubits/auth/cubit/auth_stat.dart';
 import '../../../../shared/button_sign.dart';
-import '../../MainScreen/main_screen.dart';
 import 'divider_row.dart';
 import 'media_row.dart';
 
@@ -31,25 +33,13 @@ class _BodyState extends State<Body> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) async {
         var cubit = AuthCubit.get(context);
-        if (cubit.userSignIn.message != null) {
-          Navigator.pushReplacementNamed(context, MainScreen.routName);
-          final snackBar = SnackBar(
-            content: Text('${cubit.userSignIn.message}'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {},
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        } else {
-          final snackBar = SnackBar(
-            content: Text('${cubit.userSignIn.message}'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {},
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        if (state is SignInSuccess) {
+          if (token != '') {
+            Navigator.pushReplacementNamed(context, MainScreen.routName);
+            displaySuccessMotionToast("${cubit.userSignIn.message}");
+          }
+        } else if (state is SignInFaild) {
+          await displayErrorMotionToast("user not found");
         }
       },
       builder: (context, state) {
@@ -225,5 +215,34 @@ class _BodyState extends State<Body> {
         style: const TextStyle(color: Colors.white),
       ),
     );
+  }
+
+  displayErrorMotionToast(String err) {
+    MotionToast.error(
+      title: const Text(
+        'Error',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      description: Text(err),
+      position: MotionToastPosition.top,
+      barrierColor: Colors.black.withOpacity(0.3),
+      width: 300,
+      height: 80,
+      dismissable: false,
+    ).show(context);
+  }
+
+  void displaySuccessMotionToast(String description) {
+    MotionToast toast = MotionToast.success(
+      description: Text(
+        description,
+        style: const TextStyle(fontSize: 12),
+      ),
+      dismissable: true,
+      opacity: .5,
+    );
+    toast.show(context);
   }
 }

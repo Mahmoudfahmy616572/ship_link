@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/button_sign.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
@@ -6,7 +7,7 @@ import 'package:ship_link/views/driver/screens/DriverRegister/driver.dart';
 import 'package:ship_link/views/user/screens/signup/register/Provider/provider.dart';
 import 'package:ship_link/views/user/screens/signup/register/User/user.dart';
 
-List<String> list = <String>['User', 'Driver', 'Provider'];
+List<String> list = <String>['User', 'Driver'];
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -111,15 +112,12 @@ class _SignUpState extends State<SignUp> {
         });
         switch (value) {
           case "User":
-            Navigator.pushNamed(context, UserRegister.routName);
+            GoRouter.of(context).pushReplacement("/UserRegister");
             break;
           case "Driver":
-            Navigator.pushNamed(context, DriverRegister.routName);
+            GoRouter.of(context).pushReplacement("/DriverRegister");
             break;
-          case "Provider":
-            Navigator.pushNamed(context, ProviderRegister.routName);
 
-            break;
         }
       },
       items: list.map<DropdownMenuItem<String>>((String value) {

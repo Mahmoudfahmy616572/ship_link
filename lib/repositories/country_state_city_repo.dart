@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
-import '../models/cities_models.dart';
-import '../models/contry_state_model.dart';
+import '../data/models/cities_models.dart';
+import '../data/models/contry_state_model.dart';
 
 class CountryStateCityRepo {
   static const countriesStateURL =

@@ -26,8 +26,7 @@ class ProfileImage extends StatelessWidget {
                     shape: BoxShape.circle, color: Colors.black),
                 child: Padding(
                   padding: const EdgeInsets.all(7.0),
-                  child: SvgPicture.asset(
-                      "assets/icons/cameraIcon.svg"),
+                  child: SvgPicture.asset("assets/icons/cameraIcon.svg"),
                 ),
               ),
             ))

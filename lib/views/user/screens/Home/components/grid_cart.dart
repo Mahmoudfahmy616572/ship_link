@@ -1,104 +1,84 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/cubits/getAllProducts/get_all_prouducts_cubit.dart';
+import 'package:ship_link/views/user/screens/product/product_screen.dart';
 
-import '../../../../../cubitallProducts/cubit.dart';
-import '../../../../../cubitallProducts/product_stat.dart';
-import '../../../../../models/allProducts/all_products.dart';
 import '../../../../shared/app_style.dart';
-import '../../product/product_screen.dart';
+import 'add_to_cart_Icon.dart';
 
 class DesignGridCard extends StatelessWidget {
   const DesignGridCard({
     super.key,
+    required this.imageurl,
+    required this.price,
+    required this.name,
     required this.index,
-    this.model,
   });
+  final String? imageurl;
+  final double? price;
+  final String? name;
   final int index;
-  final List<Product>? model;
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProductCubit, ProductState>(
-      listener: (context, state) {
-        if (state is AddSuccess) {
-          final snackBar = SnackBar(
-            duration: const Duration(milliseconds: 1000),
-            content: Text(state.success),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {},
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-
-        if (state is GetSingleProductSuccess) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const ProductScreen()));
-        }
-        if (state is GetCartSuccess) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const ProductScreen()));
-        }
-      },
+    return BlocConsumer<GetAllProuductsCubit, GetAllProuductsState>(
+      listener: (context, state) {},
       builder: (context, state) {
-        var cubit = ProductCubit.get(context);
-        return GestureDetector(
-          onTap: () {
-            cubit.singleProduct(model?[index].id ?? 0);
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  Container(
-                    color: Colors.transparent,
-                    height: 240,
-                    width: 190,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(9),
-                      child: Image.network(
-                        model?[index].image ?? '',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    right: 10,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          color: const Color(0xFF606066),
-                          borderRadius: BorderRadius.circular(9)),
-                      child: GestureDetector(
-                        onTap: () {
-                          cubit.addProductToCard(
-                              id: " ${model?[index].id ?? ""}");
-                        },
-                        child: SvgPicture.asset(
-                          "assets/icons/shopping_bag icon.svg",
+        if (state is GetAllProuductsSuccess) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: ((context) => ProductScreen(index: index))));
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(7),
+                      child: AspectRatio(
+                        aspectRatio: 1.5 / 1.9,
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: imageurl!,
+                          errorWidget: (context, url, error) => const Center(
+                              child: Icon(
+                            Icons.error_outline,
+                            size: 60,
+                          )),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Text.rich(TextSpan(children: [
-                TextSpan(
-                    text: "${model?[index].name}\n",
-                    style: appStyle(17, FontWeight.w400, Colors.white)),
-                TextSpan(
-                    text: "\$${model?[index].price}\n",
-                    style: appStyle(18, FontWeight.w600, Colors.white))
-              ]))
-            ],
-          ),
-        );
+                    AddToCartIcon(
+                      id: state.products.products?.products?[index].id ?? 0,
+                    ),
+                  ],
+                ),
+                Text.rich(TextSpan(children: [
+                  TextSpan(
+                      text: "$name\n",
+                      style: appStyle(17, FontWeight.w400, Colors.white)),
+                  TextSpan(
+                      text: "$price\n",
+                      style: appStyle(18, FontWeight.w600, Colors.white))
+                ]))
+              ],
+            ),
+          );
+        } else if (state is GetAllProuductsFailure) {
+          return CustomErrorWidget(
+            errMessage: state.errMessage,
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
       },
     );
   }
