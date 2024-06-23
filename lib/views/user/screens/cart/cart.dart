@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/app_style.dart';
 import 'components/body.dart';
-import 'components/buttom_nav_bar.dart';
 
 class Cart extends StatelessWidget {
   const Cart({super.key});
@@ -13,7 +12,7 @@ class Cart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const ButtomNavBar(),
+      // bottomNavigationBar: const ButtomNavBar(),
       backgroundColor: const Color(0xFFCDCDCD),
       appBar: AppBar(
         elevation: 0,

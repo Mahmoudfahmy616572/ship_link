@@ -67,4 +67,63 @@ class CartServeicesImpl extends CartServeices {
       );
     }
   }
+
+  @override
+  Future deletefromCart({
+    required int cart_id,
+    required int product_id,
+  }) async {
+    try {
+      print(cart_id);
+      print(product_id);
+      var data = await apiServeices.deleteHttp(
+        endpoint: "$deletefromCart1$cart_id$deletefromCart2$product_id",
+        headers: {
+          "Accept": "application/json",
+          "Authorization": 'Bearer $token'
+        },
+      );
+      print(data);
+
+      return right(data["success"]);
+    } catch (e) {
+      if (e is DioError) {
+        return left(
+          ServerFailure.fromDioError(e),
+        );
+      }
+      return left(
+        ServerFailure(
+          e.toString(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future confirmCart({required int id}) async {
+    try {
+      var data = await apiServeices.postHttpCart(
+          endpoint: confirmeCart,
+          headers: {
+            "Accept": "application/json",
+            "Authorization": 'Bearer $token'
+          },
+          id: id);
+      print(data);
+
+      return right(data["success"]);
+    } catch (e) {
+      if (e is DioError) {
+        return left(
+          ServerFailure.fromDioError(e),
+        );
+      }
+      return left(
+        ServerFailure(
+          e.toString(),
+        ),
+      );
+    }
+  }
 }

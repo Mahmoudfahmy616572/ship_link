@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/user/screens/checkOut/check_out.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
 
 import '../../../../shared/app_style.dart';
 import '../../../../shared/build_elevation_button.dart';
@@ -16,7 +18,6 @@ class ButtomNavBar extends StatelessWidget {
       child: InkWell(
         onTap: () {},
         child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.76,
             height: 180,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -59,26 +60,55 @@ class ButtomNavBar extends StatelessWidget {
                         )),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Total:",
-                        style: appStyle(18, FontWeight.w600, Colors.black),
-                      ),
-                      Text(
-                        "\$ 22.00 ",
-                        style: appStyle(18, FontWeight.w600, Colors.black),
-                      )
-                    ],
-                  ),
+                BlocConsumer<GetFromCartCubit, GetFromCartState>(
+                  listener: (context, state) {},
+                  builder: (context, state) {
+                    if (state is GetFromCartSuccess) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Total:",
+                              style:
+                                  appStyle(18, FontWeight.w600, Colors.black),
+                            ),
+                            Text(
+                              "\$ ${state.getProductFromCart.cart?.totalPrice ?? ""}",
+                              style:
+                                  appStyle(18, FontWeight.w600, Colors.black),
+                            )
+                          ],
+                        ),
+                      );
+                    } else if (state is GetFromCartLoading) {
+                      return const Text(".....");
+                    } else if (state is GetFromCartFailure) {
+                      return Text(state.errMessage);
+                    } else {
+                      return const CustomErrorWidget(
+                        errMessage: "0",
+                      );
+                    }
+                  },
                 ),
-                CheckoutButton(
-                  text: 'Check Out',
-                  ontap: () {
-                    Navigator.pushNamed(context, CheckOut.routName);
+                BlocBuilder<GetFromCartCubit, GetFromCartState>(
+                  builder: (context, state) {
+                    if (state is GetFromCartSuccess) {
+                      return CheckoutButton(
+                        text: 'Check Out',
+                        id: state.getProductFromCart.cart?.id ?? 0,
+                      );
+                    } else if (state is GetFromCartLoading) {
+                      return const Text(".....");
+                    } else if (state is GetFromCartFailure) {
+                      return Text(state.errMessage);
+                    } else {
+                      return const CustomErrorWidget(
+                        errMessage: "0",
+                      );
+                    }
                   },
                 )
               ],

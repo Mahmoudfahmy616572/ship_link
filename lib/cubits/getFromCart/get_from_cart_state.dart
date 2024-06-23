@@ -20,3 +20,15 @@ final class GetFromCartSuccess extends GetFromCartState {
   final GetFromCart getProductFromCart;
   const GetFromCartSuccess(this.getProductFromCart);
 }
+final class DeleteFromCartLoading extends GetFromCartState {}
+
+final class DeleteFromCartSuccess extends GetFromCartState {
+  final String success;
+  const DeleteFromCartSuccess(this.success);
+}
+
+final class DeleteFromCartFailure extends GetFromCartState {
+  final String errMassege;
+  const DeleteFromCartFailure(this.errMassege);
+}
+

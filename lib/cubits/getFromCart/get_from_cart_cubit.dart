@@ -23,4 +23,20 @@ class GetFromCartCubit extends Cubit<GetFromCartState> {
       },
     );
   }
+
+  Future<void> deleteFromCart({int? cart_id, int? product_id}) async {
+    emit(DeleteFromCartLoading());
+    var result = await cartServeices.deletefromCart(
+        cart_id: cart_id ?? 0, product_id: product_id ?? 0);
+    result.fold(
+      (failure) {
+        print(failure);
+        emit(DeleteFromCartFailure(failure.errMessage));
+      },
+      (success) {
+        GetFromCartCubit(cartServeices).getProductFromCart();
+        emit(DeleteFromCartSuccess(success));
+      },
+    );
+  }
 }

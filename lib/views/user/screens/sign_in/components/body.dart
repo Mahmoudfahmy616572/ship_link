@@ -234,7 +234,7 @@ class _BodyState extends State<Body> {
     ).show(context);
   }
 
-  void displaySuccessMotionToast(String description) {
+  displaySuccessMotionToast(String description) {
     MotionToast toast = MotionToast.success(
       description: Text(
         description,

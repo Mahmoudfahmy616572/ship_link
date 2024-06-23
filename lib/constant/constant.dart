@@ -15,3 +15,6 @@ String singout = 'auth/logout';
 String getProducts = 'Products/get';
 String addProducts = 'product/add';
 String getfromCart = 'product/getFromCart';
+String deletefromCart1 = 'product/deleteFromCart/cart/';
+String deletefromCart2 = '/product/';
+String confirmeCart = 'confirmCart';

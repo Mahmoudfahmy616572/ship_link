@@ -3,11 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:motion_toast/motion_toast.dart';
 import 'package:ship_link/cubits/addToCart/add_to_cart_cubit.dart';
 
 import '../../../../shared/app_style.dart';
 
-class BuildButtonAddToCart extends StatelessWidget {
+class BuildButtonAddToCart extends StatefulWidget {
   BuildButtonAddToCart({
     super.key,
     required this.text,
@@ -16,8 +17,15 @@ class BuildButtonAddToCart extends StatelessWidget {
   });
   final String text;
   final String img;
-  bool isLoading = false;
   final int id;
+
+  @override
+  State<BuildButtonAddToCart> createState() => _BuildButtonAddToCartState();
+}
+
+class _BuildButtonAddToCartState extends State<BuildButtonAddToCart> {
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AddToCartCubit, AddToCartState>(
@@ -26,26 +34,10 @@ class BuildButtonAddToCart extends StatelessWidget {
           isLoading = true;
         } else if (state is AddToCartSuccess) {
           isLoading = false;
-          final snackBar = SnackBar(
-            duration: const Duration(milliseconds: 1000),
-            content: Text(state.success),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {},
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          displaySuccessMotionToast(state.success);
         } else if (state is AddToCartFailure) {
           isLoading = false;
-          final snackBar = SnackBar(
-            duration: const Duration(milliseconds: 1000),
-            content: Text(state.errMessage),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {},
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          displayErrorMotionToast(state.errMessage);
         }
       },
       builder: (context, state) => Row(
@@ -53,8 +45,8 @@ class BuildButtonAddToCart extends StatelessWidget {
         children: [
           InkWell(
             onTap: () {
-              print(id);
-              BlocProvider.of<AddToCartCubit>(context).addToCart(id: id);
+              print(widget.id);
+              BlocProvider.of<AddToCartCubit>(context).addToCart(id: widget.id);
             },
             child: Container(
                 width: MediaQuery.of(context).size.width * 0.76,
@@ -66,7 +58,7 @@ class BuildButtonAddToCart extends StatelessWidget {
                     ? const Center(child: CircularProgressIndicator())
                     : Center(
                         child: Text(
-                          text,
+                          widget.text,
                           style: appStyle(20, FontWeight.w700, Colors.white),
                         ),
                       )),
@@ -81,12 +73,41 @@ class BuildButtonAddToCart extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12)),
               child: Center(
                   child: SvgPicture.asset(
-                img,
+                widget.img,
               )),
             ),
           )
         ],
       ),
     );
+  }
+
+  displayErrorMotionToast(String err) {
+    MotionToast.error(
+      title: const Text(
+        'Error',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      description: Text(err),
+      position: MotionToastPosition.top,
+      barrierColor: Colors.black.withOpacity(0.3),
+      width: 300,
+      height: 80,
+      dismissable: false,
+    ).show(context);
+  }
+
+  displaySuccessMotionToast(String description) {
+    MotionToast toast = MotionToast.success(
+      description: Text(
+        description,
+        style: const TextStyle(fontSize: 12),
+      ),
+      dismissable: true,
+      opacity: .5,
+    );
+    toast.show(context);
   }
 }

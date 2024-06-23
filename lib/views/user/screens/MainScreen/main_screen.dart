@@ -1,7 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
 import 'package:ship_link/views/user/screens/Home/home_screen.dart';
 import 'package:ship_link/views/user/screens/Profile/profile.dart';
 import 'package:ship_link/views/user/screens/cart/cart.dart';
@@ -27,6 +29,9 @@ class _MainScreenState extends State<MainScreen> {
   void onButtonPressed(int index) {
     setState(() {
       selectedIndex = index;
+      if (index == 2) {
+        BlocProvider.of<GetFromCartCubit>(context).getProductFromCart();
+      }
     });
     _pageController.animateToPage(selectedIndex,
         duration: const Duration(milliseconds: 200), curve: Curves.easeOutQuad);

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/serveices_locators.dart';
 import 'package:ship_link/cubits/addToCart/add_to_cart_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
+import 'package:ship_link/cubits/confirmCart/confirm_cart_cubit.dart';
 import 'package:ship_link/cubits/getAllProducts/get_all_prouducts_cubit.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
@@ -37,6 +38,11 @@ class MyApp extends StatelessWidget {
           create: (context) => GetFromCartCubit(
             getIt.get<CartServeicesImpl>(),
           )..getProductFromCart(),
+        ),
+        BlocProvider(
+          create: (context) => ConfirmCartCubit(
+            getIt.get<CartServeicesImpl>(),
+          )..confirmCart(),
         ),
         BlocProvider(
           create: (context) => AuthCubit(),
