@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:ship_link/constant/serveices_locators.dart';
-import 'package:ship_link/cubits/addToCart/add_to_cart_cubit.dart';
-import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
 import 'package:ship_link/views/driver/screens/DriverHome/driver_home.dart';
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
 import 'package:ship_link/views/driver/screens/MainScreen/main_screen_driver.dart';
-import 'package:ship_link/views/driver/screens/notificationsScreen/notifications.dart';
+import 'package:ship_link/views/driver/screens/ordersScreen/ordersScreen.dart';
 import 'package:ship_link/views/user/screens/ForgotPassword/forgot_password.dart';
 import 'package:ship_link/views/user/screens/Home/home_screen.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/views/user/screens/Profile/profile.dart';
 import 'package:ship_link/views/user/screens/addShippingAddress/add_shipping_address.dart';
 import 'package:ship_link/views/user/screens/cart/cart.dart';
-import 'package:ship_link/views/user/screens/chat/chat_screen.dart';
 import 'package:ship_link/views/user/screens/checkOut/check_out.dart';
 import 'package:ship_link/views/user/screens/congrats/congrates.dart';
 import 'package:ship_link/views/user/screens/delivered/delivered.dart';
@@ -24,9 +18,9 @@ import 'package:ship_link/views/user/screens/otp/otp_screen.dart';
 import 'package:ship_link/views/user/screens/sign_in/sign_in_screen.dart';
 import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 
-import 'views/driver/screens/DriverRegister/driver.dart';
+import 'views/driver/screens/DriverRegister/driver_register.dart';
+import 'views/driver/screens/DriverSignIn/signin_driver.dart';
 import 'views/user/screens/addPaymentMethod/add_payment_method.dart';
-import 'views/user/screens/product/product_screen.dart';
 import 'views/user/screens/signup/register/Provider/provider.dart';
 import 'views/user/screens/signup/register/User/user.dart';
 import 'views/user/screens/signup/sign_up.dart';
@@ -53,9 +47,9 @@ final Map<String, WidgetBuilder> routes = {
   Profile.routName: (context) => const Profile(),
   DriverHome.routName: (context) => const DriverHome(),
   MainScreenDriver.routName: (context) => const MainScreenDriver(),
-  NotificationScreen.routName: (context) => const NotificationScreen(),
+  OrdersScreen.routName: (context) => const OrdersScreen(),
   DriverProfile.routName: (context) => const DriverProfile(),
-  Chat.routName: (context) => const Chat(),
+  SignInDriver.routName: (context) => const SignInDriver(),
 };
 
 final otpInputDecoration = InputDecoration(

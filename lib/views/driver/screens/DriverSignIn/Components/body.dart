@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ship_link/constant/constant.dart';
-import 'package:ship_link/views/shared/app_style.dart';
-import 'package:ship_link/views/shared/text_field.dart';
-import 'package:ship_link/views/user/screens/ForgotPassword/forgot_password.dart';
-import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
-import 'package:ship_link/views/user/screens/sign_in/components/signup_row.dart';
-import 'package:ship_link/views/user/screens/sign_in/components/top_screen_logo.dart';
+import 'package:ship_link/views/driver/screens/DriverSignIn/Components/divider_row.dart';
+import 'package:ship_link/views/driver/screens/DriverSignIn/Components/media_row.dart';
+import 'package:ship_link/views/driver/screens/DriverSignIn/Components/signup_row.dart';
+import 'package:ship_link/views/driver/screens/DriverSignIn/Components/top_screen_logo.dart';
 
+import '../../../../../constant/constant.dart';
 import '../../../../../cubits/auth/cubit/auth_cubit.dart';
 import '../../../../../cubits/auth/cubit/auth_stat.dart';
-import '../../../../shared/button_sign.dart';
+import '../../../../shared/app_style.dart';
 import '../../../../shared/snackBar/snack_bar.dart';
-import 'divider_row.dart';
-import 'media_row.dart';
+import '../../../../shared/text_field.dart';
+import '../../../../user/screens/ForgotPassword/forgot_password.dart';
+import '../../../../user/screens/addShippingAddress/components/build_button.dart';
+import '../../MainScreen/main_screen_driver.dart';
 
 class Body extends StatefulWidget {
   const Body({super.key});
@@ -33,15 +33,16 @@ class _BodyState extends State<Body> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) async {
         var cubit = AuthCubit.get(context);
-        if (state is SignInSuccess) {
+        if (state is SignInDriverSuccess) {
           if (token != '') {
-            Navigator.pushReplacementNamed(context, MainScreen.routName);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                MainScreenDriver.routName, (Route<dynamic> routes) => false);
             CustomSnackBar.displaySuccessMotionToast(
-                "${cubit.userSignIn.message}", context);
+                "${cubit.signInDriver.message}", context);
           }
-        } else if (state is SignInFaild) {
+        } else if (state is SignInDriverFaild) {
           CustomSnackBar.displayErrorMotionToast(
-              "${cubit.userSignIn.message}", context);
+              "${cubit.signInDriver.message}", context);
         }
       },
       builder: (context, state) {
@@ -89,7 +90,7 @@ class _BodyState extends State<Body> {
                                   ),
                                 ),
                                 const Text(
-                                  "welcome back we missed you",
+                                  "Are you Ready Captain",
                                   style: TextStyle(
                                       color:
                                           Color.fromARGB(255, 228, 226, 226)),
@@ -174,8 +175,10 @@ class _BodyState extends State<Body> {
                                 BuildButton(
                                   text: 'Sign In',
                                   color: Colors.white,
+                                  textStyle: appStyle(
+                                      17, FontWeight.w700, Colors.black),
                                   ontap: () {
-                                    cubit.signIN(
+                                    cubit.signINDriver(
                                         email: email.text,
                                         password: password.text);
                                   },

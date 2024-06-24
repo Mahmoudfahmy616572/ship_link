@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/user/screens/signup/sign_up.dart';
 
 import '../../../../shared/app_style.dart';
+import '../../DriverRegister/driver_register.dart';
 
 class SignUpRow extends StatelessWidget {
   const SignUpRow({
@@ -19,7 +19,7 @@ class SignUpRow extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, SignUp.routName);
+            Navigator.pushNamed(context, DriverRegister.routName);
           },
           child: Text(
             "SignUp ",

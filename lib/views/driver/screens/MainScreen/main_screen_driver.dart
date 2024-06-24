@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
-import 'package:ship_link/views/driver/screens/notificationsScreen/notifications.dart';
+import 'package:ship_link/views/driver/screens/ordersScreen/ordersScreen.dart';
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 
 import '../DriverHome/driver_home.dart';
@@ -59,8 +59,8 @@ class _MainScreenDriverState extends State<MainScreenDriver> {
               inactiveColor: Colors.white,
             ),
             BarItem(
-              icon: Ionicons.notifications,
-              title: 'Notifications',
+              icon: Icons.delivery_dining_outlined,
+              title: 'Orders',
               activeColor: Colors.blue,
               inactiveColor: Colors.white,
             ),
@@ -77,6 +77,6 @@ class _MainScreenDriverState extends State<MainScreenDriver> {
 
 List<Widget> _listOfWidget = <Widget>[
   const DriverHome(),
-  const NotificationScreen(),
+  const OrdersScreen(),
   const DriverProfile(),
 ];

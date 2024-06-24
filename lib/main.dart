@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/serveices_locators.dart';
+import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
 import 'package:ship_link/cubits/addToCart/add_to_cart_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/confirmCart/confirm_cart_cubit.dart';
 import 'package:ship_link/cubits/getAllProducts/get_all_prouducts_cubit.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
+import 'package:ship_link/data/services/DriverHomeServeices/driver_home_imp.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
 import 'package:ship_link/data/services/homeServeice/home_serveices_impl.dart';
 import 'package:ship_link/routs.dart';
@@ -24,6 +26,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => GetOrdersCubit(
+            getIt.get<DriverHomeServeicesImpl>(),
+          )..getOrder(),
+        ),
         BlocProvider(
           create: (context) => GetAllProuductsCubit(
             getIt.get<HomeServeicesImpl>(),

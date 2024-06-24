@@ -26,10 +26,10 @@ class ServerFailure extends Failure {
         return ServerFailure(
             "something error happen in connection , try again later!");
       case DioExceptionType.unknown:
-        if (dioError.message!.contains("SocketExeption")) {
-          return ServerFailure("not enternet connection");
-        }
-        return ServerFailure("Unexpected error ,pls try again later!");
+      if (dioError.message!.contains("SocketExeption")) {
+        return ServerFailure("not enternet connection");
+      }
+      return ServerFailure("Unexpected error ,pls try again later!");
       default:
         return ServerFailure("${dioError.message}");
     }

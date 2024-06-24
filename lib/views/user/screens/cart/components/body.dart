@@ -29,7 +29,7 @@ class Body extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(
-                    height: 500,
+                    height: MediaQuery.of(context).size.height * 0.5,
                     child: ListView.builder(
                       itemCount: state.getProductFromCart.details?.length ?? 0,
                       itemBuilder: (BuildContext context, int index) {

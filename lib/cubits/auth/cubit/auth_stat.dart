@@ -22,3 +22,17 @@ class SignOutLoading extends AuthState {}
 class SignOutSuccess extends AuthState {}
 
 class SignOutFaild extends AuthState {}
+
+// ==============signin Driver=================
+class SignInDriverLoading extends AuthState {}
+
+class SignInDriverSuccess extends AuthState {}
+
+class SignInDriverFaild extends AuthState {}
+// ============SignUP Driver==============
+
+class RegisterDriverLoading extends AuthState {}
+
+class RegisterDriversuccess extends AuthState {}
+
+class RegisterDriverfaild extends AuthState {}

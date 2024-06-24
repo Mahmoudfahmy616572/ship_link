@@ -9,6 +9,8 @@ SignIn userSignIn = SignIn();
 String register = 'auth/register';
 String singin = 'auth/login';
 String singout = 'auth/logout';
+String singinDriver = 'driver/login';
+String singupDriver = 'driver/register';
 
 //=========================Products end points=========================
 
@@ -18,3 +20,6 @@ String getfromCart = 'product/getFromCart';
 String deletefromCart1 = 'product/deleteFromCart/cart/';
 String deletefromCart2 = '/product/';
 String confirmeCart = 'confirmCart';
+
+//===============Driver end point==============
+String getOrderUrl = "driver/getOrders";

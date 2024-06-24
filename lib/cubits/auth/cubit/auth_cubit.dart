@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:ship_link/constant/constant.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/data/models/register/user_register.dart';
+import 'package:ship_link/data/models/signIn_Driver/signin_driver.dart';
+import 'package:ship_link/data/models/signUp_driver/signup_driver.dart';
 import 'package:ship_link/data/models/signout/sign_out.dart';
 import 'package:ship_link/data/models/singIn/sign_in.dart';
 
@@ -14,6 +16,8 @@ class AuthCubit extends Cubit<AuthState> {
   Register userRegister = Register();
   SignIn userSignIn = SignIn();
   SignOut userSignOut = SignOut();
+  SigninDriver signInDriver = SigninDriver();
+  SignUpDriver signupDriver = SignUpDriver();
 
   signUp({
     required String firstName,
@@ -103,6 +107,84 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       print(e);
       emit(SignOutFaild());
+    }
+  }
+
+//===========sign up Driver=========
+  signUpDriver({
+    required String name,
+    required String email,
+    required String password,
+    required String phoneNumber,
+    required String address,
+    required String gender,
+    required String code,
+    required String passwordConfirmation,
+    required String vehicleNumber,
+    required String stateId,
+  }) async {
+    try {
+      print('=================');
+      emit(RegisterDriverLoading());
+      final response = await http.post(Uri.parse('$baseurl$singupDriver'),
+          body: {
+            "name": name,
+            "email": email,
+            "phone_number": phoneNumber,
+            "password": password,
+            "password_confirmation": passwordConfirmation,
+            "address": address,
+            "gender": gender,
+            "code": code,
+            "vehicle_Number": vehicleNumber,
+            "state_id": stateId,
+          },
+          headers: header);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("================");
+        print(response.body);
+        var res = jsonDecode(response.body);
+        signupDriver = SignUpDriver.fromJson(res);
+        token = signupDriver.token ?? '';
+        print(token);
+        print(signupDriver.user!.id);
+        emit(RegisterDriversuccess());
+      } else {
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+      emit(RegisterDriverfaild());
+    }
+  }
+
+//============sign in Driver=========
+  signINDriver({
+    required String email,
+    required String password,
+  }) async {
+    emit(SignInDriverLoading());
+    try {
+      var response = await http.post(Uri.parse("$baseurl$singinDriver"),
+          body: {
+            "email": email,
+            "password": password,
+          },
+          headers: header);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        var res = jsonDecode(response.body);
+        signInDriver = SigninDriver.fromJson(res);
+        token = signInDriver.token ?? '';
+        print(token);
+        print(signInDriver.user!.id);
+        emit(SignInDriverSuccess());
+      } else {
+        emit(SignInDriverFaild());
+        print(response.body);
+      }
+    } catch (e) {
+      print(e);
+      emit(SignInDriverFaild());
     }
   }
 }

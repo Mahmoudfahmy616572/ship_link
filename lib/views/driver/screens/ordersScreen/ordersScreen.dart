@@ -5,15 +5,15 @@ import 'package:ship_link/views/shared/app_style.dart';
 import 'components/body.dart';
 import 'components/notified_bell.dart';
 
-class NotificationScreen extends StatefulWidget {
-  const NotificationScreen({super.key});
-  static String routName = '/NotificationScreen';
+class OrdersScreen extends StatefulWidget {
+  const OrdersScreen({super.key});
+  static String routName = '/OrdersScreen';
 
   @override
-  State<NotificationScreen> createState() => _NotificationScreenState();
+  State<OrdersScreen> createState() => _OrdersScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _OrdersScreenState extends State<OrdersScreen> {
   bool isNotified = true;
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: const Color(0xFFCDCDCD),
         centerTitle: true,
         title: Text(
-          "Notifications",
+          "Orders",
           style: appStyle(18, FontWeight.bold, const Color(0xFF303030)),
         ),
         actions: [

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
+import '../data/services/DriverHomeServeices/driver_home_imp.dart';
 import '../data/services/cartServeices/cart_serveicesimpl.dart';
 import '../data/services/homeServeice/home_serveices_impl.dart';
 import 'api_serveices.dart';
@@ -18,5 +19,13 @@ void setupServeiceLocator() {
     ),
   );
   getIt.registerSingleton<CartServeicesImpl>(
-      CartServeicesImpl(getIt.get<ApiServeices>()));
+    CartServeicesImpl(
+      getIt.get<ApiServeices>(),
+    ),
+  );
+  getIt.registerSingleton<DriverHomeServeicesImpl>(
+    DriverHomeServeicesImpl(
+      getIt.get<ApiServeices>(),
+    ),
+  );
 }
