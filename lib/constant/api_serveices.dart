@@ -16,28 +16,46 @@ class ApiServeices {
   Future<Map<String, dynamic>> postHttp(
       {required String endpoint,
       required Map<String, String> headers,
-      required int id}) async {
+      required int id,
+      Object? data,
+      Map<String, dynamic>? queryParameters}) async {
     var response = await _dio.post(
       "$_baseurl$endpoint",
       options: Options(headers: headers),
-      data: {"user_id": '2', "product_id": id.toString()},
+      queryParameters:queryParameters ,
+      data: data,
     );
     print(response.data);
     return response.data;
   }
 
-  Future<Map<String, dynamic>> postHttpCart(
-      {required String endpoint,
-      required Map<String, String> headers,
-      required int id}) async {
-    var response = await _dio.post(
-      "$_baseurl$endpoint",
-      options: Options(headers: headers),
-      data: {"user_id": '2', "cart_id": id.toString()},
-    );
-    print(response.data);
-    return response.data;
-  }
+  // Future<Map<String, dynamic>> postHttpCart(
+  //     {required String endpoint,
+  //     required Map<String, String> headers,
+  //     required int id}) async {
+  //   var response = await _dio.post(
+  //     "$_baseurl$endpoint",
+  //     options: Options(headers: headers),
+  //     data: {"user_id": '2', "cart_id": id.toString()},
+  //   );
+
+  //   print(response.data);
+  //   return response.data;
+  // }
+
+  // Future<Map<String, dynamic>> postHttpUpdate(
+  //     {required String endpoint,
+  //     required Map<String, String> headers,
+  //     required int id}) async {
+  //   var response = await _dio.post(
+  //     "$_baseurl$endpoint",
+  //     options: Options(headers: headers),
+  //     data: {"state_id": id.toString()},
+  //   );
+
+  //   print(response.data);
+  //   return response.data;
+  // }
 
   Future<Map<String, dynamic>> deleteHttp({
     required String endpoint,

@@ -1,8 +1,13 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
+import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
 
 import '../../../../shared/app_style.dart';
+import '../../../../shared/snackBar/snack_bar.dart';
 
 class OrdersCard extends StatelessWidget {
   OrdersCard({
@@ -12,6 +17,7 @@ class OrdersCard extends StatelessWidget {
     required this.name,
     required this.email,
     required this.phoneNumber,
+    required this.index,
   });
   final String status;
   final String totalPrice;
@@ -19,41 +25,19 @@ class OrdersCard extends StatelessWidget {
   final String email;
   final String phoneNumber;
   bool isChecked = false;
+  bool isLoading = false;
+  final int index;
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Container(
-        //   padding: EdgeInsets.symmetric(
-        //       horizontal: MediaQuery.of(context).size.width * 0.02,
-        //       vertical: MediaQuery.of(context).size.height * 0.01),
-        //   width: MediaQuery.of(context).size.width * 0.92,
-        //   height: 40,
-        //   decoration: const BoxDecoration(
-        //       color: Colors.black,
-        //       borderRadius: BorderRadius.only(
-        //           topLeft: Radius.circular(10), topRight: Radius.circular(10))),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //     children: [
-        //       Text(
-        //         status,
-        //         style: appStyle(15, FontWeight.normal, const Color(0xFFCDCDCD)),
-        //       ),
-        //       Text(
-        //         totalPrice,
-        //         style: appStyle(15, FontWeight.normal, const Color(0xFFCDCDCD)),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         Container(
           padding: EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.02,
               vertical: MediaQuery.of(context).size.height * 0.01),
           alignment: Alignment.center,
           width: MediaQuery.of(context).size.width * 0.92,
-          height: MediaQuery.of(context).size.height * 0.25,
+          height: MediaQuery.of(context).size.height * 0.32,
           decoration: const BoxDecoration(
               color: Color(0xFF545454),
               borderRadius: BorderRadius.only(
@@ -121,6 +105,85 @@ class OrdersCard extends StatelessWidget {
                 text: email,
                 color: Colors.black,
               ),
+              const SizedBox(
+                height: 20,
+              ),
+              BlocConsumer<AcceptOrderCubit, AcceptOrderState>(
+                listener: (context, state) {
+                  if (state is AcceptOrderSuccess) {
+                    BlocProvider.of<GetOrdersCubit>(context).getOrder();
+                    CustomSnackBar.displaySuccessMotionToast(
+                        state.acceptOrder.message ?? "", context);
+                    isLoading = false;
+                  } else if (state is AcceptOrderFailure) {
+                    if (state.errMessage ==
+                        'Selected order has been accepted') {
+                      BlocProvider.of<GetOrdersCubit>(context).getOrder();
+                      CustomSnackBar.displaySuccessMotionToast(
+                          "Selected order has been accepted", context);
+                    } else {
+                      CustomSnackBar.displayErrorMotionToast(
+                          state.errMessage, context);
+                    }
+
+                    isLoading = false;
+                  } else if (state is AcceptOrderLoading) {
+                    isLoading = true;
+                  }
+                },
+                builder: (context, state) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: ElevatedButton(
+                            style: const ButtonStyle(
+                                backgroundColor:
+                                    MaterialStatePropertyAll(Colors.red)),
+                            onPressed: () {},
+                            child: const Text(
+                              "Reject",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          )),
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: BlocBuilder<GetOrdersCubit, GetOrdersState>(
+                            builder: (context, state) {
+                              if (state is GetOrdersSuccess) {
+                                return ElevatedButton(
+                                  style: const ButtonStyle(
+                                      backgroundColor: MaterialStatePropertyAll(
+                                          Colors.green)),
+                                  onPressed: () {
+                                    BlocProvider.of<AcceptOrderCubit>(context)
+                                        .acceptOrders(
+                                            orderId: state.getOrder.data
+                                                ?.order?[index].id);
+                                  },
+                                  child: isLoading
+                                      ? const CircularProgressIndicator()
+                                      : const Text(
+                                          "Accept",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18),
+                                        ),
+                                );
+                              } else {
+                                return const Center(
+                                  child: CustomErrorWidget(
+                                      errMessage: "something Error"),
+                                );
+                              }
+                            },
+                          )),
+                    ],
+                  );
+                },
+              )
             ],
           ),
         ),

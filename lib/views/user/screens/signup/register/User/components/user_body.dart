@@ -6,6 +6,7 @@ import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 
+import '../../../../../../../constant/constant.dart';
 import '../../../../../../shared/app_style.dart';
 import '../../../../../../shared/text_field.dart';
 import '../../../../addShippingAddress/components/build_button.dart';
@@ -40,10 +41,16 @@ class _UserBodyState extends State<UserBody> {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         var cubit = AuthCubit.get(context);
-        if (cubit.userRegister.message == "User registered successfully") {
-          Navigator.pushReplacementNamed(context, MainScreen.routName);
-          CustomSnackBar.displaySuccessMotionToast(
-              "${cubit.userRegister.message}", context);
+        if (state is Registersuccess) {
+          if (token != '') {
+            Navigator.pushReplacementNamed(context, MainScreen.routName);
+            CustomSnackBar.displaySuccessMotionToast(
+                "${cubit.userRegister.message}", context);
+          }
+          if (state is Registerfaild) {
+            CustomSnackBar.displayErrorMotionToast(
+                "${cubit.userRegister.message}", context);
+          }
         } else {
           CustomSnackBar.displayErrorMotionToast("Something error", context);
         }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/cubitDriver/get_user_driver_data/get_userdriver_data_cubit.dart';
+import 'package:ship_link/views/driver/screens/DriverProfile/components/app_bar.dart';
+import 'package:ship_link/views/driver/screens/DriverProfile/components/content_user-info.dart';
 
 import '../../../../shared/app_style.dart';
-import 'app_bar.dart';
-import 'content_user-info.dart';
 
 List<String> listPersonalInfo = <String>[
   "Update Mobile No",
@@ -29,99 +32,120 @@ class _BodyState extends State<Body> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * 0.35,
-          decoration: const BoxDecoration(
-              color: Color(0xFF545454),
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(2),
-                  topRight: Radius.circular(2),
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30))),
-          child: Column(
+    return BlocBuilder<GetUserdriverDataCubit, GetUserdriverDataState>(
+      builder: (context, state) {
+        if (state is GetUserdriverDataLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (state is GetUserdriverDataFailure) {
+          return CustomErrorWidget(
+            errMessage: state.errMessage,
+          );
+        } else if (state is GetUserdriverDataSuccess) {
+          return Column(
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.04,
-              ),
-              const CustomAppBar(),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.01,
-              ),
-              const ContentUserInfo(),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.01,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-            child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.03,
-                    vertical: MediaQuery.of(context).size.width * 0.02),
-                width: MediaQuery.of(context).size.height * 0.9,
-                height: MediaQuery.of(context).size.height * 0.05,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.black),
-                child: dropDwonPesonalInfo(),
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.05,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.03,
-                    vertical: MediaQuery.of(context).size.width * 0.02),
-                width: MediaQuery.of(context).size.height * 0.9,
-                height: MediaQuery.of(context).size.height * 0.05,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.black),
-                child: dropDrivingInfo(),
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.05,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.03,
-                    vertical: MediaQuery.of(context).size.width * 0.02),
-                width: MediaQuery.of(context).size.height * 0.9,
-                height: MediaQuery.of(context).size.height * 0.05,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.black),
-                child: Row(
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.35,
+                decoration: const BoxDecoration(
+                    color: Color(0xFF545454),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(2),
+                        topRight: Radius.circular(2),
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30))),
+                child: Column(
                   children: [
-                    SvgPicture.asset("assets/icons/support.svg"),
                     SizedBox(
-                      width: 7,
+                      height: MediaQuery.of(context).size.height * 0.04,
                     ),
-                    Text(
-                      "Support and enquiry",
-                      style: appStyle(15, FontWeight.normal, Colors.white),
+                    const CustomAppBar(),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.01,
+                    ),
+                    ContentUserInfo(
+                      name: state.getuserDriverData.data?.name ?? "",
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.01,
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
-        ))
-      ],
+              Expanded(
+                  child: ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.03,
+                          vertical: MediaQuery.of(context).size.width * 0.02),
+                      width: MediaQuery.of(context).size.height * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black),
+                      child: dropDwonPesonalInfo(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.05,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.03,
+                          vertical: MediaQuery.of(context).size.width * 0.02),
+                      width: MediaQuery.of(context).size.height * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black),
+                      child: dropDrivingInfo(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.05,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.03,
+                          vertical: MediaQuery.of(context).size.width * 0.02),
+                      width: MediaQuery.of(context).size.height * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset("assets/icons/support.svg"),
+                          const SizedBox(
+                            width: 7,
+                          ),
+                          Text(
+                            "Support and enquiry",
+                            style:
+                                appStyle(15, FontWeight.normal, Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ))
+            ],
+          );
+        } else {
+          return const CustomErrorWidget(
+            errMessage: "someThing error please try again later",
+          );
+        }
+      },
     );
   }
 

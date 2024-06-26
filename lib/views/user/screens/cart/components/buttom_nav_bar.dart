@@ -97,7 +97,7 @@ class ButtomNavBar extends StatelessWidget {
                   builder: (context, state) {
                     if (state is GetFromCartSuccess) {
                       return CheckoutButton(
-                        text: 'Check Out',
+                        text: 'Submit Order',
                         id: state.getProductFromCart.cart?.id ?? 0,
                       );
                     } else if (state is GetFromCartLoading) {

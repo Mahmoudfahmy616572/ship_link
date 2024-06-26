@@ -36,3 +36,10 @@ class RegisterDriverLoading extends AuthState {}
 class RegisterDriversuccess extends AuthState {}
 
 class RegisterDriverfaild extends AuthState {}
+// ==============signOut=================
+
+class SignOutDriverLoading extends AuthState {}
+
+class SignOutDriverSuccess extends AuthState {}
+
+class SignOutDriverFaild extends AuthState {}

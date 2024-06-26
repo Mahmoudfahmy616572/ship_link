@@ -50,6 +50,7 @@ class CartServeicesImpl extends CartServeices {
             "Accept": "application/json",
             "Authorization": 'Bearer $token'
           },
+          data: {"user_id": '2', "product_id": id.toString()},
           id: id);
       print(data);
 
@@ -103,12 +104,13 @@ class CartServeicesImpl extends CartServeices {
   @override
   Future confirmCart({required int id}) async {
     try {
-      var data = await apiServeices.postHttpCart(
+      var data = await apiServeices.postHttp(
           endpoint: confirmeCart,
           headers: {
             "Accept": "application/json",
             "Authorization": 'Bearer $token'
           },
+          data: {"user_id": '2', "cart_id": id.toString()},
           id: id);
       print(data);
 

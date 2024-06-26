@@ -21,7 +21,6 @@ import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 import 'views/driver/screens/DriverRegister/driver_register.dart';
 import 'views/driver/screens/DriverSignIn/signin_driver.dart';
 import 'views/user/screens/addPaymentMethod/add_payment_method.dart';
-import 'views/user/screens/signup/register/Provider/provider.dart';
 import 'views/user/screens/signup/register/User/user.dart';
 import 'views/user/screens/signup/sign_up.dart';
 
@@ -39,7 +38,6 @@ final Map<String, WidgetBuilder> routes = {
   OtpScreen.routName: (context) => const OtpScreen(),
   SignIn.routName: (context) => const SignIn(),
   SignUp.routName: (context) => const SignUp(),
-  ProviderRegister.routName: (context) => const ProviderRegister(),
   UserRegister.routName: (context) => const UserRegister(),
   DriverRegister.routName: (context) => const DriverRegister(),
   AddShippingAddress.routName: (context) => const AddShippingAddress(),

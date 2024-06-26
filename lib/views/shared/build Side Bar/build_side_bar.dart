@@ -9,6 +9,7 @@ import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/build%20Side%20Bar/components/rive_utiles.dart';
 
 import '../../user/screens/sign_in/sign_in_screen.dart';
+import '../snackBar/snack_bar.dart';
 import 'components/rive_assets.dart';
 import 'components/side_menu_tile.dart';
 import 'components/top_logo.dart';
@@ -24,21 +25,7 @@ class _SideBarState extends State<SideBar> {
   RiveAsset selectedMenu = sideMenue.first;
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthCubit, AuthState>(
-      listener: (context, state) {
-        var cubit = AuthCubit.get(context);
-        if (cubit.userSignOut.message == "Unauthenticated") {
-          Navigator.pushReplacementNamed(context, SignIn.routName);
-          final snackBar = SnackBar(
-            content: Text('${cubit.userSignOut.message}'),
-            action: SnackBarAction(
-              label: 'Undo',
-              onPressed: () {},
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-      },
+    return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
         var cubit = AuthCubit.get(context);
         return Scaffold(
@@ -126,8 +113,12 @@ class _SideBarState extends State<SideBar> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                             ),
-                            onPressed: () {
-                              cubit.signOut();
+                            onPressed: () async {
+                              await cubit.signOut();
+                              CustomSnackBar.displaySuccessMotionToast(
+                                  "Logout Successfuly", context);
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context, SignIn.routName, (route) => false);
                             },
                             child: Text(
                               "Logout",

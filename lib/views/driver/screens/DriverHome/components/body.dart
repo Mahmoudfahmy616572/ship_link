@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 
 import 'cancel_btn.dart';
+import 'card_order_accepted.dart';
 import 'custom_btn.dart';
 import 'profile_info.dart';
 
@@ -47,6 +51,64 @@ class _BodyState extends State<Body> {
           children: [
             const ProfileInfo(),
             SizedBox(
+              height: mediaqueryConstantHeight * 0.03,
+            ), ///////////List to view accepted order/////////////////
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Accepted Orders',
+                    style: appStyle(20, FontWeight.normal, Colors.black)),
+                Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: mediaqueryConstantWidth * 0.037,
+                        vertical: mediaqueryConstantHeight * 0.02),
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade400,
+                        borderRadius: BorderRadiusDirectional.circular(10)),
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: BlocBuilder<GetAcceptedOrderCubit,
+                        GetAcceptedOrderState>(
+                      builder: (context, state) {
+                        if (state is GetAcceptedOrderLoading) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (state is GetAcceptedOrderSuccess) {
+                          return ListView.builder(
+                              itemCount:
+                                  state.getAcceptedOrder.data?.order?.length ??
+                                      0,
+                              itemBuilder: (context, index) {
+                                return AcceptedOrderCard(
+                                  status: state.getAcceptedOrder.data
+                                          ?.order?[index].status ??
+                                      "",
+                                  name: state.getAcceptedOrder.data
+                                          ?.order?[index].user?.firstName ??
+                                      "",
+                                  phoneNumber: state.getAcceptedOrder.data
+                                          ?.order?[index].user?.phoneNumber ??
+                                      "",
+                                  totalPrice:
+                                      '${state.getAcceptedOrder.data?.order?[index].totalPrice ?? ""}',
+                                  email: state.getAcceptedOrder.data
+                                          ?.order?[index].user?.email ??
+                                      "",
+                                );
+                              });
+                        } else if (state is GetAcceptedOrderFailure) {
+                          return CustomErrorWidget(
+                            errMessage: state.errMessage,
+                          );
+                        } else {
+                          return const CustomErrorWidget(
+                            errMessage: "something Error",
+                          );
+                        }
+                      },
+                    )),
+              ],
+            ),
+            SizedBox(
               height: mediaqueryConstantHeight * 0.04,
             ),
             Column(
@@ -71,26 +133,6 @@ class _BodyState extends State<Body> {
             ),
             SizedBox(
               height: mediaqueryConstantHeight * 0.04,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Request',
-                    style: appStyle(
-                        16, FontWeight.normal, const Color(0xFF6C6B6B))),
-                const SizedBox(
-                  height: 10,
-                ),
-                Container(
-                    padding: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.03,
-                        right: MediaQuery.of(context).size.width * 0.05),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9),
-                        color: Colors.black),
-                    child: dropdwonRequest()),
-              ],
             ),
             SizedBox(
               height: mediaqueryConstantHeight * 0.04,
@@ -182,6 +224,9 @@ class _BodyState extends State<Body> {
                 ),
               ],
             ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.1,
+            )
           ],
         ),
       ),

@@ -7,7 +7,6 @@ import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/data/models/register/user_register.dart';
 import 'package:ship_link/data/models/signIn_Driver/signin_driver.dart';
 import 'package:ship_link/data/models/signUp_driver/signup_driver.dart';
-import 'package:ship_link/data/models/signout/sign_out.dart';
 import 'package:ship_link/data/models/singIn/sign_in.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -15,7 +14,6 @@ class AuthCubit extends Cubit<AuthState> {
   static AuthCubit get(context) => BlocProvider.of<AuthCubit>(context);
   Register userRegister = Register();
   SignIn userSignIn = SignIn();
-  SignOut userSignOut = SignOut();
   SigninDriver signInDriver = SigninDriver();
   SignUpDriver signupDriver = SignUpDriver();
 
@@ -95,13 +93,17 @@ class AuthCubit extends Cubit<AuthState> {
 // ===========singOut============
   signOut() async {
     try {
-      emit(SignInLoading());
-      var response =
-          await http.delete(Uri.parse("$baseurl$singin"), headers: header);
+      emit(SignOutLoading());
+      var response = await http.delete(Uri.parse("$baseurl$singout"), headers: {
+        "Accept": "application/json",
+        "Authorization": 'Bearer $token'
+      });
       if (response.statusCode == 200 || response.statusCode == 201) {
         var res = jsonDecode(response.body);
-        userSignOut = SignOut.fromJson(res);
         print(response.body);
+        print(res.body);
+
+        Future.error("error: status code ${response.statusCode}");
         emit(SignOutSuccess());
       }
     } catch (e) {
@@ -185,6 +187,29 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       print(e);
       emit(SignInDriverFaild());
+    }
+  }
+//============sign in Driver=========
+
+  signOutDriver() async {
+    try {
+      emit(SignOutDriverLoading());
+      var response = await http.delete(Uri.parse("$baseurl$signoutDriver"),
+          headers: {
+            "Accept": "application/json",
+            "Authorization": 'Bearer $token'
+          });
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        var res = jsonDecode(response.body);
+        print(response.body);
+        print(res.body);
+
+        Future.error("error: status code ${response.statusCode}");
+        emit(SignOutDriverSuccess());
+      }
+    } catch (e) {
+      print(e);
+      emit(SignOutDriverFaild());
     }
   }
 }

@@ -7,7 +7,9 @@ import 'profile_image.dart';
 class ContentUserInfo extends StatelessWidget {
   const ContentUserInfo({
     super.key,
+    required this.name,
   });
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,7 @@ class ContentUserInfo extends StatelessWidget {
           height: MediaQuery.of(context).size.height * 0.02,
         ),
         Text(
-          "Name",
+          name,
           style: appStyle(17, FontWeight.w600, Colors.white),
         ),
         Row(

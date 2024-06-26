@@ -11,6 +11,7 @@ String singin = 'auth/login';
 String singout = 'auth/logout';
 String singinDriver = 'driver/login';
 String singupDriver = 'driver/register';
+String signoutDriver = 'auth/logout';
 
 //=========================Products end points=========================
 
@@ -23,3 +24,7 @@ String confirmeCart = 'confirmCart';
 
 //===============Driver end point==============
 String getOrderUrl = "driver/getOrders";
+String getuserDataUrl = "driver/userProfile";
+String updateUserDataUrl = 'driver/updateUser';
+String acceptOrder = 'driver/acceptOrder';
+String getAcceptedOrdersUrl = 'driver/getAccepted';

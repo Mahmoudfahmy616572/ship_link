@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/Errors/custom_error_widget.dart';
 import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
+import 'package:ship_link/data/models/get_order/get_order.dart';
 
 import 'order_card.dart';
 
@@ -19,18 +20,20 @@ class Body extends StatelessWidget {
         } else if (state is GetOrdersFailure) {
           return CustomErrorWidget(errMessage: state.errMessage);
         } else if (state is GetOrdersSuccess) {
+          List<Order>? order = state.getOrder.data?.order
+              ?.where((element) => element.status == "Pending")
+              .toList();
           return ListView.builder(
-            itemCount: state.getOrder.data?.order?.length ?? 0,
+            itemCount: order?.length ?? 0,
             itemBuilder: (BuildContext context, int index) {
               return OrdersCard(
-                totalPrice:
-                    "${state.getOrder.data?.order?[index].totalPrice ?? ""}",
-                status: state.getOrder.data?.order?[index].status ?? "",
+                totalPrice: "${order?[index].totalPrice ?? ""}",
+                status: order?[index].status ?? "",
                 name:
-                    "${state.getOrder.data?.order?[index].user?.firstName ?? ""}${state.getOrder.data?.order?[index].user?.lastName ?? ""}",
-                email: state.getOrder.data?.order?[index].user?.email ?? "",
-                phoneNumber:
-                    state.getOrder.data?.order?[index].user?.phoneNumber ?? "",
+                    "${order?[index].user?.firstName ?? ""}${state.getOrder.data?.order?[index].user?.lastName ?? ""}",
+                email: order?[index].user?.email ?? "",
+                phoneNumber: order?[index].user?.phoneNumber ?? "",
+                index: index,
               );
             },
           );
