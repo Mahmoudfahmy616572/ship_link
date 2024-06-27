@@ -55,7 +55,7 @@ class Body extends StatelessWidget {
                       },
                     ),
                   ),
-                  const ButtomNavBar()
+                  ButtomNavBar()
                 ],
               ),
             );

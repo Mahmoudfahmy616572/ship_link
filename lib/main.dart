@@ -10,6 +10,7 @@ import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/confirmCart/confirm_cart_cubit.dart';
 import 'package:ship_link/cubits/getAllProducts/get_all_prouducts_cubit.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
+import 'package:ship_link/cubits/payment/payment_cubit.dart';
 import 'package:ship_link/data/services/DriverHomeServeices/driver_home_imp.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
 import 'package:ship_link/data/services/homeServeice/home_serveices_impl.dart';
@@ -65,6 +66,11 @@ class MyApp extends StatelessWidget {
           create: (context) => AddToCartCubit(
             getIt.get<CartServeicesImpl>(),
           )..addToCart(),
+        ),
+        BlocProvider(
+          create: (context) => PaymentCubit(
+            getIt.get<CartServeicesImpl>(),
+          )..checkout(),
         ),
         BlocProvider(
           create: (context) => GetFromCartCubit(

@@ -7,10 +7,10 @@ import '../../../../shared/app_style.dart';
 import '../../../../shared/build_elevation_button.dart';
 
 class ButtomNavBar extends StatelessWidget {
-  const ButtomNavBar({
+  ButtomNavBar({
     super.key,
   });
-
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -18,7 +18,7 @@ class ButtomNavBar extends StatelessWidget {
       child: InkWell(
         onTap: () {},
         child: SizedBox(
-            height: 180,
+            height: 250,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -110,7 +110,44 @@ class ButtomNavBar extends StatelessWidget {
                       );
                     }
                   },
-                )
+                ),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // BlocConsumer<ConfirmCartCubit, ConfirmCartState>(
+                //   listener: (context, state) {
+                //     if (state is ConfirmCartLoading) {
+                //       isLoading = true;
+                //     } else if (state is ConfirmCartFailure) {
+                //       isLoading = false;
+                //       CustomSnackBar.displayErrorMotionToast(
+                //           state.errMessage, context);
+                //     } else if (state is ConfirmCartSuccess) {
+                //       isLoading = false;
+
+                //       CustomSnackBar.displaySuccessMotionToast(
+                //           state.confirmCart.success ?? "", context);
+                //     }
+                //   },
+                //   builder: (context, state) {
+                //     return ElevatedButton(
+                //       style: ElevatedButton.styleFrom(
+                //         foregroundColor: Colors.white,
+                //         backgroundColor: const Color(0xFF242424),
+                //         textStyle: appStyle(18, FontWeight.w500, Colors.black),
+                //         shape: const RoundedRectangleBorder(
+                //             borderRadius:
+                //                 BorderRadius.all(Radius.circular(10))),
+                //       ),
+                //       onPressed: () async {},
+                //       child: isLoading
+                //           ? const Center(child: CircularProgressIndicator())
+                //           : const Text(
+                //               "Check Out",
+                //             ),
+                //     );
+                //   },
+                // ),
               ],
             )),
       ),

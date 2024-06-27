@@ -4,6 +4,7 @@ import 'package:ship_link/views/driver/screens/DriverSignIn/Components/divider_r
 import 'package:ship_link/views/driver/screens/DriverSignIn/Components/media_row.dart';
 import 'package:ship_link/views/driver/screens/DriverSignIn/Components/signup_row.dart';
 import 'package:ship_link/views/driver/screens/DriverSignIn/Components/top_screen_logo.dart';
+import 'package:ship_link/views/shared/build_botton.dart';
 
 import '../../../../../constant/constant.dart';
 import '../../../../../cubits/auth/cubit/auth_cubit.dart';
@@ -12,7 +13,6 @@ import '../../../../shared/app_style.dart';
 import '../../../../shared/snackBar/snack_bar.dart';
 import '../../../../shared/text_field.dart';
 import '../../../../user/screens/ForgotPassword/forgot_password.dart';
-import '../../../../user/screens/addShippingAddress/components/build_button.dart';
 import '../../MainScreen/main_screen_driver.dart';
 
 class Body extends StatefulWidget {

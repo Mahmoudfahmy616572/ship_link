@@ -12,8 +12,8 @@ final class ConfirmCartInitial extends ConfirmCartState {}
 final class ConfirmCartLoading extends ConfirmCartState {}
 
 final class ConfirmCartSuccess extends ConfirmCartState {
-  final String success;
-  const ConfirmCartSuccess(this.success);
+  final ConfirmCart confirmCart;
+  const ConfirmCartSuccess(this.confirmCart);
 }
 
 final class ConfirmCartFailure extends ConfirmCartState {

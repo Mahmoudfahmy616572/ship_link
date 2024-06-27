@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/cubits/confirmCart/confirm_cart_cubit.dart';
 
+import '../../cubits/payment/payment_cubit.dart';
+import '../user/screens/checkOutPage/check_out.dart';
 import 'app_style.dart';
 import 'snackBar/snack_bar.dart';
 
@@ -13,11 +15,13 @@ class CheckoutButton extends StatelessWidget {
     required this.text,
     this.ontap,
     this.id,
+    this.totalPrice,
   });
   final String text;
   final void Function()? ontap;
   final int? id;
   bool isLoading = false;
+  final int? totalPrice;
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ConfirmCartCubit, ConfirmCartState>(
@@ -29,7 +33,11 @@ class CheckoutButton extends StatelessWidget {
           CustomSnackBar.displayErrorMotionToast(state.errMessage, context);
         } else if (state is ConfirmCartSuccess) {
           isLoading = false;
-          CustomSnackBar.displaySuccessMotionToast(state.success, context);
+          BlocProvider.of<PaymentCubit>(context)
+              .checkout(totlePrice: state.confirmCart.order?.totalPrice ?? 0);
+          Navigator.pushNamed(context, CheckOutPage.routName);
+          CustomSnackBar.displaySuccessMotionToast(
+              state.confirmCart.success ?? "", context);
         }
       },
       builder: (context, state) {
@@ -44,9 +52,10 @@ class CheckoutButton extends StatelessWidget {
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10))),
             ),
-            onPressed: () {
+            onPressed: () async {
               print(id);
-              BlocProvider.of<ConfirmCartCubit>(context).confirmCart(id: id);
+              await BlocProvider.of<ConfirmCartCubit>(context)
+                  .confirmCart(id: id);
             },
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())

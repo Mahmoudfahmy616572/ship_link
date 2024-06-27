@@ -16,13 +16,13 @@ class ApiServeices {
   Future<Map<String, dynamic>> postHttp(
       {required String endpoint,
       required Map<String, String> headers,
-      required int id,
+      int? id,
       Object? data,
       Map<String, dynamic>? queryParameters}) async {
     var response = await _dio.post(
       "$_baseurl$endpoint",
       options: Options(headers: headers),
-      queryParameters:queryParameters ,
+      queryParameters: queryParameters,
       data: data,
     );
     print(response.data);

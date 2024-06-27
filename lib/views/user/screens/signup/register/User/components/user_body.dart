@@ -5,11 +5,11 @@ import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
+import 'package:ship_link/views/shared/build_botton.dart';
 
 import '../../../../../../../constant/constant.dart';
 import '../../../../../../shared/app_style.dart';
 import '../../../../../../shared/text_field.dart';
-import '../../../../addShippingAddress/components/build_button.dart';
 import 'link_text.dart';
 import 'space.dart';
 import 'title_text_field.dart';

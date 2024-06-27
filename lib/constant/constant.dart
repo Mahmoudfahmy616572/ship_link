@@ -21,6 +21,7 @@ String getfromCart = 'product/getFromCart';
 String deletefromCart1 = 'product/deleteFromCart/cart/';
 String deletefromCart2 = '/product/';
 String confirmeCart = 'confirmCart';
+String paymentUrl = 'checkout';
 
 //===============Driver end point==============
 String getOrderUrl = "driver/getOrders";

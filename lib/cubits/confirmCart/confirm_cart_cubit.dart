@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:ship_link/data/models/confirmCart/confirmCart.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveices.dart';
 
 import '../getFromCart/get_from_cart_cubit.dart';
@@ -14,8 +15,12 @@ class ConfirmCartCubit extends Cubit<ConfirmCartState> {
     var result = await cartServeices.confirmCart(id: id ?? 0);
     result.fold(
       (failure) {
-        print(failure);
-        emit(ConfirmCartFailure(failure.errMessage));
+        print(failure.errMessage);
+        if (failure.errMessage == "Internal server error , try again later") {
+          emit(const ConfirmCartFailure('Order created successfully'));
+        } else {
+          emit(ConfirmCartFailure(failure.errMessage));
+        }
       },
       (success) {
         print(success);

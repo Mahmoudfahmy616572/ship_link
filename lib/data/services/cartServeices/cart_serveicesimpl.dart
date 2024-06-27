@@ -3,7 +3,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:ship_link/constant/Errors/failures.dart';
+import 'package:ship_link/data/models/confirmCart/confirmCart.dart';
 import 'package:ship_link/data/models/getFromCart/get_from_cart.dart';
+import 'package:ship_link/data/models/payment/payment.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveices.dart';
 
 import '../../../constant/api_serveices.dart';
@@ -102,7 +104,7 @@ class CartServeicesImpl extends CartServeices {
   }
 
   @override
-  Future confirmCart({required int id}) async {
+  Future<Either<Failure, ConfirmCart>> confirmCart({required int id}) async {
     try {
       var data = await apiServeices.postHttp(
           endpoint: confirmeCart,
@@ -113,8 +115,37 @@ class CartServeicesImpl extends CartServeices {
           data: {"user_id": '2', "cart_id": id.toString()},
           id: id);
       print(data);
+      print(id);
+      ConfirmCart confirmCart = ConfirmCart.fromJson(data);
 
-      return right(data["success"]);
+      return right(confirmCart);
+    } catch (e) {
+      if (e is DioError) {
+        return left(
+          ServerFailure.fromDioError(e),
+        );
+      }
+      return left(
+        ServerFailure(
+          e.toString(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, Payment>> checkOut({required int totalPrice}) async {
+    try {
+      var data = await apiServeices.postHttp(endpoint: paymentUrl, headers: {
+        "Accept": "application/json",
+        "Authorization": 'Bearer $token'
+      }, queryParameters: {
+        "total": totalPrice,
+      });
+
+      Payment payment = Payment.fromJson(data);
+
+      return right(payment);
     } catch (e) {
       if (e is DioError) {
         return left(

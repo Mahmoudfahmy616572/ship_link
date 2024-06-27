@@ -8,9 +8,9 @@ import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 
 import '../../../../constant/constant.dart';
 import '../../../shared/app_style.dart';
+import '../../../shared/build_botton.dart';
 import '../../../shared/snackBar/snack_bar.dart';
 import '../../../shared/text_field.dart';
-import '../../../user/screens/addShippingAddress/components/build_button.dart';
 import '../../../user/screens/signup/register/User/components/link_text.dart';
 import '../../../user/screens/signup/register/User/components/space.dart';
 import '../../../user/screens/signup/register/User/components/title_text_field.dart';
