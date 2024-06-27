@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/Errors/custom_error_widget.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
+import 'package:ship_link/views/user/screens/cart/components/custom_bottonCart.dart';
 
 import '../../../../shared/app_style.dart';
-import '../../../../shared/build_elevation_button.dart';
 
 class ButtomNavBar extends StatelessWidget {
   ButtomNavBar({
@@ -111,43 +111,6 @@ class ButtomNavBar extends StatelessWidget {
                     }
                   },
                 ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
-                // BlocConsumer<ConfirmCartCubit, ConfirmCartState>(
-                //   listener: (context, state) {
-                //     if (state is ConfirmCartLoading) {
-                //       isLoading = true;
-                //     } else if (state is ConfirmCartFailure) {
-                //       isLoading = false;
-                //       CustomSnackBar.displayErrorMotionToast(
-                //           state.errMessage, context);
-                //     } else if (state is ConfirmCartSuccess) {
-                //       isLoading = false;
-
-                //       CustomSnackBar.displaySuccessMotionToast(
-                //           state.confirmCart.success ?? "", context);
-                //     }
-                //   },
-                //   builder: (context, state) {
-                //     return ElevatedButton(
-                //       style: ElevatedButton.styleFrom(
-                //         foregroundColor: Colors.white,
-                //         backgroundColor: const Color(0xFF242424),
-                //         textStyle: appStyle(18, FontWeight.w500, Colors.black),
-                //         shape: const RoundedRectangleBorder(
-                //             borderRadius:
-                //                 BorderRadius.all(Radius.circular(10))),
-                //       ),
-                //       onPressed: () async {},
-                //       child: isLoading
-                //           ? const Center(child: CircularProgressIndicator())
-                //           : const Text(
-                //               "Check Out",
-                //             ),
-                //     );
-                //   },
-                // ),
               ],
             )),
       ),

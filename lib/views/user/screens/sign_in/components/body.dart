@@ -41,7 +41,7 @@ class _BodyState extends State<Body> {
           }
         } else if (state is SignInFaild) {
           CustomSnackBar.displayErrorMotionToast(
-              "${cubit.userSignIn.message}", context);
+              "Email or Password Incorrect", context);
         }
       },
       builder: (context, state) {

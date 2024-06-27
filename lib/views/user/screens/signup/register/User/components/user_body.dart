@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
+import 'package:ship_link/views/shared/build_botton.dart';
 import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
-import 'package:ship_link/views/shared/build_botton.dart';
 
 import '../../../../../../../constant/constant.dart';
 import '../../../../../../shared/app_style.dart';
@@ -49,7 +49,7 @@ class _UserBodyState extends State<UserBody> {
           }
           if (state is Registerfaild) {
             CustomSnackBar.displayErrorMotionToast(
-                "${cubit.userRegister.message}", context);
+                "Email or Password Incorrect", context);
           }
         } else {
           CustomSnackBar.displayErrorMotionToast("Something error", context);

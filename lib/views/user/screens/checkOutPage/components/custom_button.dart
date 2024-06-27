@@ -30,8 +30,6 @@ class _CustomButtonState extends State<CustomButton> {
         if (state is PaymentLoading) {
           isLoading = true;
         } else if (state is PaymentSuccess) {
-          CustomSnackBar.displaySuccessMotionToast(
-              state.payment.message ?? "", context);
           isLoading = false;
         } else if (state is PaymentFailure) {
           CustomSnackBar.displayErrorMotionToast(state.errMessage, context);
@@ -56,8 +54,8 @@ class _CustomButtonState extends State<CustomButton> {
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10))),
               ),
-              onPressed: () {
-                BlocProvider.of<PaymentCubit>(context)
+              onPressed: () async {
+                await BlocProvider.of<PaymentCubit>(context)
                     .checkout(totlePrice: widget.totalPrice);
                 Navigator.push(
                   context,
@@ -65,6 +63,8 @@ class _CustomButtonState extends State<CustomButton> {
                       builder: (context) =>
                           WebPage(url: state.payment.url ?? "")),
                 );
+                CustomSnackBar.displaySuccessMotionToast(
+                    state.payment.message ?? "", context);
               },
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -73,6 +73,12 @@ class _CustomButtonState extends State<CustomButton> {
                     ),
             ),
           );
+        } else if (state is PaymentLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (state is PaymentFailure) {
+          return CustomErrorWidget(errMessage: state.errMessage);
         } else {
           return SizedBox(
             width: MediaQuery.of(context).size.width * 0.9,

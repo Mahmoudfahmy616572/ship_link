@@ -54,7 +54,7 @@ class _DriverBodyState extends State<DriverBody> {
           }
         } else if (state is RegisterDriverfaild) {
           CustomSnackBar.displayErrorMotionToast(
-              "${cubit.signupDriver.message}", context);
+              "something error , Please try again later", context);
         }
       },
       builder: (context, state) {

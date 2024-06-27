@@ -42,7 +42,7 @@ class _BodyState extends State<Body> {
           }
         } else if (state is SignInDriverFaild) {
           CustomSnackBar.displayErrorMotionToast(
-              "${cubit.signInDriver.message}", context);
+              "Email or Password  Incorrect", context);
         }
       },
       builder: (context, state) {
