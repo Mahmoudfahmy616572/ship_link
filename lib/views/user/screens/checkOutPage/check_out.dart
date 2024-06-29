@@ -41,7 +41,7 @@ class CheckOutPage extends StatelessWidget {
                             RowPrice(
                               text: "Order Subtotal:",
                               price:
-                                  "£ ${state.confirmCart.order?.totalPrice ?? 0}",
+                                  "£ ${state.confirmCart.order?.totalPrice ?? 0}.00",
                             ),
                             const RowPrice(
                               text: "Discount:",
@@ -50,7 +50,7 @@ class CheckOutPage extends StatelessWidget {
                             RowPrice(
                               text: "Total:",
                               price:
-                                  "£ ${state.confirmCart.order?.totalPrice ?? 0}",
+                                  "£ ${state.confirmCart.order?.totalPrice ?? 0}.00",
                             ),
                           ],
                         ),

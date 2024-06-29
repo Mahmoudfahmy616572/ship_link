@@ -99,9 +99,10 @@ class ButtomNavBar extends StatelessWidget {
                       return CheckoutButton(
                         text: 'Submit Order',
                         id: state.getProductFromCart.cart?.id ?? 0,
+                        userId: state.getProductFromCart.cart?.userId ?? 0,
                       );
                     } else if (state is GetFromCartLoading) {
-                      return const Text(".....");
+                      return const CircularProgressIndicator();
                     } else if (state is GetFromCartFailure) {
                       return Text(state.errMessage);
                     } else {

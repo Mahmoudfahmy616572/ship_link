@@ -82,7 +82,14 @@ class _ProductScreenState extends State<ProductScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${state.products.products?.products?[widget.index].price ?? 4}",
+                            "\$${state.products.products?.products?[widget.index].price ?? 4}",
+                            style: appStyle(22, FontWeight.w600, Colors.black),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            "${state.products.products?.products?[widget.index].description ?? 4}",
                             style: appStyle(22, FontWeight.w600, Colors.black),
                           ),
                           const SizedBox(

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'category_container.dart';
-import 'star_category_container.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/cubits/getTopSeller/get_top_seller_cubit.dart';
+import 'package:ship_link/views/user/screens/Home/components/category_container.dart';
 
 class BuildCategoryMainRow extends StatelessWidget {
   const BuildCategoryMainRow({
@@ -10,34 +11,35 @@ class BuildCategoryMainRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: EdgeInsets.only(left: 20),
-        child: Row(
-          children: [
-            BuildStarCategory(),
-            BuildCategoryContainer(
-              img: "assets/images/category1.png",
-            ),
-            BuildCategoryContainer(
-              img: "assets/images/category2.png",
-            ),
-            BuildCategoryContainer(
-              img: "assets/images/category3.png",
-            ),
-            BuildCategoryContainer(
-              img: "assets/images/category4.png",
-            ),
-            BuildCategoryContainer(
-              img: "assets/images/category5.png",
-            ),
-            BuildCategoryContainer(
-              img: "assets/images/category6.png",
-            ),
-          ],
-        ),
-      ),
-    );
+    return Padding(
+        padding: const EdgeInsets.only(left: 20),
+        child: BlocBuilder<GetTopSellerCubit, GetTopSellerState>(
+          builder: (context, state) {
+            if (state is GetTopSellerLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is GetTopSellerSuccess) {
+              return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: state.getTopSeller.topSellers?.length,
+                  itemBuilder: ((context, index) {
+                    return SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: BuildCategoryContainer(
+                          img:
+                              state.getTopSeller.topSellers?[index].image ?? "",
+                        ));
+                  }));
+            } else if (state is GetTopSellerFailure) {
+              return CustomErrorWidget(
+                errMessage: state.errMessage,
+              );
+            } else {
+              return const CustomErrorWidget(errMessage: "Error");
+            }
+          },
+        ));
   }
 }

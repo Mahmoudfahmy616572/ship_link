@@ -35,6 +35,7 @@ class BuildGridView extends StatelessWidget {
                   price: state.products.products?.products![index].price,
                   name: state.products.products?.products![index].name,
                   index: index,
+                  
                 ),
               ),
             ),

@@ -10,9 +10,10 @@ part 'confirm_cart_state.dart';
 class ConfirmCartCubit extends Cubit<ConfirmCartState> {
   ConfirmCartCubit(this.cartServeices) : super(ConfirmCartInitial());
   CartServeices cartServeices;
-  Future<void> confirmCart({int? id}) async {
+  Future<void> confirmCart({int? id, int? userId}) async {
     emit(ConfirmCartLoading());
-    var result = await cartServeices.confirmCart(id: id ?? 0);
+    var result =
+        await cartServeices.confirmCart(id: id ?? 0, userId: userId ?? 0);
     result.fold(
       (failure) {
         print(failure.errMessage);

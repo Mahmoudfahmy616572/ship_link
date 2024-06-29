@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/serveices_locators.dart';
 import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
 import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
+import 'package:ship_link/cubitDriver/getStates/get_states_cubit.dart';
 import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
 import 'package:ship_link/cubitDriver/get_user_driver_data/get_userdriver_data_cubit.dart';
 import 'package:ship_link/cubits/addToCart/add_to_cart_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/confirmCart/confirm_cart_cubit.dart';
 import 'package:ship_link/cubits/getAllProducts/get_all_prouducts_cubit.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
+import 'package:ship_link/cubits/getTopSeller/get_top_seller_cubit.dart';
 import 'package:ship_link/cubits/payment/payment_cubit.dart';
 import 'package:ship_link/data/services/DriverHomeServeices/driver_home_imp.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
@@ -58,9 +60,19 @@ class MyApp extends StatelessWidget {
           )..getAcceptedOrder(),
         ),
         BlocProvider(
+          create: (context) => GetStatesCubit(
+            getIt.get<DriverHomeServeicesImpl>(),
+          )..getStates(),
+        ),
+        BlocProvider(
           create: (context) => GetAllProuductsCubit(
             getIt.get<HomeServeicesImpl>(),
           )..getAllproducts(),
+        ),
+        BlocProvider(
+          create: (context) => GetTopSellerCubit(
+            getIt.get<HomeServeicesImpl>(),
+          )..getTopSellerProducts(),
         ),
         BlocProvider(
           create: (context) => AddToCartCubit(

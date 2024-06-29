@@ -23,34 +23,46 @@ class ProfileInfo extends StatelessWidget {
             errMessage: state.errMessage,
           );
         } else if (state is GetUserdriverDataSuccess) {
-          return Row(
-            children: [
-              const CircleAvatar(
-                backgroundImage: AssetImage("assets/images/mahmoud.jpg"),
-                radius: 45,
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    state.getuserDriverData.data?.email ?? "",
-                    style: appStyle(
-                      16,
-                      FontWeight.bold,
-                      const Color(0xFF000000),
-                    ),
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  backgroundImage: AssetImage("assets/images/mahmoud.jpg"),
+                  radius: 45,
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          state.getuserDriverData.data?.email ?? "",
+                          style: appStyle(
+                            16,
+                            FontWeight.bold,
+                            const Color(0xFF000000),
+                          ),
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Text(
+                          'Phone Number : +2${state.getuserDriverData.data?.phoneNumber ?? "0**********"}',
+                          style: appStyle(
+                              16, FontWeight.normal, const Color(0xFF000000)),
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Phone Number : +2${state.getuserDriverData.data?.phoneNumber ?? "0**********"}',
-                    style: appStyle(
-                        16, FontWeight.normal, const Color(0xFF000000)),
-                  ),
-                ],
-              )
-            ],
+                )
+              ],
+            ),
           );
         } else {
           return const CustomErrorWidget(

@@ -10,7 +10,8 @@ import '../../models/payment/payment.dart';
 abstract class CartServeices {
   Future<Either<Failure, GetFromCart>> getFromCart();
   Future addToCart({required int id});
-  Future<Either<Failure, ConfirmCart>> confirmCart({required int id});
+  Future<Either<Failure, ConfirmCart>> confirmCart(
+      {required int id, required int userId});
   Future deletefromCart({required int cart_id, required int product_id});
   Future<Either<Failure, Payment>> checkOut({required int totalPrice});
 }

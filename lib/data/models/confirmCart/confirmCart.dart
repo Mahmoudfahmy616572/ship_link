@@ -33,6 +33,7 @@ class Order {
   int? userId;
   String? cartId;
   int? totalPrice;
+  String? orderCode;
   String? status;
   DateTime? updatedAt;
   DateTime? createdAt;
@@ -42,6 +43,7 @@ class Order {
     this.userId,
     this.cartId,
     this.totalPrice,
+    this.orderCode,
     this.status,
     this.updatedAt,
     this.createdAt,
@@ -52,6 +54,7 @@ class Order {
         userId: json["user_id"],
         cartId: json["cart_id"],
         totalPrice: json["total_price"],
+        orderCode: json["order_code"],
         status: json["status"],
         updatedAt: json["updated_at"] == null
             ? null
@@ -66,6 +69,7 @@ class Order {
         "user_id": userId,
         "cart_id": cartId,
         "total_price": totalPrice,
+        "order_code": orderCode,
         "status": status,
         "updated_at": updatedAt?.toIso8601String(),
         "created_at": createdAt?.toIso8601String(),

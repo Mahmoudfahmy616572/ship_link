@@ -16,10 +16,12 @@ class CheckoutButton extends StatelessWidget {
     this.ontap,
     this.id,
     this.totalPrice,
+    this.userId,
   });
   final String text;
   final void Function()? ontap;
   final int? id;
+  final int? userId;
   bool isLoading = false;
   final int? totalPrice;
   @override
@@ -55,7 +57,7 @@ class CheckoutButton extends StatelessWidget {
             onPressed: () async {
               print(id);
               await BlocProvider.of<ConfirmCartCubit>(context)
-                  .confirmCart(id: id);
+                  .confirmCart(id: id, userId: userId);
             },
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())

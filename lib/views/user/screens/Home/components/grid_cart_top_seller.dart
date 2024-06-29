@@ -18,7 +18,7 @@ class DesignGridCard extends StatelessWidget {
     this.description,
   });
   final String? imageurl;
-  final double? price;
+  final int? price;
   final String? name;
   final int index;
   final String? description;

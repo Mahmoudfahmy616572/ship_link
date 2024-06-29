@@ -6,6 +6,7 @@ import 'package:ship_link/constant/Errors/failures.dart';
 import 'package:ship_link/constant/api_serveices.dart';
 import 'package:ship_link/data/models/acceptOrder/accept_order.dart';
 import 'package:ship_link/data/models/getAcceptedOrders/get_accepted_orders.dart';
+import 'package:ship_link/data/models/getStates/get_states.dart';
 import 'package:ship_link/data/models/getUserDriverData/get_user_driver_data.dart';
 import 'package:ship_link/data/models/get_order/get_order.dart';
 import 'package:ship_link/data/models/update_user_data/up_user_data.dart';
@@ -143,6 +144,32 @@ class DriverHomeServeicesImpl extends DriverHomeServeices {
       GetAcceptOrder getAcceptedOrder = GetAcceptOrder.fromJson(data);
 
       return right(getAcceptedOrder);
+    } catch (e) {
+      if (e is DioError) {
+        return left(
+          ServerFailure.fromDioError(e),
+        );
+      }
+      return left(
+        ServerFailure(
+          e.toString(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, GetStates>> getStates(
+      {required String selectedState}) async {
+    try {
+      var data = await apiServeices.getHttp(endpoint: getStatesUrl, headers: {
+        "Accept": "application/json",
+        "Authorization": 'Bearer $token'
+      });
+
+      GetStates getStates = GetStates.fromJson(data);
+
+      return right(getStates);
     } catch (e) {
       if (e is DioError) {
         return left(

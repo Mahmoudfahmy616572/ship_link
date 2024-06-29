@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:ship_link/views/user/screens/Home/components/favourite_brands.dart';
 import 'package:ship_link/views/user/screens/Home/components/text_field.dart';
+import 'package:ship_link/views/user/screens/Home/components/top_seller_screen.dart';
 
 import '../../../../shared/app_style.dart';
 import 'gridle_view.dart';
@@ -27,10 +28,7 @@ class Body extends StatelessWidget {
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.11,
             ),
-
-            // const LogoAndIconTopScreen(),
             const BuildTextFeild(),
-
             Expanded(
                 child: ListView.builder(
                     itemCount: 1,
@@ -66,19 +64,39 @@ class Body extends StatelessWidget {
                             ProductTextTitle(
                               textStyle:
                                   appStyle(20, FontWeight.w700, Colors.black),
-                              text: 'Category',
+                              text: 'Top Seller Products',
                             ),
                             const SizedBox(
                               height: 15,
                             ),
-                            const BuildCategoryMainRow(),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.15,
+                                width: MediaQuery.of(context).size.width,
+                                child: const BuildCategoryMainRow()),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                          context, TopSellerScreen.routName);
+                                    },
+                                    child: Text(
+                                      "Top Seller Products",
+                                      style: appStyle(
+                                          16, FontWeight.normal, Colors.black),
+                                    )),
+                                const Icon(Icons.arrow_forward_ios)
+                              ],
+                            ),
                             const SizedBox(
                               height: 15,
                             ),
                             ProductTextTitle(
                               textStyle:
                                   appStyle(24, FontWeight.w800, Colors.white),
-                              text: "Popular Products",
+                              text: "All Products",
                             ),
                             const SizedBox(
                               height: 15,

@@ -22,9 +22,11 @@ String deletefromCart1 = 'product/deleteFromCart/cart/';
 String deletefromCart2 = '/product/';
 String confirmeCart = 'confirmCart';
 String paymentUrl = 'checkout';
+String getTopSellerUrl = 'topSellers';
 
 //===============Driver end point==============
 String getOrderUrl = "driver/getOrders";
+String getStatesUrl = "getStats";
 String getuserDataUrl = "driver/userProfile";
 String updateUserDataUrl = 'driver/updateUser';
 String acceptOrder = 'driver/acceptOrder';
