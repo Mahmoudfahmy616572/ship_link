@@ -86,7 +86,7 @@ class Body extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => const MapWebViewScreen(
-                          url: "https://shiplink.spider-te8S.com/search",
+                          url: "https://shiplink.spider-te8.com/search",
                         )));
           },
         ),
