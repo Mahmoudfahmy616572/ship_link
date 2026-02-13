@@ -7,7 +7,7 @@
 *   **📍 Real-Time Driver Tracking:** Integrated **Google Maps API** to provide live GPS tracking. Users can visualize the driver's movement on an interactive map with custom markers and dynamic polyline routes.
 *   **💳 Integrated Payment Gateway:** Secure checkout experience supporting multiple payment methods (Credit Cards, Digital Wallets) through professional API integration.
 *   **🛰️ Advanced Networking:** Built with **Dio** to handle complex REST API communication with the Laravel backend, featuring custom interceptors for auth tokens.
-*   **⚡ Reactive State Management:** Utilizes **Provider** to ensure the UI stays in sync with shipment status updates without performance lag.
+*   **⚡ Reactive State Management:** Utilizes **BLoc/Cubit** to ensure the UI stays in sync with shipment status updates without performance lag.
 
 ## 🛠️ Tech Stack (Mobile Focused)
 
