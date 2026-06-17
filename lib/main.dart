@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:ship_link/constant/serveices_locators.dart';
 import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
 import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
@@ -16,12 +18,17 @@ import 'package:ship_link/cubits/payment/payment_cubit.dart';
 import 'package:ship_link/data/services/DriverHomeServeices/driver_home_imp.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
 import 'package:ship_link/data/services/homeServeice/home_serveices_impl.dart';
+import 'package:ship_link/localization.dart';
+import 'package:ship_link/providers.dart';
 import 'package:ship_link/routs.dart';
+import 'package:ship_link/services/supabase_service.dart';
 import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 
 import 'cubitDriver/upDateUserData/up_date_user_data_cubit.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseService().initialize();
   setupServeiceLocator();
   runApp(const MyApp());
 }
@@ -29,83 +36,110 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiProvider(
       providers: [
-        BlocProvider(
-          create: (context) => GetOrdersCubit(
-            getIt.get<DriverHomeServeicesImpl>(),
-          )..getOrder(),
-        ),
-        BlocProvider(
-          create: (context) => GetUserdriverDataCubit(
-            getIt.get<DriverHomeServeicesImpl>(),
-          )..getuserDriverData(),
-        ),
-        BlocProvider(
-          create: (context) => UpDateUserDataCubit(
-            getIt.get<DriverHomeServeicesImpl>(),
-          )..updateUserData(),
-        ),
-        BlocProvider(
-          create: (context) => AcceptOrderCubit(
-            getIt.get<DriverHomeServeicesImpl>(),
-          )..acceptOrders(),
-        ),
-        BlocProvider(
-          create: (context) => GetAcceptedOrderCubit(
-            getIt.get<DriverHomeServeicesImpl>(),
-          )..getAcceptedOrder(),
-        ),
-        BlocProvider(
-          create: (context) => GetStatesCubit(
-            getIt.get<DriverHomeServeicesImpl>(),
-          )..getStates(),
-        ),
-        BlocProvider(
-          create: (context) => GetAllProuductsCubit(
-            getIt.get<HomeServeicesImpl>(),
-          )..getAllproducts(),
-        ),
-        BlocProvider(
-          create: (context) => GetTopSellerCubit(
-            getIt.get<HomeServeicesImpl>(),
-          )..getTopSellerProducts(),
-        ),
-        BlocProvider(
-          create: (context) => AddToCartCubit(
-            getIt.get<CartServeicesImpl>(),
-          )..addToCart(),
-        ),
-        BlocProvider(
-          create: (context) => PaymentCubit(
-            getIt.get<CartServeicesImpl>(),
-          )..checkout(),
-        ),
-        BlocProvider(
-          create: (context) => GetFromCartCubit(
-            getIt.get<CartServeicesImpl>(),
-          )..getProductFromCart(),
-        ),
-        BlocProvider(
-          create: (context) => ConfirmCartCubit(
-            getIt.get<CartServeicesImpl>(),
-          )..confirmCart(),
-        ),
-        BlocProvider(
-          create: (context) => AuthCubit(),
-        ),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: MaterialApp(
-        routes: routes,
-        initialRoute: Splash.routName,
-
-        debugShowCheckedModeBanner: false,
-        // themeMode: ThemeMode.system,
-        // darkTheme: ThemeData.dark(),
-        // theme: TAppTheme.lightMode,
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, _) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => GetOrdersCubit(
+                  getIt.get<DriverHomeServeicesImpl>(),
+                )..getOrder(),
+              ),
+              BlocProvider(
+                create: (context) => GetUserdriverDataCubit(
+                  getIt.get<DriverHomeServeicesImpl>(),
+                )..getuserDriverData(),
+              ),
+              BlocProvider(
+                create: (context) => UpDateUserDataCubit(
+                  getIt.get<DriverHomeServeicesImpl>(),
+                )..updateUserData(),
+              ),
+              BlocProvider(
+                create: (context) => AcceptOrderCubit(
+                  getIt.get<DriverHomeServeicesImpl>(),
+                )..acceptOrders(),
+              ),
+              BlocProvider(
+                create: (context) => GetAcceptedOrderCubit(
+                  getIt.get<DriverHomeServeicesImpl>(),
+                )..getAcceptedOrder(),
+              ),
+              BlocProvider(
+                create: (context) => GetStatesCubit(
+                  getIt.get<DriverHomeServeicesImpl>(),
+                )..getStates(),
+              ),
+              BlocProvider(
+                create: (context) => GetAllProuductsCubit(
+                  getIt.get<HomeServeicesImpl>(),
+                )..getAllproducts(),
+              ),
+              BlocProvider(
+                create: (context) => GetTopSellerCubit(
+                  getIt.get<HomeServeicesImpl>(),
+                )..getTopSellerProducts(),
+              ),
+              BlocProvider(
+                create: (context) => AddToCartCubit(
+                  getIt.get<CartServeicesImpl>(),
+                )..addToCart(),
+              ),
+              BlocProvider(
+                create: (context) => PaymentCubit(
+                  getIt.get<CartServeicesImpl>(),
+                )..checkout(),
+              ),
+              BlocProvider(
+                create: (context) => GetFromCartCubit(
+                  getIt.get<CartServeicesImpl>(),
+                )..getProductFromCart(),
+              ),
+              BlocProvider(
+                create: (context) => ConfirmCartCubit(
+                  getIt.get<CartServeicesImpl>(),
+                )..confirmCart(),
+              ),
+              BlocProvider(
+                create: (context) => AuthCubit(),
+              ),
+            ],
+            child: MaterialApp(
+              title: 'ShipLink',
+              routes: routes,
+              initialRoute: Splash.routName,
+              debugShowCheckedModeBanner: false,
+              themeMode: themeProvider.themeMode,
+              theme: ThemeData(
+                brightness: Brightness.light,
+                colorSchemeSeed: const Color(0xFF242424),
+                useMaterial3: true,
+              ),
+              darkTheme: ThemeData(
+                brightness: Brightness.dark,
+                colorSchemeSeed: const Color(0xFF242424),
+                useMaterial3: true,
+              ),
+              locale: localeProvider.locale,
+              localizationsDelegates: [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('ar'),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

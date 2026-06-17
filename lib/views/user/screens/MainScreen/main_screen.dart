@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
 import 'package:ship_link/views/user/screens/Home/home_screen.dart';
 import 'package:ship_link/views/user/screens/Profile/profile.dart';
@@ -58,25 +57,25 @@ class _MainScreenState extends State<MainScreen> {
           selectedIndex: selectedIndex,
           barItems: <BarItem>[
             BarItem(
-              icon: Ionicons.home,
+              icon: Icons.home,
               title: 'Home',
               activeColor: Colors.blue,
               inactiveColor: Colors.white,
             ),
             BarItem(
-              icon: Ionicons.search,
+              icon: Icons.search,
               title: 'Search',
               activeColor: Colors.blue,
               inactiveColor: Colors.white,
             ),
             BarItem(
-              icon: Ionicons.cart_sharp,
+              icon: Icons.shopping_cart,
               title: 'cart',
               activeColor: Colors.blue,
               inactiveColor: Colors.white,
             ),
             BarItem(
-              icon: Ionicons.person,
+              icon: Icons.person,
               title: 'Profile',
               activeColor: Colors.blue,
               inactiveColor: Colors.white,

@@ -91,7 +91,7 @@ class _BuildButtonAddToCartState extends State<BuildButtonAddToCart> {
         ),
       ),
       description: Text(err),
-      position: MotionToastPosition.top,
+      toastAlignment: Alignment.topCenter,
       barrierColor: Colors.black.withOpacity(0.3),
       width: 300,
       height: 80,

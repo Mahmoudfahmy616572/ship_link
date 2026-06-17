@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 
 import 'components/body.dart';
@@ -35,7 +34,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               : const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Icon(
-                    Ionicons.notifications_outline,
+                    Icons.notifications_outlined,
                     size: 30,
                     color: Color(0xFF303030),
                   ),

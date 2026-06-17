@@ -188,16 +188,19 @@ class Theme extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      SvgPicture.asset("assets/icons/Theme.svg"),
-      const SizedBox(
-        width: 10,
-      ),
-      Text(
-        "Theme",
-        style: appStyle(15, FontWeight.w600, Colors.white),
-      )
-    ]);
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, '/settings'),
+      child: Row(children: [
+        SvgPicture.asset("assets/icons/Theme.svg"),
+        const SizedBox(
+          width: 10,
+        ),
+        Text(
+          "Theme & Language",
+          style: appStyle(15, FontWeight.w600, Colors.white),
+        )
+      ]),
+    );
   }
 }
 

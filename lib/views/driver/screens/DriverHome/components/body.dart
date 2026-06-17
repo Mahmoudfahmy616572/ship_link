@@ -44,16 +44,13 @@ class _BodyState extends State<Body> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ElevatedButton(
+                ElevatedButton.icon(
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const WebLocation(
-                                  url:
-                                      "https://shiplink.spider-te8.com/Driver/Delveiry")));
+                      Navigator.pushNamed(
+                          context, '/liveTracking');
                     },
-                    child: const Text("Select Your Location")),
+                    icon: const Icon(Icons.map),
+                    label: const Text("Live Tracking (Google Maps)")),
                 Text('Accepted Orders',
                     style: appStyle(20, FontWeight.normal, Colors.black)),
                 Container(

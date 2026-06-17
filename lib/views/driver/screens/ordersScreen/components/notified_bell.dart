@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
 
 class NotifiedBell extends StatelessWidget {
   const NotifiedBell({
@@ -12,7 +11,7 @@ class NotifiedBell extends StatelessWidget {
       children: [
         const Icon(
           color: Color(0xFF303030),
-          Ionicons.notifications_outline,
+          Icons.notifications_outlined,
           size: 30,
         ),
         Positioned(

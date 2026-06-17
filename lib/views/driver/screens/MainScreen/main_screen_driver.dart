@@ -1,7 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:ionicons/ionicons.dart';
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
 import 'package:ship_link/views/driver/screens/ordersScreen/ordersScreen.dart';
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
@@ -53,7 +52,7 @@ class _MainScreenDriverState extends State<MainScreenDriver> {
           selectedIndex: selectedIndex,
           barItems: <BarItem>[
             BarItem(
-              icon: Ionicons.home,
+              icon: Icons.home,
               title: 'Home',
               activeColor: Colors.blue,
               inactiveColor: Colors.white,
@@ -65,7 +64,7 @@ class _MainScreenDriverState extends State<MainScreenDriver> {
               inactiveColor: Colors.white,
             ),
             BarItem(
-              icon: Ionicons.person,
+              icon: Icons.person,
               title: 'Profile',
               activeColor: Colors.blue,
               inactiveColor: Colors.white,

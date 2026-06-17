@@ -136,6 +136,34 @@ class _BodyState extends State<Body> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.03,
+                          vertical: MediaQuery.of(context).size.width * 0.02),
+                      width: MediaQuery.of(context).size.height * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/settings');
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(Icons.settings, color: Colors.white),
+                            const SizedBox(width: 7),
+                            Text(
+                              "Settings",
+                              style: appStyle(15, FontWeight.normal, Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ))
             ],

@@ -11,7 +11,7 @@ class CustomSnackBar {
         ),
       ),
       description: Text(err),
-      position: MotionToastPosition.top,
+      toastAlignment: Alignment.topCenter,
       barrierColor: Colors.black.withOpacity(0.3),
       animationDuration: const Duration(milliseconds: 500),
       width: 300,
