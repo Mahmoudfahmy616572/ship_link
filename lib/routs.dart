@@ -3,6 +3,7 @@ import 'package:ship_link/views/driver/screens/DriverHome/driver_home.dart';
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
 import 'package:ship_link/views/driver/screens/MainScreen/main_screen_driver.dart';
 import 'package:ship_link/views/driver/screens/ordersScreen/ordersScreen.dart';
+import 'package:ship_link/views/admin/screens/admin_main_screen.dart';
 import 'package:ship_link/views/shared/live_tracking_screen.dart';
 import 'package:ship_link/views/shared/settings_screen.dart';
 import 'package:ship_link/views/user/screens/ForgotPassword/forgot_password.dart';
@@ -50,6 +51,7 @@ final Map<String, WidgetBuilder> routes = {
   TopSellerScreen.routName: (context) => const TopSellerScreen(),
   SettingsScreen.routName: (context) => const SettingsScreen(),
   LiveTrackingScreen.routName: (context) => const LiveTrackingScreen(),
+  AdminMainScreen.routName: (context) => const AdminMainScreen(),
 };
 
 final otpInputDecoration = InputDecoration(

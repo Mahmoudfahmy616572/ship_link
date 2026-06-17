@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'package:ship_link/constant/serveices_locators.dart';
 import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
 import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
@@ -21,6 +23,7 @@ import 'package:ship_link/data/services/homeServeice/home_serveices_impl.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/providers.dart';
 import 'package:ship_link/routs.dart';
+import 'package:ship_link/services/notification_service.dart';
 import 'package:ship_link/services/supabase_service.dart';
 import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
 
@@ -29,6 +32,14 @@ import 'cubitDriver/upDateUserData/up_date_user_data_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseService().initialize();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await NotificationService().initialize();
+  } catch (_) {
+    debugPrint('Firebase not configured - notifications disabled');
+  }
   setupServeiceLocator();
   runApp(const MyApp());
 }
