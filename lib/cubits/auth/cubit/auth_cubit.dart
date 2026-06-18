@@ -43,6 +43,8 @@ class AuthCubit extends Cubit<AuthState> {
           'first_name': firstName,
           'last_name': lastName,
           'phone_number': phoneNumber,
+          'address': address,
+          'code': code,
           'gender': gender,
           'role': 'user',
         });
@@ -128,6 +130,8 @@ class AuthCubit extends Cubit<AuthState> {
           'email': email,
           'name': name,
           'phone_number': phoneNumber,
+          'address': address,
+          'code': code,
           'gender': gender,
           'vehicle_number': vehicleNumber,
           'state_id': stateId,
