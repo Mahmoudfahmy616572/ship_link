@@ -1,21 +1,22 @@
-import 'dart:convert';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 import 'package:ship_link/constant/constant.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/data/models/register/user_register.dart';
 import 'package:ship_link/data/models/signIn_Driver/signin_driver.dart';
 import 'package:ship_link/data/models/signUp_driver/signup_driver.dart';
 import 'package:ship_link/data/models/singIn/sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(InitialState());
+
   static AuthCubit get(context) => BlocProvider.of<AuthCubit>(context);
   Register userRegister = Register();
   SignIn userSignIn = SignIn();
   SigninDriver signInDriver = SigninDriver();
   SignUpDriver signupDriver = SignUpDriver();
+
+  final _supabase = Supabase.instance.client;
 
   signUp({
     required String firstName,
@@ -29,90 +30,78 @@ class AuthCubit extends Cubit<AuthState> {
     required String passwordConfirmation,
   }) async {
     try {
-      print('=================');
       emit(RegisterLoading());
-      final response = await http.post(Uri.parse('$baseurl$register'),
-          body: {
-            "first_name": firstName,
-            "last_name": lastName,
-            "email": email,
-            "phone_number": phoneNumber,
-            "password": password,
-            "password_confirmation": passwordConfirmation,
-            "address": address,
-            "gender": gender,
-            "code": code,
-          },
-          headers: header);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print("================");
-        print(response.body);
-        var res = jsonDecode(response.body);
-        userRegister = Register.fromJson(res);
-        token = userRegister.token ?? '';
+      final res = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
+      final user = res.user;
+      if (user != null) {
+        await _supabase.from('profiles').upsert({
+          'id': user.id,
+          'email': email,
+          'first_name': firstName,
+          'last_name': lastName,
+          'phone_number': phoneNumber,
+          'address': address,
+          'gender': gender,
+          'code': code,
+          'role': 'user',
+        });
+        token = user.id;
+        userRegister = Register(
+          message: 'Registration successful',
+          token: user.id,
+        );
+        emit(Registersuccess());
+      } else if (res.session != null) {
+        token = res.session!.user.id;
         emit(Registersuccess());
       } else {
-        print(response.body);
+        emit(Registerfaild());
       }
     } catch (e) {
-      print(e);
       emit(Registerfaild());
     }
   }
 
-// ===========singin============
   signIN({
     required String email,
     required String password,
   }) async {
     emit(SignInLoading());
     try {
-      var response = await http.post(Uri.parse("$baseurl$singin"),
-          body: {
-            "email": email,
-            "password": password,
-          },
-          headers: header);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        var res = jsonDecode(response.body);
-        userSignIn = SignIn.fromJson(res);
-        token = userSignIn.token ?? '';
-        print(token);
-        print(userSignIn.user!.id);
+      final res = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      final user = res.user;
+      if (user != null) {
+        token = user.id;
+        userSignIn = SignIn(
+          message: 'Login successful',
+          token: user.id,
+        );
         emit(SignInSuccess());
       } else {
         emit(SignInFaild());
-        print(response.body);
       }
     } catch (e) {
-      print(e);
       emit(SignInFaild());
     }
   }
 
-// ===========singOut============
   signOut() async {
     try {
       emit(SignOutLoading());
-      var response = await http.delete(Uri.parse("$baseurl$singout"), headers: {
-        "Accept": "application/json",
-        "Authorization": 'Bearer $token'
-      });
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        var res = jsonDecode(response.body);
-        print(response.body);
-        print(res.body);
-
-        Future.error("error: status code ${response.statusCode}");
-        emit(SignOutSuccess());
-      }
+      await _supabase.auth.signOut();
+      token = '';
+      emit(SignOutSuccess());
     } catch (e) {
-      print(e);
       emit(SignOutFaild());
     }
   }
 
-//===========sign up Driver=========
   signUpDriver({
     required String name,
     required String email,
@@ -126,89 +115,72 @@ class AuthCubit extends Cubit<AuthState> {
     required String stateId,
   }) async {
     try {
-      print('=================');
       emit(RegisterDriverLoading());
-      final response = await http.post(Uri.parse('$baseurl$singupDriver'),
-          body: {
-            "name": name,
-            "email": email,
-            "phone_number": phoneNumber,
-            "password": password,
-            "password_confirmation": passwordConfirmation,
-            "address": address,
-            "gender": gender,
-            "code": code,
-            "vehicle_Number": vehicleNumber,
-            "state_id": stateId,
-          },
-          headers: header);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print("================");
-        print(response.body);
-        var res = jsonDecode(response.body);
-        signupDriver = SignUpDriver.fromJson(res);
-        token = signupDriver.token ?? '';
-        print(token);
-        print(signupDriver.user!.id);
+      final res = await _supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
+      final user = res.user;
+      if (user != null) {
+        await _supabase.from('profiles').upsert({
+          'id': user.id,
+          'email': email,
+          'name': name,
+          'phone_number': phoneNumber,
+          'address': address,
+          'gender': gender,
+          'code': code,
+          'vehicle_number': vehicleNumber,
+          'state_id': stateId,
+          'role': 'driver',
+        });
+        token = user.id;
+        signupDriver = SignUpDriver(
+          message: 'Driver registration successful',
+          token: user.id,
+        );
         emit(RegisterDriversuccess());
       } else {
-        print(response.body);
+        emit(RegisterDriverfaild());
       }
     } catch (e) {
-      print(e);
       emit(RegisterDriverfaild());
     }
   }
 
-//============sign in Driver=========
   signINDriver({
     required String email,
     required String password,
   }) async {
     emit(SignInDriverLoading());
     try {
-      var response = await http.post(Uri.parse("$baseurl$singinDriver"),
-          body: {
-            "email": email,
-            "password": password,
-          },
-          headers: header);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        var res = jsonDecode(response.body);
-        signInDriver = SigninDriver.fromJson(res);
-        token = signInDriver.token ?? '';
-        print(token);
-        print(signInDriver.user!.id);
+      final res = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      final user = res.user;
+      if (user != null) {
+        token = user.id;
+        signInDriver = SigninDriver(
+          message: 'Driver login successful',
+          token: user.id,
+        );
         emit(SignInDriverSuccess());
       } else {
         emit(SignInDriverFaild());
-        print(response.body);
       }
     } catch (e) {
-      print(e);
       emit(SignInDriverFaild());
     }
   }
-//============sign in Driver=========
 
   signOutDriver() async {
     try {
       emit(SignOutDriverLoading());
-      var response = await http.delete(Uri.parse("$baseurl$signoutDriver"),
-          headers: {
-            "Accept": "application/json",
-            "Authorization": 'Bearer $token'
-          });
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        var res = jsonDecode(response.body);
-        print(response.body);
-        print(res.body);
-
-        Future.error("error: status code ${response.statusCode}");
-        emit(SignOutDriverSuccess());
-      }
+      await _supabase.auth.signOut();
+      token = '';
+      emit(SignOutDriverSuccess());
     } catch (e) {
-      print(e);
       emit(SignOutDriverFaild());
     }
   }

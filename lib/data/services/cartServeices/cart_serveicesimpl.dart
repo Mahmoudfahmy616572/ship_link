@@ -1,73 +1,47 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
 import 'package:ship_link/constant/Errors/failures.dart';
 import 'package:ship_link/data/models/confirmCart/confirmCart.dart';
 import 'package:ship_link/data/models/getFromCart/get_from_cart.dart';
 import 'package:ship_link/data/models/payment/payment.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveices.dart';
-
-import '../../../constant/api_serveices.dart';
-import '../../../constant/constant.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CartServeicesImpl extends CartServeices {
-  final ApiServeices apiServeices;
-  CartServeicesImpl(this.apiServeices);
+  CartServeicesImpl();
+
+  SupabaseClient get _supabase => Supabase.instance.client;
+  String? get _userId => _supabase.auth.currentUser?.id;
 
   @override
   Future<Either<Failure, GetFromCart>> getFromCart() async {
     try {
-      var data = await apiServeices.getHttp(
-        endpoint: getfromCart,
-        headers: {
-          "Accept": "application/json",
-          "Authorization": 'Bearer $token'
-        },
-      );
-
-      GetFromCart getFromCart = GetFromCart.fromJson(data);
-
+      if (_userId == null) return left(ServerFailure('Not authenticated'));
+      final data = await _supabase
+          .from('cart_items')
+          .select('*, products(*)')
+          .eq('user_id', _userId!);
+      GetFromCart getFromCart = GetFromCart.fromJson({
+        'cart': {'id': 0, 'user_id': _userId, 'status': 1, 'is_open': 1},
+        'details': data,
+      });
       return right(getFromCart);
     } catch (e) {
-      if (e is DioError) {
-        return left(
-          ServerFailure.fromDioError(e),
-        );
-      }
-      return left(
-        ServerFailure(
-          e.toString(),
-        ),
-      );
+      return left(ServerFailure(e.toString()));
     }
   }
 
   @override
   Future addToCart({required int id}) async {
     try {
-      var data = await apiServeices.postHttp(
-          endpoint: addProducts,
-          headers: {
-            "Accept": "application/json",
-            "Authorization": 'Bearer $token'
-          },
-          data: {"user_id": '2', "product_id": id.toString()},
-          id: id);
-      print(data);
-
-      return right(data["success"]);
+      if (_userId == null) return left(ServerFailure('Not authenticated'));
+      await _supabase.from('cart_items').upsert({
+        'user_id': _userId!,
+        'product_id': id,
+        'quantity': 1,
+      });
+      return right(true);
     } catch (e) {
-      if (e is DioError) {
-        return left(
-          ServerFailure.fromDioError(e),
-        );
-      }
-      return left(
-        ServerFailure(
-          e.toString(),
-        ),
-      );
+      return left(ServerFailure(e.toString()));
     }
   }
 
@@ -77,29 +51,14 @@ class CartServeicesImpl extends CartServeices {
     required int product_id,
   }) async {
     try {
-      print(cart_id);
-      print(product_id);
-      var data = await apiServeices.deleteHttp(
-        endpoint: "$deletefromCart1$cart_id$deletefromCart2$product_id",
-        headers: {
-          "Accept": "application/json",
-          "Authorization": 'Bearer $token'
-        },
-      );
-      print(data);
-
-      return right(data["success"]);
+      await _supabase
+          .from('cart_items')
+          .delete()
+          .eq('id', cart_id)
+          .eq('product_id', product_id);
+      return right(true);
     } catch (e) {
-      if (e is DioError) {
-        return left(
-          ServerFailure.fromDioError(e),
-        );
-      }
-      return left(
-        ServerFailure(
-          e.toString(),
-        ),
-      );
+      return left(ServerFailure(e.toString()));
     }
   }
 
@@ -107,57 +66,30 @@ class CartServeicesImpl extends CartServeices {
   Future<Either<Failure, ConfirmCart>> confirmCart(
       {required int id, required int userId}) async {
     try {
-      var data = await apiServeices.postHttp(
-          endpoint: confirmeCart,
-          headers: {
-            "Accept": "application/json",
-            "Authorization": 'Bearer $token'
-          },
-          data: {"user_id": userId.toString(), "cart_id": id.toString()},
-          id: id);
-      print(data);
-      print(id);
-      ConfirmCart confirmCart = ConfirmCart.fromJson(data);
-
+      final data = await _supabase.from('orders').insert({
+        'user_id': userId,
+        'cart_id': id,
+        'status': 'pending',
+      }).select();
+      ConfirmCart confirmCart = ConfirmCart.fromJson({
+        'success': 'Order confirmed',
+        'order': data.isNotEmpty ? data.first : null,
+      });
       return right(confirmCart);
     } catch (e) {
-      if (e is DioError) {
-        return left(
-          ServerFailure.fromDioError(e),
-        );
-      }
-      return left(
-        ServerFailure(
-          e.toString(),
-        ),
-      );
+      return left(ServerFailure(e.toString()));
     }
   }
 
   @override
   Future<Either<Failure, Payment>> checkOut({required int totalPrice}) async {
     try {
-      var data = await apiServeices.postHttp(endpoint: paymentUrl, headers: {
-        "Accept": "application/json",
-        "Authorization": 'Bearer $token'
-      }, queryParameters: {
-        "total": totalPrice,
-      });
-
-      Payment payment = Payment.fromJson(data);
-
+      Payment payment = Payment(
+        url: 'https://shiplink.spider-te8.com/checkout?total=$totalPrice',
+      );
       return right(payment);
     } catch (e) {
-      if (e is DioError) {
-        return left(
-          ServerFailure.fromDioError(e),
-        );
-      }
-      return left(
-        ServerFailure(
-          e.toString(),
-        ),
-      );
+      return left(ServerFailure(e.toString()));
     }
   }
 }
