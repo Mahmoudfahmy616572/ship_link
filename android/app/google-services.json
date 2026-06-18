@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "shiplink-placeholder",
-    "storage_bucket": "shiplink-placeholder.appspot.com"
+    "project_number": "872096044047",
+    "project_id": "shiplink-9159d",
+    "storage_bucket": "shiplink-9159d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+        "mobilesdk_app_id": "1:872096044047:android:feb0a6ce9404989e6fbf7a",
         "android_client_info": {
           "package_name": "com.example.ship_link"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyPlaceholder000000000000000000000"
+          "current_key": "AIzaSyAOBDqUFz2usbjWdeKZg0hwssVNggVMX6Y"
         }
       ],
       "services": {
