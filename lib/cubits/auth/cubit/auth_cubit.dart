@@ -44,7 +44,6 @@ class AuthCubit extends Cubit<AuthState> {
           'last_name': lastName,
           'phone_number': phoneNumber,
           'gender': gender,
-          'code': code,
           'role': 'user',
         });
         token = user.id;
@@ -130,7 +129,6 @@ class AuthCubit extends Cubit<AuthState> {
           'name': name,
           'phone_number': phoneNumber,
           'gender': gender,
-          'code': code,
           'vehicle_number': vehicleNumber,
           'state_id': stateId,
           'role': 'driver',
