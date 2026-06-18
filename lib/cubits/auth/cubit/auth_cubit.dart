@@ -61,6 +61,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(Registerfaild());
       }
     } catch (e) {
+      print('AuthCubit.signUp error: $e');
       emit(Registerfaild());
     }
   }
@@ -87,6 +88,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(SignInFaild());
       }
     } catch (e) {
+      print('AuthCubit.signIN error: $e');
       emit(SignInFaild());
     }
   }
@@ -98,6 +100,7 @@ class AuthCubit extends Cubit<AuthState> {
       token = '';
       emit(SignOutSuccess());
     } catch (e) {
+      print('AuthCubit.signOut error: $e');
       emit(SignOutFaild());
     }
   }
@@ -144,6 +147,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(RegisterDriverfaild());
       }
     } catch (e) {
+      print('AuthCubit.signUpDriver error: $e');
       emit(RegisterDriverfaild());
     }
   }
@@ -170,6 +174,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(SignInDriverFaild());
       }
     } catch (e) {
+      print('AuthCubit.signINDriver error: $e');
       emit(SignInDriverFaild());
     }
   }
@@ -181,6 +186,7 @@ class AuthCubit extends Cubit<AuthState> {
       token = '';
       emit(SignOutDriverSuccess());
     } catch (e) {
+      print('AuthCubit.signOutDriver error: $e');
       emit(SignOutDriverFaild());
     }
   }
