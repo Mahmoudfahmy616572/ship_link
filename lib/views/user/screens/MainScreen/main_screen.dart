@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
+import 'package:ship_link/views/shared/notification_bell.dart';
 import 'package:ship_link/views/user/screens/Home/home_screen.dart';
 import 'package:ship_link/views/user/screens/Profile/profile.dart';
 import 'package:ship_link/views/user/screens/cart/cart.dart';
@@ -39,13 +40,28 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: PageView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _pageController,
-                children: _listOfWidget,
+        body: Stack(
+          children: [
+            Column(
+              children: <Widget>[
+                Expanded(
+                  child: PageView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: _pageController,
+                    children: _listOfWidget,
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const NotificationBell(),
               ),
             ),
           ],

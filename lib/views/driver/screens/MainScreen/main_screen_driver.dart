@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
 import 'package:ship_link/views/driver/screens/ordersScreen/ordersScreen.dart';
+import 'package:ship_link/views/shared/notification_bell.dart';
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 
 import '../DriverHome/driver_home.dart';
@@ -34,13 +35,28 @@ class _MainScreenDriverState extends State<MainScreenDriver> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: PageView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _pageController,
-                children: _listOfWidget,
+        body: Stack(
+          children: [
+            Column(
+              children: <Widget>[
+                Expanded(
+                  child: PageView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: _pageController,
+                    children: _listOfWidget,
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const NotificationBell(),
               ),
             ),
           ],
