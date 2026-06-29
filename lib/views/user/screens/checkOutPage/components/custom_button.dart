@@ -1,109 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../../constant/Errors/custom_error_widget.dart';
-import '../../../../../cubits/payment/payment_cubit.dart';
-import '../../../../shared/app_style.dart';
-import '../../../../shared/snackBar/snack_bar.dart';
-import '../../paymentWebView/payment_web_view.dart';
-
-class CustomButton extends StatefulWidget {
-  CustomButton({
-    super.key,
-    required this.totalPrice,
-  });
-
-  final int totalPrice;
-
-  @override
-  State<CustomButton> createState() => _CustomButtonState();
-}
-
-class _CustomButtonState extends State<CustomButton> {
-  bool isLoading = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocConsumer<PaymentCubit, PaymentState>(
-      listener: (context, state) {
-        isLoading = true;
-        if (state is PaymentLoading) {
-          isLoading = true;
-        } else if (state is PaymentSuccess) {
-          isLoading = false;
-        } else if (state is PaymentFailure) {
-          CustomSnackBar.displayErrorMotionToast(state.errMessage, context);
-          isLoading = false;
-        } else {
-          const CustomErrorWidget(
-            errMessage: "Error",
-          );
-          isLoading = false;
-        }
-      },
-      builder: (context, state) {
-        if (state is PaymentSuccess) {
-          return SizedBox(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.height * 0.07,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xFF242424),
-                textStyle: appStyle(18, FontWeight.w500, Colors.black),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-              ),
-              onPressed: () async {
-                await BlocProvider.of<PaymentCubit>(context)
-                    .checkout(totlePrice: widget.totalPrice);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          WebPage(url: state.payment.url ?? "")),
-                );
-                CustomSnackBar.displaySuccessMotionToast(
-                    state.payment.message ?? "", context);
-              },
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : const Text(
-                      "CheckOut",
-                    ),
-            ),
-          );
-        } else if (state is PaymentLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (state is PaymentFailure) {
-          return CustomErrorWidget(errMessage: state.errMessage);
-        } else {
-          return SizedBox(
-            width: MediaQuery.of(context).size.width * 0.9,
-            height: MediaQuery.of(context).size.height * 0.07,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: const Color(0xFF242424),
-                textStyle: appStyle(18, FontWeight.w500, Colors.black),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-              ),
-              onPressed: () {},
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : const Text(
-                      "CheckOut",
-                    ),
-            ),
-          );
-        }
-      },
-    );
-  }
-}
+import 'package:ship_link/utils/sizer.dart';
+import 'package:ship_link/views/shared/app_style.dart';
 
 class RowPrice extends StatelessWidget {
   const RowPrice({
@@ -118,15 +15,65 @@ class RowPrice extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          text,
-          style: appStyle(18, FontWeight.w600, Colors.black),
-        ),
-        Text(
-          price,
-          style: appStyle(18, FontWeight.w600, Colors.black),
-        ),
+        Text(text, style: appStyle(18, FontWeight.w600, Colors.black)),
+        Text(price, style: appStyle(18, FontWeight.w600, Colors.black)),
       ],
+    );
+  }
+}
+
+class PaymentMethodCard extends StatelessWidget {
+  const PaymentMethodCard({
+    super.key,
+    required this.selected,
+    required this.onTap,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final bool selected;
+  final VoidCallback onTap;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: selected ? const Color(0xFF242424) : const Color(0xFFE5E7EB),
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon,
+                color: selected ? const Color(0xFF242424) : const Color(0xFF9CA3AF)),
+            SizedBox(width: 14.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: appStyle(15, FontWeight.w600, const Color(0xFF111827))),
+                  Text(subtitle, style: appStyle(13, FontWeight.w400, const Color(0xFF6B7280))),
+                ],
+              ),
+            ),
+            Icon(
+              selected ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: selected ? const Color(0xFF242424) : const Color(0xFFD1D5DB),
+              size: 22.sp,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

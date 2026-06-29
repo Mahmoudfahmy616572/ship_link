@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 import '../../../../shared/app_style.dart';
 
@@ -14,16 +15,16 @@ class RecieverMessage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.w),
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10.w),
             decoration: BoxDecoration(
                 color: Colors.grey[700],
-                borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(30),
-                    topLeft: Radius.circular(30),
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(30.r),
+                    topLeft: Radius.circular(30.r),
                     bottomLeft: Radius.circular(0),
-                    bottomRight: Radius.circular(30))),
+                    bottomRight: Radius.circular(30.r))),
             child: Text(
               "Hello i'm here mother fucker",
               style: appStyle(16, FontWeight.normal, Colors.white),

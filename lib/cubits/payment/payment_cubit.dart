@@ -9,17 +9,15 @@ part 'payment_state.dart';
 class PaymentCubit extends Cubit<PaymentState> {
   PaymentCubit(this.cartServeices) : super(PaymentInitial());
   final CartServeices cartServeices;
-  Future<void> checkout({int? totlePrice}) async {
-    emit(PaymentLoading());
-    var result = await cartServeices.checkOut(totalPrice: totlePrice ?? 0);
+  Future<void> checkout({int? totalPrice, int? orderId}) async {
+    if (!isClosed) emit(PaymentLoading());
+    var result = await cartServeices.checkOut(totalPrice: totalPrice ?? 0, orderId: orderId);
     result.fold(
       (failure) {
-        print(failure);
-        emit(PaymentFailure(failure.errMessage));
+        if (!isClosed) emit(PaymentFailure(failure.errMessage));
       },
       (product) {
-        print(product);
-        emit(PaymentSuccess(product));
+        if (!isClosed) emit(PaymentSuccess(product));
       },
     );
   }

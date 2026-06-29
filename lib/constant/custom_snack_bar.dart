@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:motion_toast/motion_toast.dart';
 
 class CustomSnackBarWidget {
@@ -14,8 +15,8 @@ class CustomSnackBarWidget {
       description: Text(err),
       toastAlignment: Alignment.topCenter,
       barrierColor: Colors.black.withOpacity(0.3),
-      width: 300,
-      height: 80,
+      width: 300.w,
+      height: 80.h,
       dismissable: false,
     ).show(context);
   }
@@ -24,7 +25,7 @@ class CustomSnackBarWidget {
     MotionToast toast = MotionToast.success(
       description: Text(
         description,
-        style: const TextStyle(fontSize: 12),
+        style: TextStyle(fontSize: 12.sp),
       ),
       dismissable: true,
       opacity: .5,

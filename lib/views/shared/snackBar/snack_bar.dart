@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:motion_toast/motion_toast.dart';
+import 'package:ship_link/localization.dart';
 
 class CustomSnackBar {
   static void displayErrorMotionToast(String err, BuildContext context) {
     MotionToast.error(
-      title: const Text(
-        'Error',
+      title: Text(
+        context.t.tr('error'),
         style: TextStyle(
           fontWeight: FontWeight.bold,
         ),
@@ -14,8 +16,8 @@ class CustomSnackBar {
       toastAlignment: Alignment.topCenter,
       barrierColor: Colors.black.withOpacity(0.3),
       animationDuration: const Duration(milliseconds: 500),
-      width: 300,
-      height: 100,
+      width: 300.w,
+      height: 100.h,
       dismissable: false,
     ).show(context);
   }
@@ -25,7 +27,7 @@ class CustomSnackBar {
     MotionToast toast = MotionToast.success(
       description: Text(
         description,
-        style: const TextStyle(fontSize: 12),
+        style: TextStyle(fontSize: 12.sp),
       ),
       dismissable: true,
       animationDuration: const Duration(milliseconds: 500),

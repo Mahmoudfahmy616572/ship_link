@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../shared/app_style.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class AdminDataTable extends StatelessWidget {
   final List<String> columns;
@@ -16,7 +17,7 @@ class AdminDataTable extends StatelessWidget {
     return Card(
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../constant/colors.dart';
 import '../../../services/supabase_service.dart';
+import '../../shared/shimmer/shimmer_loading.dart';
 import '../widgets/admin_data_table.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class AdminProducts extends StatefulWidget {
   const AdminProducts({super.key});
@@ -32,19 +35,19 @@ class _AdminProductsState extends State<AdminProducts> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return ShimmerLoading.grid();
     }
     return AdminDataTable(
       columns: const ['ID', 'Name', 'Price', 'Category', 'Top Seller'],
       rows: _products.map((p) {
         return DataRow(cells: [
           DataCell(Text('${p['id']}')),
-          DataCell(SizedBox(width: 150, child: Text('${p['name']}'))),
+          DataCell(SizedBox(width: 150.w, child: Text('${p['name']}'))),
           DataCell(Text('\$${p['price']}')),
           DataCell(Text('${p['category'] ?? '-'}')),
           DataCell(Icon(
             p['is_top_seller'] == true ? Icons.star : Icons.star_border,
-            color: p['is_top_seller'] == true ? Colors.amber : Colors.grey,
+            color: p['is_top_seller'] == true ? AppColors.starFilled : AppColors.textDisabled,
           )),
         ]);
       }).toList(),

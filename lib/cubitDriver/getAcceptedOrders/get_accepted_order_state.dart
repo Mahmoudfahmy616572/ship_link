@@ -18,5 +18,6 @@ final class GetAcceptedOrderFailure extends GetAcceptedOrderState {
 
 final class GetAcceptedOrderSuccess extends GetAcceptedOrderState {
   final GetAcceptOrder getAcceptedOrder;
-  const GetAcceptedOrderSuccess(this.getAcceptedOrder);
+  final bool isOffline;
+  const GetAcceptedOrderSuccess(this.getAcceptedOrder, {this.isOffline = false});
 }

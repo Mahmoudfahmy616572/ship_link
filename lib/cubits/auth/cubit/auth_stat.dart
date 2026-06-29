@@ -1,21 +1,48 @@
-abstract class AuthState {}
+import 'package:equatable/equatable.dart';
 
+abstract class AuthState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
+
+// New states for Google Sign-In
 class InitialState extends AuthState {}
-// ============SignUP==============
 
+class LoadingState extends AuthState {}
+
+class SuccessState extends AuthState {}
+
+class NewGoogleUser extends AuthState {}
+
+class ErrorState extends AuthState {
+  final String message;
+  ErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+// Old states (kept for backward compatibility with driver screens)
 class RegisterLoading extends AuthState {}
 
 class Registersuccess extends AuthState {}
 
-class Registerfaild extends AuthState {}
+class Registerfaild extends AuthState {
+  final String message;
+  Registerfaild([this.message = '']);
+  @override
+  List<Object?> get props => [message];
+}
 
-// ==============signin=================
 class SignInLoading extends AuthState {}
 
 class SignInSuccess extends AuthState {}
 
-class SignInFaild extends AuthState {}
-// ==============signOut=================
+class SignInFaild extends AuthState {
+  final String message;
+  SignInFaild([this.message = '']);
+  @override
+  List<Object?> get props => [message];
+}
 
 class SignOutLoading extends AuthState {}
 
@@ -23,20 +50,17 @@ class SignOutSuccess extends AuthState {}
 
 class SignOutFaild extends AuthState {}
 
-// ==============signin Driver=================
-class SignInDriverLoading extends AuthState {}
-
-class SignInDriverSuccess extends AuthState {}
-
-class SignInDriverFaild extends AuthState {}
-// ============SignUP Driver==============
-
 class RegisterDriverLoading extends AuthState {}
 
 class RegisterDriversuccess extends AuthState {}
 
 class RegisterDriverfaild extends AuthState {}
-// ==============signOut=================
+
+class SignInDriverLoading extends AuthState {}
+
+class SignInDriverSuccess extends AuthState {}
+
+class SignInDriverFaild extends AuthState {}
 
 class SignOutDriverLoading extends AuthState {}
 

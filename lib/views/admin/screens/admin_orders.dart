@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../constant/colors.dart';
 import '../../../services/supabase_service.dart';
 import '../../shared/app_style.dart';
+import '../../shared/shimmer/shimmer_loading.dart';
 import '../widgets/admin_data_table.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class AdminOrders extends StatefulWidget {
   const AdminOrders({super.key});
@@ -40,7 +43,7 @@ class _AdminOrdersState extends State<AdminOrders> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return ShimmerLoading.orderHistory();
     }
     return AdminDataTable(
       columns: const ['ID', 'User', 'Total', 'Status', 'Actions'],
@@ -70,16 +73,16 @@ class _AdminOrdersState extends State<AdminOrders> {
 
   Widget _statusChip(String status) {
     final colors = {
-      'pending': Colors.orange,
-      'accepted': Colors.blue,
-      'delivered': Colors.green,
-      'cancelled': Colors.red,
+      'pending': AppColors.pending,
+      'accepted': AppColors.primary,
+      'delivered': AppColors.success,
+      'cancelled': AppColors.error,
     };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: (colors[status] ?? Colors.grey).withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
+        color: (colors[status] ?? AppColors.textDisabled).withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Text(status,
           style: appStyle(12, FontWeight.bold, colors[status] ?? Colors.grey)),

@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS notifications (
   body TEXT NOT NULL,
   type TEXT NOT NULL DEFAULT 'general',
   read BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  data JSONB
 );
 
 -- Enable RLS
@@ -17,5 +18,15 @@ CREATE POLICY "Users can view own notifications"
   ON notifications FOR SELECT
   USING (auth.uid() = user_id);
 
--- Also allow admin (if we add role-based auth later)
--- Only allow inserts via trigger or service_role for now
+-- Allow any authenticated user to insert (used by driver app to notify user)
+CREATE POLICY "Users can insert notifications"
+  ON notifications FOR INSERT
+  WITH CHECK (true);
+
+-- Allow users to mark notifications as read
+CREATE POLICY "Users can update own notifications"
+  ON notifications FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- Add data column for existing installations
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS data JSONB;

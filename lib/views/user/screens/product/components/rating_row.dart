@@ -1,35 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 import '../../../../shared/app_style.dart';
 
-class RaitingRow extends StatelessWidget {
-  const RaitingRow({
+class RatingRow extends StatelessWidget {
+  final double rating;
+  final int reviewCount;
+
+  const RatingRow({
     super.key,
+    this.rating = 0,
+    this.reviewCount = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(
-          Icons.star,
-          color: Colors.amber,
-          size: 30,
-        ),
-        const SizedBox(
-          width: 10,
-        ),
+        Icon(Icons.star, color: AppColors.starFilled, size: 22.sp),
+        SizedBox(width: 8.w),
         Text(
-          "4.5",
-          style: appStyle(18, FontWeight.w700, Colors.black),
+          rating > 0 ? rating.toStringAsFixed(1) : '-',
+          style: appStyle(16.sp, FontWeight.w700, Colors.black),
         ),
-        const SizedBox(
-          width: 20,
-        ),
+        SizedBox(width: 16.w),
         Text(
-          "(50 reviews)",
-          style: appStyle(16, FontWeight.normal, Colors.grey),
-        )
+          reviewCount > 0 ? '$reviewCount reviews' : 'No reviews yet',
+          style: appStyle(14.sp, FontWeight.normal, Colors.grey),
+        ),
       ],
     );
   }

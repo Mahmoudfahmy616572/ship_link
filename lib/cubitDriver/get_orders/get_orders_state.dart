@@ -13,7 +13,8 @@ final class GetOrdersLoading extends GetOrdersState {}
 
 final class GetOrdersSuccess extends GetOrdersState {
   final GetOrder getOrder;
-  const GetOrdersSuccess(this.getOrder);
+  final bool isOffline;
+  const GetOrdersSuccess(this.getOrder, {this.isOffline = false});
 }
 
 final class GetOrdersFailure extends GetOrdersState {

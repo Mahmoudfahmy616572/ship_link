@@ -3,30 +3,34 @@ import 'package:equatable/equatable.dart';
 import 'package:ship_link/data/models/confirmCart/confirmCart.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveices.dart';
 
-import '../getFromCart/get_from_cart_cubit.dart';
-
 part 'confirm_cart_state.dart';
 
 class ConfirmCartCubit extends Cubit<ConfirmCartState> {
   ConfirmCartCubit(this.cartServeices) : super(ConfirmCartInitial());
   CartServeices cartServeices;
-  Future<void> confirmCart({int? id, int? userId}) async {
-    emit(ConfirmCartLoading());
-    var result =
-        await cartServeices.confirmCart(id: id ?? 0, userId: userId ?? 0);
+  Future<void> confirmCart({
+    int? id,
+    String? userId,
+    String? deliveryAddress,
+    double? deliveryLat,
+    double? deliveryLng,
+    String? addressLabel,
+  }) async {
+    if (!isClosed) emit(ConfirmCartLoading());
+    var result = await cartServeices.confirmCart(
+      id: id ?? 0,
+      userId: userId ?? '',
+      deliveryAddress: deliveryAddress,
+      deliveryLat: deliveryLat,
+      deliveryLng: deliveryLng,
+      addressLabel: addressLabel,
+    );
     result.fold(
       (failure) {
-        print(failure.errMessage);
-        if (failure.errMessage == "Internal server error , try again later") {
-          emit(const ConfirmCartFailure('Order created successfully'));
-        } else {
-          emit(ConfirmCartFailure(failure.errMessage));
-        }
+        if (!isClosed) emit(ConfirmCartFailure(failure.errMessage));
       },
       (success) {
-        print(success);
-        GetFromCartCubit(cartServeices).getProductFromCart();
-        emit(ConfirmCartSuccess(success));
+        if (!isClosed) emit(ConfirmCartSuccess(success));
       },
     );
   }

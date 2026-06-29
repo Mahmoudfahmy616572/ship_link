@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/views/driver/screens/DriverSignIn/signin_driver.dart';
+import 'package:ship_link/localization.dart';
+import 'package:ship_link/views/driver/screens/DriverRegister/driver_register.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/button_sign.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
@@ -35,11 +36,11 @@ class _SignUpState extends State<SignUp> {
                 ),
                 Image.asset("assets/images/signin Logo.png"),
                 Text(
-                  "Sign UP",
+                  context.t.tr('sign_up'),
                   style: appStyle(25, FontWeight.bold, Colors.black),
                 ),
                 Text(
-                  "Enter your credentials to access your\n account",
+                  context.t.tr('login_subtitle'),
                   textAlign: TextAlign.center,
                   style:
                       appStyle(13, FontWeight.normal, const Color(0xFF6C6C6C)),
@@ -53,7 +54,7 @@ class _SignUpState extends State<SignUp> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "SignUp as:",
+                        context.t.tr('sign_up_as'),
                         style: appStyle(
                             16, FontWeight.w500, const Color(0xFF6C6C6C)),
                       ),
@@ -76,7 +77,7 @@ class _SignUpState extends State<SignUp> {
                 Padding(
                   padding: const EdgeInsets.only(left: 120, right: 120),
                   child: BuildButton(
-                    text: 'CONTINUE',
+                    text: context.t.tr('continue_btn'),
                     color: Colors.white,
                     ontap: () {
                       Navigator.pushNamed(context, MainScreen.routName);
@@ -113,7 +114,7 @@ class _SignUpState extends State<SignUp> {
             Navigator.pushNamed(context, UserRegister.routName);
             break;
           case "Driver":
-            Navigator.pushNamed(context, SignInDriver.routName);
+            Navigator.pushNamed(context, DriverRegister.routName);
             break;
         }
       },

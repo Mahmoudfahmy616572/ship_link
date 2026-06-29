@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'notification_screen.dart';
 
 class NotificationBell extends StatefulWidget {
-  const NotificationBell({super.key});
+  final Color? iconColor;
+  const NotificationBell({super.key, this.iconColor});
 
   @override
   State<NotificationBell> createState() => _NotificationBellState();
@@ -47,20 +49,20 @@ class _NotificationBellState extends State<NotificationBell> {
       icon: Stack(
         clipBehavior: Clip.none,
         children: [
-          const Icon(Icons.notifications_outlined, color: Colors.white, size: 28),
+          Icon(Icons.notifications_outlined, color: widget.iconColor ?? Colors.white, size: 28.sp),
           if (_unread > 0)
             Positioned(
               right: -4,
               top: -4,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: EdgeInsets.all(4.w),
                 decoration: const BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
                   _unread > 99 ? '99+' : '$_unread',
-                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 9.sp, fontWeight: FontWeight.bold),
                 ),
               ),
             ),

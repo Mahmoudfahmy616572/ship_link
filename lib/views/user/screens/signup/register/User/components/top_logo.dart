@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 
 import '../../../../../../shared/app_style.dart';
 
@@ -19,7 +20,7 @@ class TopLogo extends StatelessWidget {
           style: appStyle(25, FontWeight.bold, Colors.black),
         ),
         Text(
-          "Enter your credentials to access your\n account",
+          context.t.tr('login_subtitle'),
           textAlign: TextAlign.center,
           style: appStyle(13, FontWeight.normal, const Color(0xFF6C6C6C)),
         ),

@@ -11,7 +11,7 @@ class SupabaseService {
   Future<void> initialize() async {
     await Supabase.initialize(
       url: AppConfig.supabaseUrl,
-      anonKey: AppConfig.supabaseAnonKey,
+      publishableKey: AppConfig.supabaseAnonKey,
     );
   }
 
@@ -114,5 +114,52 @@ class SupabaseService {
     final response =
         await client.from('orders').select('*').eq('status', 'accepted');
     return response;
+  }
+
+  Future<List<Map<String, dynamic>>> getProfilesByRole(String role) async {
+    final response = await client
+        .from('profiles')
+        .select('*')
+        .eq('role', role);
+    return response;
+  }
+
+  Future<num> getTotalRevenue() async {
+    final response = await client
+        .from('orders')
+        .select('total_price');
+    num total = 0;
+    for (final row in response) {
+      total += (row['total_price'] as num? ?? 0);
+    }
+    return total;
+  }
+
+  Future<List<Map<String, dynamic>>> getOrdersGroupedByDate({int days = 7}) async {
+    final since = DateTime.now().subtract(Duration(days: days)).toIso8601String();
+    final response = await client
+        .from('orders')
+        .select('total_price, created_at, status')
+        .gte('created_at', since)
+        .order('created_at', ascending: true);
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  /// Returns the discount percent if [code] is valid & active, else null.
+  Future<int?> verifyPromoCode(String code) async {
+    final response = await client
+        .from('promo_codes')
+        .select('discount_percent, max_uses, current_uses, expires_at, is_active')
+        .eq('code', code.toUpperCase())
+        .limit(1)
+        .maybeSingle();
+    if (response == null) return null;
+    if (response['is_active'] != true) return null;
+    final maxUses = response['max_uses'] as int? ?? 0;
+    final currentUses = response['current_uses'] as int? ?? 0;
+    if (maxUses > 0 && currentUses >= maxUses) return null;
+    final expiresAt = response['expires_at'] as String?;
+    if (expiresAt != null && DateTime.parse(expiresAt).isBefore(DateTime.now())) return null;
+    return response['discount_percent'] as int?;
   }
 }

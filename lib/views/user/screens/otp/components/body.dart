@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 
 import '../../../../../routs.dart';
 import '../../../../shared/app_style.dart';
 import '../../../../shared/button_sign.dart';
 import 'expired_time.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class Body extends StatefulWidget {
   const Body({super.key});
@@ -50,15 +52,15 @@ class _BodyState extends State<Body> {
           builder: (BuildContext context) => AlertDialog(
             backgroundColor: const Color.fromARGB(255, 255, 255, 255),
             content: SizedBox(
-              width: 380,
-              height: 400,
+              width: 380.w,
+              height: 400.h,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Stack(children: [
                     SizedBox(
-                        width: 125,
-                        height: 170,
+                        width: 125.w,
+                        height: 170.h,
                         child: Image.asset("assets/images/iphone.png")),
                     Positioned(
                       right: -1,
@@ -66,19 +68,19 @@ class _BodyState extends State<Body> {
                       child: SvgPicture.asset("assets/icons/checkIcon.svg"),
                     ),
                   ]),
-                  const SizedBox(
-                    height: 15,
+                  SizedBox(
+                    height: 15.h,
                   ),
                   Text(
-                    'Password Update \nSuccessfullys',
+                    context.t.tr('password_update_success'),
                     style: appStyle(30, FontWeight.bold, Colors.black),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(
-                    height: 15,
+                  SizedBox(
+                    height: 15.h,
                   ),
                   Text(
-                    'your password has been \n updated successfuly',
+                    context.t.tr('password_updated_message'),
                     style: appStyle(17, FontWeight.normal, Colors.black),
                     textAlign: TextAlign.center,
                   ),
@@ -96,13 +98,13 @@ class _BodyState extends State<Body> {
                   },
                   child: Container(
                     width: double.infinity,
-                    height: 40,
+                    height: 40.h,
                     decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(9)),
                     child: Center(
                       child: Text(
-                        "Back to home",
+                        context.t.tr('back_to_home'),
                         style: appStyle(20, FontWeight.w600, Colors.white),
                         textAlign: TextAlign.center,
                       ),
@@ -113,15 +115,15 @@ class _BodyState extends State<Body> {
         ),
         child: Column(
           children: [
-            const SizedBox(
-              height: 30,
+            SizedBox(
+              height: 30.h,
             ),
             Image.asset("assets/images/otp_logo.png"),
             Column(
               children: [
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.67,
                   decoration: const BoxDecoration(
@@ -141,30 +143,30 @@ class _BodyState extends State<Body> {
                           child: Column(
                             children: [
                               Text(
-                                "Verification",
+                                context.t.tr('verification'),
                                 style: appStyle(
                                   35,
                                   FontWeight.bold,
                                   const Color(0xFFEFEFEF),
                                 ),
                               ),
-                              const SizedBox(
-                                height: 40,
+                              SizedBox(
+height: 40.h,
                               ),
                               Text(
-                                "OTP VERIFICATION",
+                                context.t.tr('otp_verification'),
                                 style: appStyle(
                                   18,
                                   FontWeight.w500,
                                   const Color(0xFFEFEFEF),
                                 ),
                               ),
-                              const SizedBox(
-                                height: 8,
+                              SizedBox(
+                                height: 8.h,
                               ),
                               Text.rich(
                                 TextSpan(
-                                    text: "Enter the OTP sent to ",
+                                    text: context.t.tr('enter_otp'),
                                     style: const TextStyle(color: Colors.white),
                                     children: [
                                       TextSpan(
@@ -177,35 +179,35 @@ class _BodyState extends State<Body> {
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 25,
+                        SizedBox(
+                          height: 25.h,
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          padding: EdgeInsets.symmetric(horizontal: 25.w),
                           child: otpForm(),
                         ),
-                        const SizedBox(
-                          height: 20,
+                        SizedBox(
+                          height: 20.h,
                         ),
-                        expiredTime(),
-                        const SizedBox(
-                          height: 15,
+                        expiredTime(context),
+                        SizedBox(
+                          height: 15.h,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Don’t receive code ? ",
+                              context.t.tr('dont_receive_code'),
                               style:
                                   appStyle(15, FontWeight.w400, Colors.white),
                             ),
-                            Text("Re-send",
+                            Text(context.t.tr('resend'),
                                 style:
                                     appStyle(15, FontWeight.w600, Colors.white))
                           ],
                         ),
-                        const SizedBox(
-                          height: 15,
+                        SizedBox(
+                          height: 15.h,
                         ),
                         GestureDetector(
                           // onTap: () {
@@ -214,8 +216,8 @@ class _BodyState extends State<Body> {
                           //       MaterialPageRoute(
                           //           builder: (context) => const PopUpMsg()));
                           // },
-                          child: const BuildButton(
-                            text: 'Submit',
+                          child: BuildButton(
+                            text: context.t.tr('submit'),
                             color: Colors.white,
                           ),
                         ),
@@ -234,12 +236,12 @@ class _BodyState extends State<Body> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         SizedBox(
-          width: 60,
+          width: 60.w,
           child: TextFormField(
             autofocus: true,
             keyboardType: TextInputType.number,
             obscureText: true,
-            style: const TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20.sp),
             textAlign: TextAlign.center,
             decoration: otpInputDecoration,
             onChanged: (value) {
@@ -248,13 +250,13 @@ class _BodyState extends State<Body> {
           ),
         ),
         SizedBox(
-          width: 60,
+          width: 60.w,
           child: TextFormField(
             focusNode: pin2focusNode,
             autofocus: true,
             keyboardType: TextInputType.number,
             obscureText: true,
-            style: const TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20.sp),
             textAlign: TextAlign.center,
             decoration: otpInputDecoration,
             onChanged: (value) {
@@ -263,13 +265,13 @@ class _BodyState extends State<Body> {
           ),
         ),
         SizedBox(
-          width: 60,
+          width: 60.w,
           child: TextFormField(
             focusNode: pin3focusNode,
             autofocus: true,
             keyboardType: TextInputType.number,
             obscureText: true,
-            style: const TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20.sp),
             textAlign: TextAlign.center,
             decoration: otpInputDecoration,
             onChanged: (value) {
@@ -278,13 +280,13 @@ class _BodyState extends State<Body> {
           ),
         ),
         SizedBox(
-          width: 60,
+          width: 60.w,
           child: TextFormField(
             focusNode: pin4focusNode,
             autofocus: true,
             keyboardType: TextInputType.number,
             obscureText: true,
-            style: const TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20.sp),
             textAlign: TextAlign.center,
             decoration: otpInputDecoration,
             onChanged: (value) {

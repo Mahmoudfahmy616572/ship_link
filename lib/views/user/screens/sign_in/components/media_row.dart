@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 import 'media_container.dart';
 
@@ -9,8 +10,8 @@ class MediaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 50.0),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 50.0.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
 
 import '../../data/services/cartServeices/cart_serveices.dart';
 
@@ -10,18 +9,15 @@ class AddToCartCubit extends Cubit<AddToCartState> {
   AddToCartCubit(this.cartServeices) : super(AddToCartInitial());
   final CartServeices cartServeices;
 
-  Future<void> addToCart({int? id}) async {
-    emit(AddToCartLoading());
-    var result = await cartServeices.addToCart(id: id ?? 0);
+  Future<void> addToCart({int? id, int quantity = 1}) async {
+    if (!isClosed) emit(AddToCartLoading());
+    var result = await cartServeices.addToCart(id: id ?? 0, quantity: quantity);
     result.fold(
       (failure) {
-        print(failure);
-        emit(AddToCartFailure(failure.errMessage));
+        if (!isClosed) emit(AddToCartFailure(failure.errMessage));
       },
       (success) {
-        print(success);
-        GetFromCartCubit(cartServeices).getProductFromCart();
-        emit(AddToCartSuccess(success));
+        if (!isClosed) emit(AddToCartSuccess(success));
       },
     );
   }

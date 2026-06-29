@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../constant/colors.dart';
 import '../../shared/app_style.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class AdminStatsCard extends StatelessWidget {
   final String title;
@@ -20,7 +22,7 @@ class AdminStatsCard extends StatelessWidget {
     return Card(
       elevation: 4,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20.w),
         child: Row(
           children: [
             CircleAvatar(
@@ -28,12 +30,12 @@ class AdminStatsCard extends StatelessWidget {
               backgroundColor: color.withOpacity(0.15),
               child: Icon(icon, color: color, size: 30),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: appStyle(14, FontWeight.normal, Colors.grey)),
-                const SizedBox(height: 4),
+                Text(title, style: appStyle(14, FontWeight.normal, AppColors.textSecondary)),
+                SizedBox(height: 4.h),
                 Text(value,
                     style: appStyle(24, FontWeight.bold, Colors.black87)),
               ],

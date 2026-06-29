@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../../constant/colors.dart';
 import '../../shared/app_style.dart';
 import '../widgets/admin_sidebar.dart';
 import 'admin_dashboard.dart';
 import 'admin_orders.dart';
 import 'admin_drivers.dart';
 import 'admin_products.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class AdminMainScreen extends StatefulWidget {
   const AdminMainScreen({super.key});
@@ -49,13 +51,13 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           ),
           Expanded(
             child: Container(
-              color: const Color(0xFFF5F6FA),
+              color: AppColors.background,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (isWide)
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.all(20.w),
                       child: Text(_titles[_selectedIndex],
                           style: appStyle(28, FontWeight.bold, Colors.black87)),
                     ),
@@ -70,8 +72,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           ? BottomNavigationBar(
               currentIndex: _selectedIndex,
               type: BottomNavigationBarType.fixed,
-              backgroundColor: const Color(0xFF1a1a2e),
-              selectedItemColor: Colors.blueAccent,
+              backgroundColor: AppColors.textPrimary,
+              selectedItemColor: AppColors.primary,
               unselectedItemColor: Colors.grey,
               onTap: (i) => setState(() => _selectedIndex = i),
               items: const [

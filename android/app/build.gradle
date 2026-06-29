@@ -17,6 +17,7 @@ android {
     ndkVersion "27.0.12077973"
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -29,12 +30,30 @@ android {
         main.java.srcDirs += "src/main/kotlin"
     }
 
+    flavorDimensions "app"
+
+    productFlavors {
+        user {
+            dimension "app"
+            applicationId "com.example.ship_link.user"
+            versionNameSuffix "-user"
+            resValue "string", "app_name", "ShipLink"
+        }
+        driver {
+            dimension "app"
+            applicationId "com.example.ship_link.driver"
+            versionNameSuffix "-driver"
+            resValue "string", "app_name", "ShipLink Driver"
+        }
+    }
+
     defaultConfig {
-        applicationId "com.example.ship_link"
+        applicationId "com.example.ship_link.user"
         minSdkVersion flutter.minSdkVersion
         targetSdk flutter.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
+        missingDimensionStrategy "app", "user"
     }
 
     signingConfigs {
@@ -55,4 +74,9 @@ android {
 
 flutter {
     source "../.."
+}
+
+dependencies {
+    implementation "com.google.android.gms:play-services-base:18.5.0"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.1.5"
 }

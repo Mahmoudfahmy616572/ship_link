@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/constant/colors.dart';
 
 import '../views/shared/app_style.dart';
 
@@ -10,13 +11,13 @@ class TTextTheme {
     headlineLarge: appStyle(
       35,
       FontWeight.bold,
-      const Color(0xFFEFEFEF),
+      AppColors.surfaceAlt,
     ),
     headlineMedium: appStyle(25, FontWeight.w600, Colors.black),
     headlineSmall: appStyle(
       14,
       FontWeight.w300,
-      const Color(0xFF6C6C6C),
+      AppColors.textSecondary,
     ),
     //for HomePage title
     titleLarge: appStyle(24, FontWeight.w700, Colors.white), //last title
@@ -36,13 +37,13 @@ class TTextTheme {
       headlineLarge: appStyle(
         35,
         FontWeight.bold,
-        const Color(0xFFEFEFEF),
+        AppColors.surfaceAlt,
       ),
       headlineMedium: appStyle(25, FontWeight.w600, Colors.black),
       headlineSmall: appStyle(
         14,
         FontWeight.w300,
-        const Color(0xFF6C6C6C),
+        AppColors.textSecondary,
       ),
       //for HomePage title
       titleLarge: appStyle(24, FontWeight.w700, Colors.white), //last title
@@ -55,7 +56,7 @@ class TTextTheme {
       //for cartPage
       labelLarge: appStyle(19, FontWeight.w500, Colors.black),
       labelMedium:
-          appStyle(18, FontWeight.w500, const Color(0xFF606060)), //title
+appStyle(18, FontWeight.w500, AppColors.textSecondary), //title
       labelSmall: appStyle(17, FontWeight.w500, Colors.black) //price
       );
 }

@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:flutter_svg/svg.dart';
 
 class DismissibleContainer extends StatelessWidget {
@@ -11,7 +12,7 @@ class DismissibleContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
       decoration:
           const BoxDecoration(color: Color.fromARGB(255, 252, 190, 190)),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [

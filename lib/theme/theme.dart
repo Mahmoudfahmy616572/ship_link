@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/theme/app_bar_theme.dart';
 import 'package:ship_link/theme/button_theme.dart';
 import 'package:ship_link/theme/text_form_feild.dart';
@@ -21,7 +22,7 @@ class TAppTheme {
       useMaterial3: true,
       fontFamily: "Poppins",
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFFCDCDCD),
+      scaffoldBackgroundColor: AppColors.background,
       primaryColor: Colors.white,
       textTheme: TTextTheme.textDarkMode,
       elevatedButtonTheme: TButtonTheme.darkbuttonTheme,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 
 import '../../../../shared/app_style.dart';
+import 'package:ship_link/utils/sizer.dart';
 
-Row expiredTime() {
+Row expiredTime(BuildContext context) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
@@ -15,9 +17,9 @@ Row expiredTime() {
         ),
         onEnd: () {},
       ),
-      const Text(
-        " Sec",
-        style: TextStyle(fontSize: 18, color: Colors.white),
+      Text(
+        context.t.tr('sec'),
+        style: TextStyle(fontSize: 18.sp, color: Colors.white),
       )
     ],
   );

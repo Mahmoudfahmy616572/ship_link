@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/views/shared/build_botton.dart';
 import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
@@ -40,19 +41,16 @@ class _UserBodyState extends State<UserBody> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
-        var cubit = AuthCubit.get(context);
         if (state is Registersuccess) {
           if (token != '') {
             Navigator.pushReplacementNamed(context, MainScreen.routName);
-            CustomSnackBar.displaySuccessMotionToast(
-                "${cubit.userRegister.message}", context);
           }
-          if (state is Registerfaild) {
-            CustomSnackBar.displayErrorMotionToast(
-                "Email or Password Incorrect", context);
-          }
-        } else {
-          CustomSnackBar.displayErrorMotionToast("Something error", context);
+        } else if (state is Registerfaild) {
+          CustomSnackBar.displayErrorMotionToast(
+              state.message.isNotEmpty
+                  ? state.message
+                  : context.t.tr('registration_failed'),
+              context);
         }
       },
       builder: (context, state) {
@@ -65,9 +63,9 @@ class _UserBodyState extends State<UserBody> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Center(
+                Center(
                     child: TopLogo(
-                  text: 'Sign UP User ',
+                  text: context.t.tr('sign_up_user'),
                 )),
                 Expanded(
                   child: ListView(
@@ -83,7 +81,7 @@ class _UserBodyState extends State<UserBody> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "First Name",
+                                    context.t.tr('first_name'),
                                     style: appStyle(14, FontWeight.normal,
                                         const Color(0xFF6C6C6C)),
                                   ),
@@ -97,16 +95,16 @@ class _UserBodyState extends State<UserBody> {
                                       validator: (currentValue) {
                                         var nonNullValue = currentValue ?? '';
                                         if (nonNullValue.isEmpty) {
-                                          return ("first name is required");
+                                          return (context.t.tr('first_name_required'));
                                         }
                                         if (currentValue!.length < 3) {
-                                          return 'Name must be more than 2 charater';
+                                          return context.t.tr('name_must_be_more_than_2');
                                         }
 
                                         return null;
                                       },
                                       controller: firstName,
-                                      hintText: "Enter Your First Name",
+                                      hintText: context.t.tr('enter_first_name'),
                                       obscureText: false,
                                     ),
                                   ),
@@ -116,7 +114,7 @@ class _UserBodyState extends State<UserBody> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Last Name",
+                                    context.t.tr('last_name'),
                                     style: appStyle(14, FontWeight.normal,
                                         const Color(0xFF6C6C6C)),
                                   ),
@@ -130,16 +128,16 @@ class _UserBodyState extends State<UserBody> {
                                         validator: (currentValue) {
                                           var nonNullValue = currentValue ?? '';
                                           if (nonNullValue.isEmpty) {
-                                            return ("last name is required");
+                                            return (context.t.tr('last_name_required'));
                                           }
                                           if (currentValue!.length < 3) {
-                                            return 'Name must be more than 2 charater';
+                                            return context.t.tr('name_must_be_more_than_2');
                                           }
 
                                           return null;
                                         },
                                         controller: lastName,
-                                        hintText: "Enter Your Last Name",
+                                        hintText: context.t.tr('enter_last_name'),
                                         obscureText: false,
                                       )),
                                 ],
@@ -147,8 +145,8 @@ class _UserBodyState extends State<UserBody> {
                             ],
                           ),
                           const Space(),
-                          const TitleTextField(
-                            text: 'Email',
+                          TitleTextField(
+                            text: context.t.tr('email'),
                           ),
                           const SizedBox(
                             height: 5,
@@ -156,47 +154,40 @@ class _UserBodyState extends State<UserBody> {
                           BuildTextField(
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return 'Please enter an email address';
+                                return context.t.tr('please_enter_email');
                               } else if (!RegExp(
                                       r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$')
                                   .hasMatch(value)) {
-                                return 'Please enter a valid email address';
+                                return context.t.tr('please_enter_valid_email');
                               }
                               return null; // Return null if the input is valid
                             },
                             controller: email,
-                            hintText: "Enter Your Email",
+                            hintText: context.t.tr('enter_email'),
                             obscureText: false,
                             textInputType: TextInputType.emailAddress,
                           ),
                           const Space(),
-                          const TitleTextField(
-                            text: 'Phone Number',
+                          TitleTextField(
+                            text: context.t.tr('phone_number_optional'),
                           ),
                           const SizedBox(
                             height: 5,
                           ),
                           BuildTextField(
-                            validator: (val) {
-                              if (val!.length != 11) {
-                                return ('Mobile Number must be of 11 digit');
-                              } else {
-                                return null;
-                              }
-                            },
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
                                   RegExp(r'[0-9]')),
                               FilteringTextInputFormatter.digitsOnly
                             ],
                             controller: phoneNumber,
-                            hintText: "Enter Your Phone Number",
+                            hintText: context.t.tr('enter_phone'),
                             obscureText: false,
                             textInputType: TextInputType.phone,
                           ),
                           const Space(),
-                          const TitleTextField(
-                            text: 'Address',
+                          TitleTextField(
+                            text: context.t.tr('address'),
                           ),
                           const SizedBox(
                             height: 5,
@@ -205,22 +196,22 @@ class _UserBodyState extends State<UserBody> {
                             validator: (currentValue) {
                               var nonNullValue = currentValue ?? '';
                               if (nonNullValue.isEmpty) {
-                                return ("address is required");
+                                return (context.t.tr('address_required'));
                               }
                               if (currentValue!.length < 10) {
-                                return 'address must be more accurate and detailed';
+                                return context.t.tr('address_detailed');
                               }
 
                               return null;
                             },
                             controller: address,
-                            hintText: "Enter Your Address",
+                            hintText: context.t.tr('enter_address'),
                             obscureText: false,
                             textInputType: TextInputType.streetAddress,
                           ),
                           const Space(),
-                          const TitleTextField(
-                            text: ' Postal Code',
+                          TitleTextField(
+                            text: context.t.tr('postal_code'),
                           ),
                           const SizedBox(
                             height: 5,
@@ -245,13 +236,13 @@ class _UserBodyState extends State<UserBody> {
                               FilteringTextInputFormatter.digitsOnly
                             ],
                             controller: postalCode,
-                            hintText: "Enter Your Postal Code",
+                            hintText: context.t.tr('enter_postal_code'),
                             obscureText: false,
                             textInputType: TextInputType.number,
                           ),
                           const Space(),
-                          const TitleTextField(
-                            text: 'Password',
+                          TitleTextField(
+                            text: context.t.tr('password'),
                           ),
                           const SizedBox(
                             height: 5,
@@ -262,16 +253,16 @@ class _UserBodyState extends State<UserBody> {
                                     r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
                                 var passNonNullValue = passCurrentValue ?? "";
                                 if (passNonNullValue.isEmpty) {
-                                  return ("Password is required");
+                                  return (context.t.tr('password_required'));
                                 } else if (passNonNullValue.length < 6) {
-                                  return ("Password Must be more than 5 characters");
+                                  return (context.t.tr('password_min_length'));
                                 } else if (!regex.hasMatch(passNonNullValue)) {
-                                  return ("Password should contain upper,lower,digit and Special character ");
+                                  return (context.t.tr('password_complexity'));
                                 }
                                 return null;
                               },
                               controller: password,
-                              hintText: "Enter Your Password",
+                              hintText: context.t.tr('enter_password'),
                               obscureText: isVisiable ? true : false,
                               textInputType: TextInputType.text,
                               suffixIcon: IconButton(
@@ -285,20 +276,20 @@ class _UserBodyState extends State<UserBody> {
                                     : const Icon(Icons.visibility_off),
                               )),
                           const Space(),
-                          const TitleTextField(
-                            text: 'Confirm Password',
+                          TitleTextField(
+                            text: context.t.tr('confirm_password'),
                           ),
                           const SizedBox(
                             height: 5,
                           ),
                           BuildTextField(
                               validator: (val) {
-                                if (val!.isEmpty) return ('Empty');
-                                if (val != password.text) return ('Not Match');
+                                if (val!.isEmpty) return (context.t.tr('empty'));
+                                if (val != password.text) return (context.t.tr('not_match'));
                                 return null;
                               },
                               controller: confirmPassword,
-                              hintText: "Enter Your Confirm Password",
+                              hintText: context.t.tr('enter_confirm_password'),
                               obscureText: isVisiableConfirm ? true : false,
                               textInputType: TextInputType.text,
                               suffixIcon: IconButton(
@@ -316,27 +307,23 @@ class _UserBodyState extends State<UserBody> {
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
-                            child: BuildButton(
-                                text: 'Sign up',
+                            child:                             BuildButton(
+                                text: context.t.tr('sign_up'),
                                 color: Colors.white,
                                 textStyle:
                                     appStyle(17, FontWeight.w700, Colors.black),
                                 ontap: () {
+                                  final fullName =
+                                      '${firstName.text} ${lastName.text}'.trim();
                                   cubit.signUp(
-                                      firstName: firstName.text,
-                                      lastName: lastName.text,
+                                      name: fullName,
                                       email: email.text,
                                       password: password.text,
-                                      phoneNumber: phoneNumber.text,
-                                      address: address.text,
-                                      gender: "male",
-                                      code: postalCode.text,
-                                      passwordConfirmation:
-                                          confirmPassword.text);
+                                      phone: phoneNumber.text);
                                 }),
                           ),
                           const Space(),
-                          const LinkText(),
+                          LinkText(),
                         ],
                       ),
                     ],

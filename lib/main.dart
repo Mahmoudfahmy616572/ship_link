@@ -4,30 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
-import 'package:ship_link/constant/serveices_locators.dart';
-import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
-import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
-import 'package:ship_link/cubitDriver/getStates/get_states_cubit.dart';
-import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
-import 'package:ship_link/cubitDriver/get_user_driver_data/get_userdriver_data_cubit.dart';
-import 'package:ship_link/cubits/addToCart/add_to_cart_cubit.dart';
+import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/constant/services_locators.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
-import 'package:ship_link/cubits/confirmCart/confirm_cart_cubit.dart';
-import 'package:ship_link/cubits/getAllProducts/get_all_prouducts_cubit.dart';
-import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
-import 'package:ship_link/cubits/getTopSeller/get_top_seller_cubit.dart';
-import 'package:ship_link/cubits/payment/payment_cubit.dart';
-import 'package:ship_link/data/services/DriverHomeServeices/driver_home_imp.dart';
-import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
-import 'package:ship_link/data/services/homeServeice/home_serveices_impl.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/providers.dart';
 import 'package:ship_link/routs.dart';
 import 'package:ship_link/services/notification_service.dart';
 import 'package:ship_link/services/supabase_service.dart';
 import 'package:ship_link/views/user/screens/splash/splash_screen.dart';
-
-import 'cubitDriver/upDateUserData/up_date_user_data_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,10 +21,10 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await NotificationService().initialize();
   } catch (_) {
-    debugPrint('Firebase not configured - notifications disabled');
+    debugPrint('Firebase core init failed');
   }
+  await NotificationService().initialize();
   setupServeiceLocator();
   runApp(const MyApp());
 }
@@ -56,90 +41,43 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (context) => GetOrdersCubit(
-                  getIt.get<DriverHomeServeicesImpl>(),
-                )..getOrder(),
-              ),
-              BlocProvider(
-                create: (context) => GetUserdriverDataCubit(
-                  getIt.get<DriverHomeServeicesImpl>(),
-                )..getuserDriverData(),
-              ),
-              BlocProvider(
-                create: (context) => UpDateUserDataCubit(
-                  getIt.get<DriverHomeServeicesImpl>(),
-                )..updateUserData(),
-              ),
-              BlocProvider(
-                create: (context) => AcceptOrderCubit(
-                  getIt.get<DriverHomeServeicesImpl>(),
-                )..acceptOrders(),
-              ),
-              BlocProvider(
-                create: (context) => GetAcceptedOrderCubit(
-                  getIt.get<DriverHomeServeicesImpl>(),
-                )..getAcceptedOrder(),
-              ),
-              BlocProvider(
-                create: (context) => GetStatesCubit(
-                  getIt.get<DriverHomeServeicesImpl>(),
-                )..getStates(),
-              ),
-              BlocProvider(
-                create: (context) => GetAllProuductsCubit(
-                  getIt.get<HomeServeicesImpl>(),
-                )..getAllproducts(),
-              ),
-              BlocProvider(
-                create: (context) => GetTopSellerCubit(
-                  getIt.get<HomeServeicesImpl>(),
-                )..getTopSellerProducts(),
-              ),
-              BlocProvider(
-                create: (context) => AddToCartCubit(
-                  getIt.get<CartServeicesImpl>(),
-                )..addToCart(),
-              ),
-              BlocProvider(
-                create: (context) => PaymentCubit(
-                  getIt.get<CartServeicesImpl>(),
-                )..checkout(),
-              ),
-              BlocProvider(
-                create: (context) => GetFromCartCubit(
-                  getIt.get<CartServeicesImpl>(),
-                )..getProductFromCart(),
-              ),
-              BlocProvider(
-                create: (context) => ConfirmCartCubit(
-                  getIt.get<CartServeicesImpl>(),
-                )..confirmCart(),
-              ),
-              BlocProvider(
-                create: (context) => AuthCubit(),
-              ),
-            ],
+          return BlocProvider(
+            create: (context) => AuthCubit(),
             child: MaterialApp(
+              navigatorKey: NotificationService.navigatorKey,
               title: 'ShipLink',
-              routes: routes,
+              onGenerateRoute: onGenerateRoute,
               initialRoute: Splash.routName,
+              onUnknownRoute: (settings) => SlowMaterialPageRoute(
+                builder: (_) => const Splash(),
+                settings: settings,
+              ),
               debugShowCheckedModeBanner: false,
               themeMode: themeProvider.themeMode,
               theme: ThemeData(
                 brightness: Brightness.light,
-                colorSchemeSeed: const Color(0xFF242424),
+                colorSchemeSeed: AppColors.primary,
                 useMaterial3: true,
+                pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: <TargetPlatform, PageTransitionsBuilder>{
+                    TargetPlatform.android: _TopToBottomTransitionBuilder(),
+                    TargetPlatform.iOS: _TopToBottomTransitionBuilder(),
+                  },
+                ),
               ),
               darkTheme: ThemeData(
                 brightness: Brightness.dark,
-                colorSchemeSeed: const Color(0xFF242424),
+                colorSchemeSeed: AppColors.primary,
                 useMaterial3: true,
+                pageTransitionsTheme: const PageTransitionsTheme(
+                  builders: <TargetPlatform, PageTransitionsBuilder>{
+                    TargetPlatform.android: _TopToBottomTransitionBuilder(),
+                    TargetPlatform.iOS: _TopToBottomTransitionBuilder(),
+                  },
+                ),
               ),
               locale: localeProvider.locale,
-              localizationsDelegates: [
+              localizationsDelegates: const [
                 AppLocalizations.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
@@ -152,6 +90,30 @@ class MyApp extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _TopToBottomTransitionBuilder extends PageTransitionsBuilder {
+  const _TopToBottomTransitionBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(0, -1),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeInOut,
+      )),
+      child: child,
     );
   }
 }

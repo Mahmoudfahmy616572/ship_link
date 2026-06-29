@@ -30,9 +30,9 @@ class GetFromCart {
 
 class Cart {
     int? id;
-    int? userId;
+    String? userId;
     int? status;
-    String? totalPrice;
+    double? totalPrice;
     int? isOpen;
     DateTime? createdAt;
     DateTime? updatedAt;
@@ -48,10 +48,10 @@ class Cart {
     });
 
     factory Cart.fromJson(Map<String, dynamic> json) => Cart(
-        id: json["id"],
-        userId: json["user_id"],
+        id: (json["id"] as num?)?.toInt(),
+        userId: json["user_id"]?.toString(),
         status: json["status"],
-        totalPrice: json["totalPrice"],
+        totalPrice: (json["totalPrice"] as num?)?.toDouble(),
         isOpen: json["is_open"],
         createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
         updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
@@ -86,11 +86,13 @@ class Detail {
     });
 
     factory Detail.fromJson(Map<String, dynamic> json) => Detail(
-        id: json["id"],
-        cartId: json["cart_id"],
-        product: json["product"] == null ? null : Product.fromJson(json["product"]),
-        qty: json["qty"],
-        totalPrice: json["total_price"]?.toDouble(),
+        id: (json["id"] as num?)?.toInt(),
+        cartId: (json["id"] as num?)?.toInt(),
+        product: (json["products"] ?? json["product"]) == null
+            ? null
+            : Product.fromJson(json["products"] ?? json["product"]),
+        qty: json["quantity"],
+        totalPrice: (json["total_price"] as num?)?.toDouble(),
         isOpen: json["is_open"],
     );
 
@@ -109,19 +111,31 @@ class Product {
     String? image;
     String? name;
     double? price;
+    String? category;
+    List<String>? images;
 
     Product({
         this.id,
         this.image,
         this.name,
         this.price,
+        this.category,
+        this.images,
     });
+
+    List<String> get imageList {
+      if (images != null && images!.isNotEmpty) return images!;
+      if (image != null) return [image!];
+      return [];
+    }
 
     factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json["id"],
         image: json["image"],
         name: json["name"],
         price: json["price"]?.toDouble(),
+        category: json["category"],
+        images: json["images"] == null ? null : List<String>.from(json["images"]!.map((x) => x.toString())),
     );
 
     Map<String, dynamic> toJson() => {
@@ -129,5 +143,7 @@ class Product {
         "image": image,
         "name": name,
         "price": price,
+        "category": category,
+        "images": images,
     };
 }
