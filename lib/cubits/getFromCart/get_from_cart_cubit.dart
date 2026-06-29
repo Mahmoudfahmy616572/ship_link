@@ -9,33 +9,32 @@ part 'get_from_cart_state.dart';
 class GetFromCartCubit extends Cubit<GetFromCartState> {
   GetFromCartCubit(this.cartServeices) : super(GetFromCartInitial());
   final CartServeices cartServeices;
+
   Future<void> getProductFromCart() async {
-    emit(GetFromCartLoading());
+    if (!isClosed && state is GetFromCartInitial) {
+      emit(GetFromCartLoading());
+    }
     var result = await cartServeices.getFromCart();
     result.fold(
       (failure) {
-        print(failure);
-        emit(GetFromCartFailure(failure.errMessage));
+        if (!isClosed) emit(GetFromCartFailure(failure.errMessage));
       },
       (product) {
-        print(product);
-        emit(GetFromCartSuccess(product));
+        if (!isClosed) emit(GetFromCartSuccess(product));
       },
     );
   }
 
-  Future<void> deleteFromCart({int? cart_id, int? product_id}) async {
-    emit(DeleteFromCartLoading());
+  Future<void> deleteFromCart({required int cart_id, required int product_id}) async {
+    if (!isClosed) emit(DeleteFromCartLoading());
     var result = await cartServeices.deletefromCart(
-        cart_id: cart_id ?? 0, product_id: product_id ?? 0);
+        cart_id: cart_id, product_id: product_id);
     result.fold(
       (failure) {
-        print(failure);
-        emit(DeleteFromCartFailure(failure.errMessage));
+        if (!isClosed) emit(DeleteFromCartFailure(failure.errMessage));
       },
-      (success) {
-        GetFromCartCubit(cartServeices).getProductFromCart();
-        emit(DeleteFromCartSuccess(success));
+      (_) {
+        if (!isClosed) getProductFromCart();
       },
     );
   }

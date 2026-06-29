@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class AddOrSubtractButton extends StatelessWidget {
   const AddOrSubtractButton({
@@ -15,11 +17,13 @@ class AddOrSubtractButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(55),
       onTap: ontap,
       child: Container(
-        width: 30,
-        height: 30,
-        decoration:
-            const BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
-        child: Icon(icon),
+        width: 36.w,
+        height: 36.w,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.cta,
+        ),
+        child: Icon(icon, color: Colors.white, size: 18.sp),
       ),
     );
   }

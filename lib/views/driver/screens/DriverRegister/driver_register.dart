@@ -7,10 +7,10 @@ class DriverRegister extends StatelessWidget {
   static String routName = '/driver';
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
-      child: Scaffold(
-        backgroundColor: Color(0xFFCDCDCD),
-        body: DriverBody(),
+    return const Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: DriverBody(),
       ),
     );
   }

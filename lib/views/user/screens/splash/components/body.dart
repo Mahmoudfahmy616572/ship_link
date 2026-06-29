@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class Body extends StatelessWidget {
   const Body({
@@ -26,13 +28,13 @@ class Body extends StatelessWidget {
             const Color(0xFF343434).withOpacity(0.2),
             const Color(0xFF343434).withOpacity(0.22)
           ])),
-          child: const Center(
+          child: Center(
             child: Text(
-              'Fast Shipping at Low\nCosts',
+              context.t.tr('fast_shipping_low_costs'),
               style: TextStyle(
                   color: Colors.white,
                   letterSpacing: 1,
-                  fontSize: 22,
+                  fontSize: 22.sp,
                   fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),

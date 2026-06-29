@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:rive/rive.dart';
 
 class MenuBTN extends StatelessWidget {
@@ -16,10 +17,10 @@ class MenuBTN extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.only(left: 10, bottom: 40),
+          padding: EdgeInsets.only(left: 10.w, bottom: 40.h),
           child: Container(
-            height: 45,
-            width: 45,
+            height: 45.h,
+            width: 45.w,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [

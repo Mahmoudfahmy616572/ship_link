@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/driver/screens/DriverSignIn/signin_driver.dart';
 import 'package:ship_link/views/shared/text_field.dart';
 
@@ -11,6 +12,7 @@ import '../../../../../cubitDriver/get_user_driver_data/get_userdriver_data_cubi
 import '../../../../../cubitDriver/upDateUserData/up_date_user_data_cubit.dart';
 import '../../../../shared/app_style.dart';
 import '../../../../shared/snackBar/snack_bar.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({
@@ -37,10 +39,10 @@ class CustomAppBar extends StatelessWidget {
                         context, SignInDriver.routName);
                   },
                   child: Container(
-                    padding: const EdgeInsets.all(5),
+                    padding: EdgeInsets.all(5.w),
                     decoration: BoxDecoration(
                         color: Colors.red,
-                        borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10.r)),
                     child: Text(
                       "LogOut",
                       style: appStyle(15, FontWeight.w600, Colors.white),
@@ -76,7 +78,7 @@ class CustomAppBar extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit User Info'),
+          title: Text(context.t.tr('edit_user_info')),
           content: BlocConsumer<GetUserdriverDataCubit, GetUserdriverDataState>(
             listener: (context, state) {},
             builder: (context, state) {
@@ -85,23 +87,23 @@ class CustomAppBar extends StatelessWidget {
                   width: MediaQuery.of(context).size.width * 0.94,
                   height: MediaQuery.of(context).size.height * 0.3,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                     color: Colors.grey,
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0.w),
                     child: Column(
                       children: [
-                        const SizedBox(
-                          height: 10,
+                        SizedBox(
+                          height: 10.h,
                         ),
                         BuildTextField(
                           controller: nameController,
                           hintText: 'enter your name',
                           obscureText: false,
                         ),
-                        const SizedBox(
-                          height: 10,
+                        SizedBox(
+                          height: 10.h,
                         ),
                         BuildTextField(
                           controller: phoneController,
@@ -109,11 +111,11 @@ class CustomAppBar extends StatelessWidget {
                           textInputType: TextInputType.phone,
                           obscureText: false,
                         ),
-                        const SizedBox(
-                          height: 10,
+                        SizedBox(
+                          height: 10.h,
                         ),
-                        const SizedBox(
-                          height: 10,
+                        SizedBox(
+                          height: 10.h,
                         ),
                       ],
                     ),
@@ -151,7 +153,7 @@ class CustomAppBar extends StatelessWidget {
               builder: (context, state) {
                 return SizedBox(
                   width: double.infinity,
-                  height: 60,
+                  height: 60.h,
                   child: BlocBuilder<GetUserdriverDataCubit,
                       GetUserdriverDataState>(
                     builder: (context, state) {
@@ -162,16 +164,14 @@ class CustomAppBar extends StatelessWidget {
                               backgroundColor: const Color(0xFF242424),
                               textStyle:
                                   appStyle(18, FontWeight.w500, Colors.black),
-                              shape: const RoundedRectangleBorder(
+                              shape: RoundedRectangleBorder(
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
+                                      BorderRadius.all(Radius.circular(10.r))),
                             ),
                             onPressed: () async {
-                              print(state.getuserDriverData.data?.id ?? 0);
-                              await BlocProvider.of<UpDateUserDataCubit>(
-                                      context)
-                                  .updateUserData(
-                                id: state.getuserDriverData.data?.id ?? 0,
+                                  await BlocProvider.of<UpDateUserDataCubit>(
+                                          context)
+                                      .updateUserData(
                                 name: nameController.text,
                                 phoneNumber: phoneController.text,
                               );
@@ -181,7 +181,7 @@ class CustomAppBar extends StatelessWidget {
                                 ? const Center(
                                     child: CircularProgressIndicator(),
                                   )
-                                : const Text("Edit"));
+                                : Text(context.t.tr('edit')));
                       } else {
                         return const CustomErrorWidget(
                           errMessage: "error",
@@ -199,13 +199,13 @@ class CustomAppBar extends StatelessWidget {
                     foregroundColor: Colors.white,
                     backgroundColor: const Color(0xFF242424),
                     textStyle: appStyle(18, FontWeight.w500, Colors.black),
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10.r))),
                   ),
                   onPressed: () async {
                     Navigator.of(context).pop();
                   },
-                  child: const Text("Cancel")),
+                  child: Text(context.t.tr('cancel'))),
             )
           ],
         );

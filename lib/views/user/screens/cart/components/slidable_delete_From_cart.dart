@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../../../../cubits/getFromCart/get_from_cart_cubit.dart';
 import '../../../../../data/models/getFromCart/get_from_cart.dart';
+import 'package:ship_link/localization.dart';
 import 'product_card.dart';
 
 class SlidableDeleteFromCart extends StatelessWidget {
@@ -32,15 +33,15 @@ class SlidableDeleteFromCart extends StatelessWidget {
           SlidableAction(
             flex: 1,
             onPressed: (context) {
-              print(model.details?[index].cartId);
-              cubit.deleteFromCart(
-                  cart_id: model.details?[index].cartId,
-                  product_id: model.details?[index].product?.id);
+              final cartId = model.details?[index].cartId;
+              final prodId = model.details?[index].product?.id;
+              if (cartId == null || prodId == null) return;
+              cubit.deleteFromCart(cart_id: cartId, product_id: prodId);
             },
             backgroundColor: const Color(0xFF000000),
             foregroundColor: Colors.white,
             icon: Icons.delete,
-            label: 'Delete',
+            label: context.t.tr('delete'),
           ),
         ],
       ),

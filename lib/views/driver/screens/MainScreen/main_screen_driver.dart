@@ -1,9 +1,14 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ship_link/constant/services_locators.dart';
+import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
+import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
+import 'package:ship_link/cubitDriver/get_user_driver_data/get_userdriver_data_cubit.dart';
+import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
+import 'package:ship_link/data/services/DriverHomeServeices/driver_home_serveices.dart';
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
 import 'package:ship_link/views/driver/screens/ordersScreen/ordersScreen.dart';
-import 'package:ship_link/views/shared/notification_bell.dart';
+
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 
 import '../DriverHome/driver_home.dart';
@@ -12,7 +17,7 @@ class MainScreenDriver extends StatefulWidget {
   const MainScreenDriver({super.key});
   static String routName = '/MainScreenDriver';
   @override
-  _MainScreenDriverState createState() => _MainScreenDriverState();
+  State<MainScreenDriver> createState() => _MainScreenDriverState();
 }
 
 class _MainScreenDriverState extends State<MainScreenDriver> {
@@ -24,74 +29,59 @@ class _MainScreenDriverState extends State<MainScreenDriver> {
     _pageController = PageController(initialPage: selectedIndex);
   }
 
-  void onButtonPressed(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
+  void switchToTab(int index) {
+    setState(() => selectedIndex = index);
     _pageController.animateToPage(selectedIndex,
         duration: const Duration(milliseconds: 200), curve: Curves.easeOutQuad);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(
-          children: [
-            Column(
-              children: <Widget>[
-                Expanded(
-                  child: PageView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    controller: _pageController,
-                    children: _listOfWidget,
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: const NotificationBell(),
-              ),
-            ),
+    final service = getIt<DriverHomeServeices>();
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => GetOrdersCubit(service)..getOrder()),
+        BlocProvider(create: (_) => GetAcceptedOrderCubit(service)..getAcceptedOrder()),
+        BlocProvider(create: (_) => GetUserdriverDataCubit(service)..getuserDriverData()),
+        BlocProvider(create: (_) => AcceptOrderCubit(service)),
+      ],
+      child: Scaffold(
+        body: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _pageController,
+          children: const [
+            DriverHome(),
+            OrdersScreen(),
+            DriverProfile(),
           ],
         ),
         bottomNavigationBar: SlidingClippedNavBar.colorful(
-          backgroundColor: Colors.black,
-          onButtonPressed: onButtonPressed,
-          iconSize: 28,
+          backgroundColor: Colors.white,
+          onButtonPressed: (i) => switchToTab(i),
+          iconSize: 26,
           selectedIndex: selectedIndex,
-          barItems: <BarItem>[
+          barItems: [
             BarItem(
-              icon: Icons.home,
+              icon: Icons.home_rounded,
               title: 'Home',
-              activeColor: Colors.blue,
-              inactiveColor: Colors.white,
+              activeColor: const Color(0xFF2563EB),
+              inactiveColor: const Color(0xFF9CA3AF),
             ),
             BarItem(
-              icon: Icons.delivery_dining_outlined,
+              icon: Icons.delivery_dining_rounded,
               title: 'Orders',
-              activeColor: Colors.blue,
-              inactiveColor: Colors.white,
+              activeColor: const Color(0xFF2563EB),
+              inactiveColor: const Color(0xFF9CA3AF),
             ),
             BarItem(
-              icon: Icons.person,
+              icon: Icons.person_rounded,
               title: 'Profile',
-              activeColor: Colors.blue,
-              inactiveColor: Colors.white,
+              activeColor: const Color(0xFF2563EB),
+              inactiveColor: const Color(0xFF9CA3AF),
             ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }
-
-List<Widget> _listOfWidget = <Widget>[
-  const DriverHome(),
-  const OrdersScreen(),
-  const DriverProfile(),
-];

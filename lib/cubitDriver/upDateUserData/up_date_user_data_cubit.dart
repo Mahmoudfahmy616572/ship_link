@@ -11,10 +11,9 @@ class UpDateUserDataCubit extends Cubit<UpDateUserDataState> {
       : super(UpDateUserDataInitial());
   final DriverHomeServeices driverHomeServeices;
   Future<void> updateUserData(
-      {int? id, String? name, String? phoneNumber}) async {
+      {String? name, String? phoneNumber}) async {
     emit(UpDateUserDataILoading());
     var result = await driverHomeServeices.updateUserData(
-      id: id ?? 0,
       phoneNumber: phoneNumber!,
       name: name!,
     );

@@ -63,14 +63,18 @@ class Data {
 
 class Order {
   int? id;
-  int? userId;
+  String? userId;
   int? cartId;
   int? totalPrice;
   String? status;
-  int? driverId;
+  String? driverId;
   DateTime? createdAt;
   DateTime? updatedAt;
   User? user;
+  String? deliveryAddress;
+  double? deliveryLat;
+  double? deliveryLng;
+  String? addressLabel;
 
   Order({
     this.id,
@@ -82,22 +86,30 @@ class Order {
     this.createdAt,
     this.updatedAt,
     this.user,
+    this.deliveryAddress,
+    this.deliveryLat,
+    this.deliveryLng,
+    this.addressLabel,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) => Order(
-        id: json["id"],
-        userId: json["user_id"],
-        cartId: json["cart_id"],
-        totalPrice: json["total_price"],
+        id: (json["id"] as num?)?.toInt(),
+        userId: json["user_id"]?.toString(),
+        cartId: (json["cart_id"] as num?)?.toInt(),
+        totalPrice: (json["total_price"] as num?)?.toInt(),
         status: json["status"],
-        driverId: json["driver_id"],
+        driverId: json["driver_id"]?.toString(),
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
         updatedAt: json["updated_at"] == null
             ? null
             : DateTime.parse(json["updated_at"]),
-        user: json["user"] == null ? null : User.fromJson(json["user"]),
+        user: json["profiles"] == null ? null : User.fromJson(json["profiles"]),
+        deliveryAddress: json["delivery_address"],
+        deliveryLat: (json["delivery_lat"] as num?)?.toDouble(),
+        deliveryLng: (json["delivery_lng"] as num?)?.toDouble(),
+        addressLabel: json["address_label"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -110,11 +122,15 @@ class Order {
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
         "user": user?.toJson(),
+        "delivery_address": deliveryAddress,
+        "delivery_lat": deliveryLat,
+        "delivery_lng": deliveryLng,
+        "address_label": addressLabel,
       };
 }
 
 class User {
-  int? id;
+  String? id;
   String? firstName;
   String? lastName;
   String? email;
@@ -129,7 +145,7 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["id"],
+        id: json["id"]?.toString(),
         firstName: json["first_name"],
         lastName: json["last_name"],
         email: json["email"],

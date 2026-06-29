@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../shared/snackBar/snack_bar.dart';
@@ -11,8 +12,21 @@ class MapWebViewScreen extends StatelessWidget {
   const MapWebViewScreen({super.key, required this.url});
   final String url;
   static String routName = '/mabWebView';
+
+  bool _isTrustedDomain(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return false;
+    return uri.host.endsWith('spider-te8.com') || uri.host.endsWith('localhost');
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_isTrustedDomain(url)) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(child: Text('Untrusted URL')),
+      );
+    }
     Uri urls = Uri.parse(url);
     var webcontroller = WebViewController()
       ..loadRequest(urls)
@@ -21,9 +35,7 @@ class MapWebViewScreen extends StatelessWidget {
       ..addJavaScriptChannel(
         'messageHandler',
         onMessageReceived: (p0) {
-          print(p0);
           var data = jsonDecode(p0.message);
-          print(data['success']);
           if (data['success'] == false) {
             Navigator.pop(context);
           }
@@ -40,23 +52,14 @@ class MapWebViewScreen extends StatelessWidget {
                     .runJavaScriptReturningResult(
                         "document.documentElement.innerText")
                     .then((value) {
-                  print('=================================');
                   var data = jsonDecode(value.toString());
-                  var dataSp = jsonDecode(data);
-                  print(dataSp["success"]);
-                  if (dataSp["success"] == 'false') {
-                    print('Faild');
+                  if (data["success"] == 'true') {
                     Navigator.pop(context);
-                    // Navigator.pushNamedAndRemoveUntil(
-                    //     context, Congrates.routName, (route) => false);
                     CustomSnackBar.displaySuccessMotionToast(
-                        "payment Successfuly", context);
-                  } else if (dataSp["success"] != 'false') {
-                    print('Success');
-                    // Navigator.pushNamedAndRemoveUntil(
-                    //     context, CheckOutPage.routName, (route) => false);
+                        context.t.tr('payment_successful'), context);
+                  } else {
                     CustomSnackBar.displayErrorMotionToast(
-                        "payment Successfuly", context);
+                        context.t.tr('payment_failed'), context);
                   }
                 });
               },

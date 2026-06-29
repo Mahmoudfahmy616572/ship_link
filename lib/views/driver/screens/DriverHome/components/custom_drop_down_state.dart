@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/driver/screens/DriverHome/components/details_dropdown.dart';
 
 class CustomDropDownState extends State<CustomDropDown> {
@@ -27,7 +28,7 @@ class CustomDropDownState extends State<CustomDropDown> {
         },
         child: ButtonWidget(
           onTap: onTap,
-          child: const Text('Button Text'),
+          child: Text(context.t.tr('button_text')),
         ),
       ),
     );

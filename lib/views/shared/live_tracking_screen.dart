@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:ship_link/config.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/services/supabase_service.dart';
+import 'package:ship_link/widgets/adaptive_map.dart';
 
 class LiveTrackingScreen extends StatefulWidget {
   final String? driverId;
@@ -14,9 +14,9 @@ class LiveTrackingScreen extends StatefulWidget {
 }
 
 class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
-  GoogleMapController? _mapController;
-  final Set<Marker> _markers = {};
+  AdaptiveMapController? _mapController;
   final SupabaseService _supabase = SupabaseService();
+  List<MapMarker> _markers = [];
 
   @override
   void initState() {
@@ -31,21 +31,17 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
           final lat = (data['latitude'] as num).toDouble();
           final lng = (data['longitude'] as num).toDouble();
           setState(() {
-            _markers.clear();
-            _markers.add(
-              Marker(
-                markerId: const MarkerId('driver'),
-                position: LatLng(lat, lng),
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueBlue),
-                infoWindow:
-                    const InfoWindow(title: 'Driver Location'),
+            _markers = [
+              MapMarker(
+                id: 'driver',
+                latitude: lat,
+                longitude: lng,
+                icon: buildDriverMarker(),
+                label: context.t.tr('driver_location'),
               ),
-            );
+            ];
           });
-          _mapController?.animateCamera(
-            CameraUpdate.newLatLng(LatLng(lat, lng)),
-          );
+          _mapController?.animateTo(lat, lng);
         }
       });
     }
@@ -55,20 +51,17 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Live Tracking'),
+        title: Text(context.t.tr('live_tracking')),
         centerTitle: true,
       ),
-      body: GoogleMap(
-        initialCameraPosition: const CameraPosition(
-          target: LatLng(30.0444, 31.2357),
-          zoom: 12,
-        ),
+      body: AdaptiveMap(
+        initialLatitude: 30.0444,
+        initialLongitude: 31.2357,
+        initialZoom: 12,
         markers: _markers,
-        myLocationEnabled: widget.driverId == null,
-        myLocationButtonEnabled: true,
-        onMapCreated: (controller) {
-          _mapController = controller;
-        },
+        showMyLocation: widget.driverId == null,
+        showMyLocationButton: true,
+        onMapCreated: (ctrl) => _mapController = ctrl,
       ),
     );
   }

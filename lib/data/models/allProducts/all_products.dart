@@ -55,8 +55,10 @@ class Product {
     int? qty;
     int? status;
     int? providerId;
+    String? category;
     DateTime? createdAt;
     DateTime? updatedAt;
+    List<String>? images;
 
     Product({
         this.id,
@@ -69,9 +71,17 @@ class Product {
         this.qty,
         this.status,
         this.providerId,
+        this.category,
         this.createdAt,
         this.updatedAt,
+        this.images,
     });
+
+    List<String> get imageList {
+      if (images != null && images!.isNotEmpty) return images!;
+      if (image != null) return [image!];
+      return [];
+    }
 
     factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json["id"],
@@ -84,8 +94,10 @@ class Product {
         qty: json["qty"],
         status: json["status"],
         providerId: json["provider_id"],
+        category: json["category"],
         createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
         updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
+        images: json["images"] == null ? null : List<String>.from(json["images"]!.map((x) => x.toString())),
     );
 
     Map<String, dynamic> toJson() => {
@@ -99,7 +111,9 @@ class Product {
         "qty": qty,
         "status": status,
         "provider_id": providerId,
+        "category": category,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
+        "images": images,
     };
 }

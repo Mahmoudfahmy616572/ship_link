@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class ProductTextTitle extends StatelessWidget {
   const ProductTextTitle({
@@ -12,7 +13,7 @@ class ProductTextTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15),
+      padding: EdgeInsets.only(left: 15.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

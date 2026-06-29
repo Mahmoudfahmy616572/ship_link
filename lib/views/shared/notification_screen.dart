@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app_style.dart';
 
@@ -49,11 +50,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: Text(context.t.tr('notifications')),
         backgroundColor: const Color(0xFF1a1a2e),
       ),
       body: _notifications.isEmpty
-          ? const Center(child: Text('No notifications yet'))
+          ? Center(child: Text(context.t.tr('no_notifications_yet')))
           : ListView.builder(
               itemCount: _notifications.length,
               itemBuilder: (_, i) {
@@ -76,7 +77,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ? null
                       : TextButton(
                           onPressed: () => _markRead(n['id']),
-                          child: const Text('Mark read'),
+                          child: Text(context.t.tr('mark_read')),
                         ),
                 );
               },

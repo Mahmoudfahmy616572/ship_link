@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:flutter_svg/svg.dart';
 
 class ButtonShoppingbag extends StatelessWidget {
@@ -9,11 +10,11 @@ class ButtonShoppingbag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.all(9),
-        height: 40,
-        width: 40,
+        padding: EdgeInsets.all(9.w),
+        height: 40.h,
+        width: 40.w,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(9), color: Colors.grey),
+            borderRadius: BorderRadius.circular(9.r), color: Colors.grey),
         child: SvgPicture.asset(
           "assets/icons/shopping_bag icon.svg",
           // ignore: deprecated_member_use

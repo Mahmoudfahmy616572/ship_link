@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 import '../../../../shared/app_style.dart';
 import '../../favourite/Components/button_shopping.dart';
@@ -18,7 +19,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 120,
+      height: 120.h,
       decoration: const BoxDecoration(
           border: Border(bottom: BorderSide(color: Color(0xFF606060)))),
       child: Row(
@@ -27,29 +28,29 @@ class ProductCard extends StatelessWidget {
           Row(
             children: [
               Padding(
-                padding: const EdgeInsets.all(4.0),
+                padding: EdgeInsets.all(4.w),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(7),
+                  borderRadius: BorderRadius.circular(7.r),
                   child: AspectRatio(
                     
                     aspectRatio: 1.6 / 1.5,
                     child: CachedNetworkImage(
                       fit: BoxFit.cover,
                       imageUrl: img,
-                      errorWidget: (context, url, error) => const Center(
+                      errorWidget: (context, url, error) => Center(
                           child: Icon(
                         Icons.error_outline,
-                        size: 60,
+                        size: 60.sp,
                       )),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 30,
+              SizedBox(
+                width: 30.w,
               ),
               Container(
-                padding: const EdgeInsets.only(top: 15),
+                padding: EdgeInsets.only(top: 15.h),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,8 +60,8 @@ class ProductCard extends StatelessWidget {
                       style: appStyle(
                           17, FontWeight.w500, const Color(0xFF606060)),
                     ),
-                    const SizedBox(
-                      height: 10,
+                    SizedBox(
+                      height: 10.h,
                     ),
                     Text(
                       price,
@@ -72,14 +73,14 @@ class ProductCard extends StatelessWidget {
             ],
           ),
           const Text("  "),
-          const Column(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // ButtonDeleteproduct(),
               SizedBox(
-                height: 35,
+                height: 35.h,
               ),
-              ButtonShoppingbag(),
+              const ButtonShoppingbag(),
             ],
           )
         ],

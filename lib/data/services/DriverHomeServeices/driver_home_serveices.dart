@@ -14,9 +14,12 @@ abstract class DriverHomeServeices {
   Future<Either<Failure, GetAcceptOrder>> getAcceptedOrders();
   Future<Either<Failure, GetuserDriverData>> getuserData();
   Future<Either<Failure, UpDateUserData>> updateUserData({
-    required int id,
-    required String phoneNumber,
     required String name,
+    required String phoneNumber,
   });
   Future<Either<Failure, AcceptOrder>> acceptOrders({required int orderId});
+  Future<Either<Failure, AcceptOrder>> markPickedUp({required int orderId});
+  Future<Either<Failure, AcceptOrder>> markShipped({required int orderId});
+  Future<Either<Failure, AcceptOrder>> markDelivered({required int orderId});
+  Future<Either<Failure, AcceptOrder>> cancelOrder({required int orderId});
 }

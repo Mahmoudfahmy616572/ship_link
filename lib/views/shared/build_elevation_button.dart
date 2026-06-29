@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:ship_link/constant/colors.dart';
 import 'app_style.dart';
 
 class CheckoutButton extends StatelessWidget {
@@ -25,8 +26,7 @@ class CheckoutButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
-          backgroundColor: const Color(0xFF242424),
-          textStyle: appStyle(18, FontWeight.w500, Colors.black),
+          backgroundColor: AppColors.primary,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10))),
         ),

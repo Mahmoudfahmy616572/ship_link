@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 import '../../../../shared/app_style.dart';
 
@@ -13,7 +14,7 @@ class NameAndPrice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(top: 15),
+      padding: EdgeInsets.only(top: 15.h),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,8 +23,8 @@ class NameAndPrice extends StatelessWidget {
             title,
             style: appStyle(17, FontWeight.w500, const Color(0xFF606060)),
           ),
-          const SizedBox(
-            height: 10,
+          SizedBox(
+            height: 10.h,
           ),
           Text(
             price,

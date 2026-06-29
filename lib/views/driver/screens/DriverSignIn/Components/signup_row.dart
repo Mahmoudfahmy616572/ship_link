@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/constant/colors.dart';
 
 import '../../../../shared/app_style.dart';
 import '../../DriverRegister/driver_register.dart';
@@ -23,7 +24,7 @@ class SignUpRow extends StatelessWidget {
           },
           child: Text(
             "SignUp ",
-            style: appStyle(15, FontWeight.w500, Colors.blueAccent),
+            style: appStyle(15, FontWeight.w500, AppColors.primary),
           ),
         ),
       ],

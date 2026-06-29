@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final signUpDriver = signUpDriverFromJson(jsonString);
-
 import 'dart:convert';
 
 SignUpDriver signUpDriverFromJson(String str) =>
@@ -34,81 +30,53 @@ class SignUpDriver {
 }
 
 class User {
+  String? id;
   String? name;
   String? email;
   String? phoneNumber;
-  String? stateId;
-  String? gender;
-  String? code;
+  String? vehicleType;
   String? vehicleNumber;
+  String? state;
   DateTime? updatedAt;
   DateTime? createdAt;
-  int? id;
-  State? state;
 
   User({
+    this.id,
     this.name,
     this.email,
     this.phoneNumber,
-    this.stateId,
-    this.gender,
-    this.code,
+    this.vehicleType,
     this.vehicleNumber,
+    this.state,
     this.updatedAt,
     this.createdAt,
-    this.id,
-    this.state,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
+        id: json["id"],
         name: json["name"],
         email: json["email"],
         phoneNumber: json["phone_number"],
-        stateId: json["state_id"],
-        gender: json["gender"],
-        code: json["code"],
-        vehicleNumber: json["vehicle_Number"],
+        vehicleType: json["vehicle_type"],
+        vehicleNumber: json["vehicle_number"],
+        state: json["state"],
         updatedAt: json["updated_at"] == null
             ? null
             : DateTime.parse(json["updated_at"]),
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
-        id: json["id"],
-        state: json["state"] == null ? null : State.fromJson(json["state"]),
       );
 
   Map<String, dynamic> toJson() => {
+        "id": id,
         "name": name,
         "email": email,
         "phone_number": phoneNumber,
-        "state_id": stateId,
-        "gender": gender,
-        "code": code,
-        "vehicle_Number": vehicleNumber,
+        "vehicle_type": vehicleType,
+        "vehicle_number": vehicleNumber,
+        "state": state,
         "updated_at": updatedAt?.toIso8601String(),
         "created_at": createdAt?.toIso8601String(),
-        "id": id,
-        "state": state?.toJson(),
-      };
-}
-
-class State {
-  int? id;
-  String? name;
-
-  State({
-    this.id,
-    this.name,
-  });
-
-  factory State.fromJson(Map<String, dynamic> json) => State(
-        id: json["id"],
-        name: json["name"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
       };
 }

@@ -13,7 +13,8 @@ final class GetUserdriverDataLoading extends GetUserdriverDataState {}
 
 final class GetUserdriverDataSuccess extends GetUserdriverDataState {
   final GetuserDriverData getuserDriverData;
-  const GetUserdriverDataSuccess(this.getuserDriverData);
+  final bool isOffline;
+  const GetUserdriverDataSuccess(this.getuserDriverData, {this.isOffline = false});
 }
 
 final class GetUserdriverDataFailure extends GetUserdriverDataState {

@@ -6,32 +6,30 @@ abstract class Failure {
 }
 
 class ServerFailure extends Failure {
-  ServerFailure(super.errMesssage);
+  ServerFailure(super.errMessage);
   factory ServerFailure.fromDioError(DioException dioError) {
     switch (dioError.type) {
       case DioExceptionType.connectionTimeout:
-        return ServerFailure("Connection timeout with Apiserveices");
+        return ServerFailure("Connection timeout with API");
       case DioExceptionType.sendTimeout:
-        return ServerFailure("Send timeout with Apiserveices");
+        return ServerFailure("Send timeout with API");
       case DioExceptionType.receiveTimeout:
-        return ServerFailure("Receive timeout with Apiserveices");
+        return ServerFailure("Receive timeout with API");
       case DioExceptionType.badCertificate:
-        return ServerFailure("Connection badCertificate with Apiserveices");
+        return ServerFailure("Connection badCertificate with API");
       case DioExceptionType.badResponse:
         return ServerFailure.fromResponse(
             dioError.response!.statusCode!, dioError.response!.data);
       case DioExceptionType.cancel:
-        return ServerFailure("requist to ApiResponse was canceld");
+        return ServerFailure("Request to API was cancelled");
       case DioExceptionType.connectionError:
         return ServerFailure(
-            "something error happen in connection , try again later!");
+            "Connection error, try again later!");
       case DioExceptionType.unknown:
         if (dioError.message!.contains("SocketExeption")) {
-          return ServerFailure("not enternet connection");
+          return ServerFailure("No internet connection");
         }
-        return ServerFailure("Unexpected error ,pls try again later!");
-      default:
-        return ServerFailure("${dioError.message}");
+        return ServerFailure("Unexpected error, try again later!");
     }
   }
   factory ServerFailure.fromResponse(int statusCode, dynamic response) {
@@ -42,8 +40,7 @@ class ServerFailure extends Failure {
     } else if (statusCode == 500) {
       return ServerFailure("Internal server error , try again later");
     } else {
-      print(response);
-      return ServerFailure(response);
+      return ServerFailure("Unexpected error occurred");
     }
   }
 }

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
+import '../../../constant/colors.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class AdminSidebar extends StatelessWidget {
   final int selectedIndex;
@@ -18,7 +21,6 @@ class AdminSidebar extends StatelessWidget {
       _MenuItem(Icons.receipt_long, 'Orders'),
       _MenuItem(Icons.local_shipping, 'Drivers'),
       _MenuItem(Icons.inventory_2, 'Products'),
-      _MenuItem(Icons.people, 'Users'),
     ];
 
     return Container(
@@ -27,9 +29,9 @@ class AdminSidebar extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            height: 80,
+            height: 80.h,
             alignment: Alignment.center,
-            child: Text('ShipLink Admin',
+            child: Text(context.t.tr('app_name'),
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: isWide ? 18 : 12,
@@ -44,12 +46,12 @@ class AdminSidebar extends StatelessWidget {
               color: selected ? Colors.white12 : null,
               child: ListTile(
                 leading: Icon(item.icon,
-                    color: selected ? Colors.blueAccent : Colors.grey),
+                    color: selected ? AppColors.primary : AppColors.textDisabled),
                 title: isWide
                     ? Text(item.label,
                         style: TextStyle(
-                            color: selected ? Colors.blueAccent : Colors.grey,
-                            fontSize: 14))
+                            color: selected ? AppColors.primary : AppColors.textDisabled,
+                            fontSize: 14.sp))
                     : null,
                 onTap: () => onItemSelected(i),
               ),
@@ -61,7 +63,7 @@ class AdminSidebar extends StatelessWidget {
             child: ListTile(
               leading: const Icon(Icons.exit_to_app, color: Colors.red),
               title:
-                  isWide ? const Text('Exit', style: TextStyle(color: Colors.red)) : null,
+                  isWide ? Text(context.t.tr('exit'), style: TextStyle(color: Colors.red)) : null,
               onTap: () => Navigator.pop(context),
             ),
           ),

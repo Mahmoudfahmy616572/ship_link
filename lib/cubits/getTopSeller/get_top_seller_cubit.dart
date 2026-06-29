@@ -10,14 +10,14 @@ class GetTopSellerCubit extends Cubit<GetTopSellerState> {
   GetTopSellerCubit(this.homeServeices) : super(GetTopSellerInitial());
   final HomeServeices homeServeices;
   Future<void> getTopSellerProducts() async {
-    emit(GetTopSellerLoading());
+    if (!isClosed) emit(GetTopSellerLoading());
     var result = await homeServeices.getTopSeller();
     result.fold(
       (failure) {
-        emit(GetTopSellerFailure(failure.errMessage));
+        if (!isClosed) emit(GetTopSellerFailure(failure.errMessage));
       },
       (getTopSeller) {
-        emit(GetTopSellerSuccess(getTopSeller));
+        if (!isClosed) emit(GetTopSellerSuccess(getTopSeller));
       },
     );
   }

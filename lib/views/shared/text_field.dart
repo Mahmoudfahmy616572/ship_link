@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:flutter/services.dart';
 
 class BuildTextField extends StatelessWidget {
@@ -31,9 +32,9 @@ class BuildTextField extends StatelessWidget {
       obscureText: obscureText,
       decoration: InputDecoration(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+              EdgeInsets.symmetric(horizontal: 15.w, vertical: 0.h),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(4.r),
           ),
           errorBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.red, width: 1),
@@ -42,7 +43,7 @@ class BuildTextField extends StatelessWidget {
             borderSide: BorderSide(color: Colors.blue, width: 1),
           ),
           hintText: hintText,
-          hintStyle: const TextStyle(color: Color(0xFFCDCDCD), fontSize: 13.5),
+          hintStyle: TextStyle(color: Color(0xFFCDCDCD), fontSize: 13.5.sp),
           suffixIcon: suffixIcon,
           suffixIconColor: Colors.white,
           prefixIconColor: Colors.white,

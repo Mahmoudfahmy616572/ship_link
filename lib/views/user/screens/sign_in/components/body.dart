@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/constant.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/text_field.dart';
-import 'package:ship_link/views/user/screens/ForgotPassword/forgot_password.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
+import 'package:ship_link/views/user/screens/reset_password/reset_password_screen.dart';
 import 'package:ship_link/views/user/screens/sign_in/components/signup_row.dart';
 import 'package:ship_link/views/user/screens/sign_in/components/top_screen_logo.dart';
 
@@ -14,6 +15,7 @@ import '../../../../shared/button_sign.dart';
 import '../../../../shared/snackBar/snack_bar.dart';
 import 'divider_row.dart';
 import 'media_row.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class Body extends StatefulWidget {
   const Body({super.key});
@@ -37,11 +39,11 @@ class _BodyState extends State<Body> {
           if (token != '') {
             Navigator.pushReplacementNamed(context, MainScreen.routName);
             CustomSnackBar.displaySuccessMotionToast(
-                "${cubit.userSignIn.message}", context);
+                context.t.tr('welcome_back'), context);
           }
         } else if (state is SignInFaild) {
           CustomSnackBar.displayErrorMotionToast(
-              "Email or Password Incorrect", context);
+              context.t.tr('email_or_password_incorrect'), context);
         }
       },
       builder: (context, state) {
@@ -51,8 +53,8 @@ class _BodyState extends State<Body> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const SizedBox(
-                  height: 30,
+                SizedBox(
+                  height: 30.h,
                 ),
                 const TopScreenLogo(),
                 SizedBox(
@@ -60,9 +62,9 @@ class _BodyState extends State<Body> {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
                   width: double.infinity,
-                  height: 600,
+                  height: 600.h,
                   decoration: const BoxDecoration(
                       image: DecorationImage(
                           image:
@@ -81,15 +83,15 @@ class _BodyState extends State<Body> {
                             child: Column(
                               children: [
                                 Text(
-                                  "Welcome Back!",
+                                  context.t.tr('welcome_back_title'),
                                   style: appStyle(
                                     35,
                                     FontWeight.bold,
                                     const Color(0xFFEFEFEF),
                                   ),
                                 ),
-                                const Text(
-                                  "welcome back we missed you",
+                                Text(
+                                  context.t.tr('welcome_back_subtitle'),
                                   style: TextStyle(
                                       color:
                                           Color.fromARGB(255, 228, 226, 226)),
@@ -97,17 +99,17 @@ class _BodyState extends State<Body> {
                               ],
                             ),
                           ),
-                          const SizedBox(
-                            height: 25,
+                          SizedBox(
+                            height: 25.h,
                           ),
                           Form(
                             key: formKey,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                textfieldLable(text: 'Email'),
-                                const SizedBox(
-                                  height: 10,
+                                textfieldLable(text: context.t.tr('email')),
+                                SizedBox(
+                                  height: 10.h,
                                 ),
                                 BuildTextField(
                                   controller: email,
@@ -118,16 +120,16 @@ class _BodyState extends State<Body> {
                                       return null;
                                     }
                                   },
-                                  hintText: 'Enter your email',
+                                  hintText: context.t.tr('enter_email'),
                                   suffixIcon: const Icon(Icons.email),
                                   obscureText: false,
                                 ),
-                                const SizedBox(
-                                  height: 25,
+                                SizedBox(
+                                  height: 25.h,
                                 ),
-                                textfieldLable(text: 'Password'),
-                                const SizedBox(
-                                  height: 10,
+                                textfieldLable(text: context.t.tr('password')),
+                                SizedBox(
+                                  height: 10.h,
                                 ),
                                 BuildTextField(
                                   controller: password,
@@ -139,7 +141,7 @@ class _BodyState extends State<Body> {
                                     }
                                   },
                                   obscureText: isVisable ? true : false,
-                                  hintText: 'Enter your password',
+                                  hintText: context.t.tr('enter_password'),
                                   suffixIcon: IconButton(
                                       onPressed: () {
                                         setState(() {
@@ -150,29 +152,29 @@ class _BodyState extends State<Body> {
                                           ? const Icon(Icons.visibility)
                                           : const Icon(Icons.visibility_off)),
                                 ),
-                                const SizedBox(
-                                  height: 5,
+                                SizedBox(
+                                  height: 5.h,
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                            context, ForgotPassword.routName);
+                                        Navigator.pushNamed(context,
+                                            ResetPasswordScreen.routName);
                                       },
-                                      child: const Text(
-                                        "Forgot Password?",
+                                      child: Text(
+                                        context.t.tr('forgot_password'),
                                         style: TextStyle(color: Colors.white),
                                       ),
                                     )
                                   ],
                                 ),
-                                const SizedBox(
-                                  height: 25,
+                                SizedBox(
+                                  height: 25.h,
                                 ),
                                 BuildButton(
-                                  text: 'Sign In',
+                                  text: context.t.tr('sign_in'),
                                   color: Colors.white,
                                   ontap: () {
                                     cubit.signIN(
@@ -183,20 +185,20 @@ class _BodyState extends State<Body> {
                               ],
                             ),
                           ),
-                          const SizedBox(
-                            height: 20,
+                          SizedBox(
+                            height: 20.h,
                           ),
-                          const DividerRow(),
-                          const SizedBox(
-                            height: 30,
+                          DividerRow(),
+                          SizedBox(
+                            height: 30.h,
                           ),
                           const MediaRow(),
-                          const SizedBox(
-                            height: 15,
+                          SizedBox(
+                            height: 15.h,
                           ),
-                          const SignUpRow(),
-                          const SizedBox(
-                            height: 15,
+                          SignUpRow(),
+                          SizedBox(
+                            height: 15.h,
                           ),
                         ]),
                   ),
@@ -211,7 +213,7 @@ class _BodyState extends State<Body> {
 
   Padding textfieldLable({required String text}) {
     return Padding(
-      padding: const EdgeInsets.only(left: 7),
+      padding: EdgeInsets.only(left: 7.w),
       child: Text(
         text,
         style: const TextStyle(color: Colors.white),

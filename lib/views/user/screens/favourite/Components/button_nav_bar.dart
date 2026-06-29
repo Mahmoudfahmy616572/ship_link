@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 
 class ButtomNavBar extends StatelessWidget {
   const ButtomNavBar({
@@ -8,7 +9,7 @@ class ButtomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(15.w),
         child: Center(
           child: Text("ssss"),
         )

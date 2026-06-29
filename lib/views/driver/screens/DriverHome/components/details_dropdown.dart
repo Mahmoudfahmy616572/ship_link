@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 
 class ButtonWidget extends StatelessWidget {
   const ButtonWidget({
@@ -98,7 +99,7 @@ class CustomDropDownState extends State<CustomDropDown> {
       },
       child: ButtonWidget(
         onTap: onTap,
-        child: const Text('Button Text'),
+        child: Text(context.t.tr('button_text')),
       ),
     );
   }

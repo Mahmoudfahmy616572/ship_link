@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/providers.dart';
+import 'package:ship_link/views/shared/notification_preferences_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -21,7 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
             Card(
@@ -45,6 +47,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () {
                   context.read<LocaleProvider>().toggleLocale();
                 },
+              ),
+            ),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.notifications_outlined),
+                title: Text(t.tr('notification_preferences')),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NotificationPreferencesScreen()),
+                ),
               ),
             ),
           ],

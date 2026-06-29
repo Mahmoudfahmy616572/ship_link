@@ -35,15 +35,17 @@ class TopSeller {
   String? name;
   String? description;
   String? image;
-  int? price;
+  double? price;
   int? isOffer;
-  dynamic newPrice;
+  double? newPrice;
   int? qty;
   int? status;
   int? popular;
   int? providerId;
-  dynamic createdAt;
+  String? category;
+  DateTime? createdAt;
   DateTime? updatedAt;
+  List<String>? images;
 
   TopSeller({
     this.id,
@@ -57,26 +59,34 @@ class TopSeller {
     this.status,
     this.popular,
     this.providerId,
+    this.category,
     this.createdAt,
     this.updatedAt,
+    this.images,
   });
+
+  List<String> get imageList {
+    if (images != null && images!.isNotEmpty) return images!;
+    if (image != null) return [image!];
+    return [];
+  }
 
   factory TopSeller.fromJson(Map<String, dynamic> json) => TopSeller(
         id: json["id"],
         name: json["name"],
         description: json["description"],
         image: json["image"],
-        price: json["price"],
+        price: (json["price"] as num?)?.toDouble(),
         isOffer: json["is_offer"],
-        newPrice: json["new_price"],
+        newPrice: (json["new_price"] as num?)?.toDouble(),
         qty: json["qty"],
         status: json["status"],
         popular: json["popular"],
         providerId: json["provider_id"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
+        category: json["category"],
+        createdAt: json["created_at"] == null ? null : DateTime.tryParse(json["created_at"]),
+        updatedAt: json["updated_at"] == null ? null : DateTime.tryParse(json["updated_at"]),
+        images: json["images"] == null ? null : List<String>.from(json["images"]!.map((x) => x.toString())),
       );
 
   Map<String, dynamic> toJson() => {
@@ -91,7 +101,9 @@ class TopSeller {
         "status": status,
         "popular": popular,
         "provider_id": providerId,
-        "created_at": createdAt,
+        "category": category,
+        "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
+        "images": images,
       };
 }

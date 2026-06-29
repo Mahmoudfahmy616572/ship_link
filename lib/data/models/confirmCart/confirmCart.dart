@@ -51,18 +51,18 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) => Order(
-        userId: json["user_id"],
-        cartId: json["cart_id"],
-        totalPrice: json["total_price"],
+        userId: json["user_id"] is String ? int.tryParse(json["user_id"]) : (json["user_id"] as num?)?.toInt(),
+        cartId: json["cart_id"]?.toString(),
+        totalPrice: (json["total_price"] as num?)?.toInt(),
         orderCode: json["order_code"],
         status: json["status"],
         updatedAt: json["updated_at"] == null
             ? null
-            : DateTime.parse(json["updated_at"]),
+            : DateTime.tryParse(json["updated_at"]),
         createdAt: json["created_at"] == null
             ? null
-            : DateTime.parse(json["created_at"]),
-        id: json["id"],
+            : DateTime.tryParse(json["created_at"]),
+        id: (json["id"] as num?)?.toInt(),
       );
 
   Map<String, dynamic> toJson() => {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/utils/sizer.dart';
+import 'package:ship_link/constant/colors.dart';
 
 import '../../../../shared/app_style.dart';
 
@@ -14,16 +16,16 @@ class SenderMessage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.w),
           child: Container(
             width: MediaQuery.of(context).size.width * 0.56,
-            padding: const EdgeInsets.all(10),
-            decoration: const BoxDecoration(
-                color: Colors.blue,
+            padding: EdgeInsets.all(10.w),
+            decoration: BoxDecoration(
+                color: AppColors.primary,
                 borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(30),
-                    topLeft: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
+                    topRight: Radius.circular(30.r),
+                    topLeft: Radius.circular(30.r),
+                    bottomLeft: Radius.circular(30.r),
                     bottomRight: Radius.circular(0))),
             child: Text(
               "Hello i'm here mother fucker ddjjdj djdjsadsjfaj dajfajdsfja adjf",

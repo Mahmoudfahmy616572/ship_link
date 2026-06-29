@@ -10,14 +10,14 @@ class GetAllProuductsCubit extends Cubit<GetAllProuductsState> {
   GetAllProuductsCubit(this.homeServeices) : super(GetAllProuductsInitial());
   final HomeServeices homeServeices;
   Future<void> getAllproducts() async {
-    emit(GetAllProuductsLoading());
+    if (!isClosed) emit(GetAllProuductsLoading());
     var result = await homeServeices.getAllproducts();
     result.fold(
       (failure) {
-        emit(GetAllProuductsFailure(failure.errMessage));
+        if (!isClosed) emit(GetAllProuductsFailure(failure.errMessage));
       },
       (product) {
-        emit(GetAllProuductsSuccess(product));
+        if (!isClosed) emit(GetAllProuductsSuccess(product));
       },
     );
   }
