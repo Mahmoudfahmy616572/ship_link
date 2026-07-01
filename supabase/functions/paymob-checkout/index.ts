@@ -1,10 +1,10 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const PAYMOB_API_KEY = Deno.env.get('PAYMOB_API_KEY') ?? ''
 const PAYMOB_INTEGRATION_ID = Deno.env.get('PAYMOB_INTEGRATION_ID') ?? ''
+const PAYMOB_BASE = 'https://accept.paymob.com'
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     const { totalPrice, orderId, userId } = await req.json()
     if (!totalPrice || !orderId || !userId) {
@@ -12,7 +12,7 @@ serve(async (req) => {
     }
 
     // 1. Auth
-    const authRes = await fetch('https://accept.paymob.com/api/auth/tokens', {
+    const authRes = await fetch(`${PAYMOB_BASE}/api/auth/tokens`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ api_key: PAYMOB_API_KEY }),
@@ -24,7 +24,7 @@ serve(async (req) => {
     }
 
     // 2. Create order on Paymob
-    const orderRes = await fetch('https://accept.paymob.com/api/ecommerce/orders', {
+    const orderRes = await fetch(`${PAYMOB_BASE}/api/ecommerce/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -48,16 +48,14 @@ serve(async (req) => {
     const { data: userData } = await supabase.from('profiles').select('email').eq('id', userId).maybeSingle()
     const userEmail = userData?.email ?? `${userId}@ship-link.app`
 
-    const projectRef = supabaseUrl.replace('https://', '').replace('.supabase.co', '')
-    const callbackUrl = `https://${projectRef}.supabase.co/functions/v1/paymob-callback`
-
+    // 4. Payment key
     const billingData = {
       apartment: 'N/A', email: userEmail, floor: 'N/A', first_name: 'User',
-      street: 'N/A', building: 'N/A', phone_number: 'N/A',
+      street: 'N/A', building: 'N/A', phone_number: `01${String(Math.random()).slice(2, 11)}`,
       shipping_method: 'PKG', postal_code: 'N/A', city: 'N/A',
       country: 'EG', last_name: 'User', state: 'N/A',
     }
-    const pkRes = await fetch('https://accept.paymob.com/api/acceptance/payment_keys', {
+    const pkRes = await fetch(`${PAYMOB_BASE}/api/acceptance/payment_keys`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -68,7 +66,6 @@ serve(async (req) => {
         billing_data: billingData,
         currency: 'EGP',
         integration_id: Number(PAYMOB_INTEGRATION_ID),
-        lock_order_when_paid: 'true',
       }),
     })
     const pkData = await pkRes.json()
@@ -77,10 +74,10 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Failed to get payment key', details: pkData }), { status: 500 })
     }
 
-    // 4. Build checkout URL with return_url so Paymob redirects to our callback
-    const url = `https://accept.paymob.com/api/acceptance/payments/payment?payment_token=${paymentKey}&return_url=${encodeURIComponent(callbackUrl)}`
+    // 5. Build iframe URL
+    const url = `${PAYMOB_BASE}/api/acceptance/iframes/1054329?payment_token=${paymentKey}`
 
-    // 5. Store paymob_order_id on our order for callback matching
+    // 6. Store paymob_order_id for callback matching
     await supabase.from('orders').update({ paymob_order_id: paymobOrderId }).eq('id', orderId)
 
     return new Response(JSON.stringify({ url, transactionId: paymobOrderId }), {

@@ -322,6 +322,8 @@ class AppLocalizations {
       'max_price': 'Max price',
       'order_again': 'Order Again',
       'items_added_to_cart': 'Items added to cart',
+      'paid': 'Paid',
+      'cod': 'COD',
     },
     'ar': {
       'app_name': 'ShipLink',
@@ -639,6 +641,8 @@ class AppLocalizations {
       'max_price': 'السعر الأقصى',
       'order_again': 'إعادة الطلب',
       'items_added_to_cart': 'تمت إضافة العناصر إلى السلة',
+      'paid': 'مدفوع',
+      'cod': 'كاش',
     },
   };
 

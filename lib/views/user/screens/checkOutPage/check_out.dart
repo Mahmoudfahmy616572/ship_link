@@ -250,9 +250,24 @@ class _CheckOutPageState extends State<CheckOutPage> {
   Future<void> _processPayment(BuildContext context) async {
     setState(() => _processing = true);
     try {
-      final userEmail =
-          Supabase.instance.client.auth.currentUser?.email ?? "your email";
+      final supabase = Supabase.instance.client;
+      final uid = supabase.auth.currentUser?.id;
+      final userEmail = supabase.auth.currentUser?.email ?? "your email";
+      final confirmState = context.read<ConfirmCartCubit>().state;
+      final orderId = confirmState is ConfirmCartSuccess
+          ? confirmState.confirmCart.order?.id
+          : null;
+
+      // Record payment method on the order
+      final paymentMethod = _selectedMethod == 0 ? 'cod' : 'card';
+      if (orderId != null) {
+        await supabase.from('orders').update({'payment_method': paymentMethod}).eq('id', orderId);
+      }
+
       if (_selectedMethod == 0) {
+        if (uid != null) {
+          await supabase.from('cart_items').delete().eq('user_id', uid);
+        }
         CustomSnackBar.displaySuccessMotionToast(
             "Order placed successfully!", context);
         Navigator.pushReplacement(
@@ -268,10 +283,6 @@ class _CheckOutPageState extends State<CheckOutPage> {
           ),
         );
       } else {
-        final confirmState = context.read<ConfirmCartCubit>().state;
-        final orderId = confirmState is ConfirmCartSuccess
-            ? confirmState.confirmCart.order?.id
-            : null;
         final paymentCubit = context.read<PaymentCubit>();
         await paymentCubit.checkout(
           totalPrice: _finalTotal.round(),
@@ -288,7 +299,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                   BlocProvider.value(value: context.read<ConfirmCartCubit>()),
                   BlocProvider.value(value: context.read<PaymentCubit>()),
                 ],
-                child: WebPage(url: paymentState.payment.url ?? ""),
+                child: WebPage(url: paymentState.payment.url ?? "", orderId: orderId ?? 0),
               ),
             ),
           );

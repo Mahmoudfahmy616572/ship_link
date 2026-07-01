@@ -1,5 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const PAYMOB_HMAC = Deno.env.get('PAYMOB_HMAC') ?? ''
 
@@ -15,7 +14,34 @@ async function computeHmac(secret: string, data: string): Promise<string> {
   return Array.from(new Uint8Array(signature)).map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-serve(async (req) => {
+function htmlPage(title: string, message: string, isSuccess: boolean) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f5f5f5; }
+    .card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+    .icon { font-size: 64px; margin-bottom: 16px; }
+    h1 { margin: 0 0 8px; color: ${isSuccess ? '#10B981' : '#EF4444'}; }
+    p { color: #6B7280; margin: 0 0 24px; }
+    .btn { display: inline-block; padding: 12px 24px; border-radius: 8px; background: #2563EB; color: white; text-decoration: none; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">${isSuccess ? '\u2705' : '\u274C'}</div>
+    <h1>${title}</h1>
+    <p>${message}</p>
+    <a class="btn" href="javascript:window.close()">Close &amp; Return to App</a>
+  </div>
+</body>
+</html>`
+}
+
+Deno.serve(async (req) => {
   try {
     const url = new URL(req.url)
     const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
@@ -23,11 +49,10 @@ serve(async (req) => {
     let paymobOrderId: string | null = null
 
     if (req.method === 'GET') {
-      // Redirect from Paymob after payment (WebView lands here)
       success = url.searchParams.get('success') === 'true'
       paymobOrderId = url.searchParams.get('order') ?? url.searchParams.get('order_id')
+      console.log('GET callback query params:', Object.fromEntries(url.searchParams.entries()))
     } else {
-      // Webhook from Paymob server
       const body = await req.json()
       const obj = body.obj ?? body
 
@@ -46,6 +71,11 @@ serve(async (req) => {
     }
 
     if (!paymobOrderId) {
+      if (req.method === 'GET') {
+        return new Response(htmlPage('Error', 'Missing order reference. Please return to the app.', false), {
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        })
+      }
       return new Response(JSON.stringify({ success: false, error: 'Missing order id' }), {
         headers: { 'Content-Type': 'application/json' },
       })
@@ -58,6 +88,11 @@ serve(async (req) => {
       .limit(1)
 
     if (!orders || orders.length === 0) {
+      if (req.method === 'GET') {
+        return new Response(htmlPage('Error', 'Order not found. Please return to the app.', false), {
+          headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        })
+      }
       return new Response(JSON.stringify({ success: false, error: 'Order not found' }), {
         headers: { 'Content-Type': 'application/json' },
       })
@@ -70,18 +105,27 @@ serve(async (req) => {
         .from('orders')
         .update({ status: 'confirmed', paid_at: new Date().toISOString() })
         .eq('id', orderId)
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { 'Content-Type': 'application/json' },
-      })
     } else {
       await supabase
         .from('orders')
         .update({ status: 'payment_failed' })
         .eq('id', orderId)
-      return new Response(JSON.stringify({ success: false }), {
-        headers: { 'Content-Type': 'application/json' },
-      })
     }
+
+    if (req.method === 'GET') {
+      return new Response(
+        htmlPage(
+          success ? 'Payment Successful!' : 'Payment Failed',
+          success ? 'Your payment has been processed. You can close this tab and return to the app.' : 'There was an issue processing your payment. Please try again.',
+          success,
+        ),
+        { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
+      )
+    }
+
+    return new Response(JSON.stringify({ success }), {
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (e) {
     return new Response(JSON.stringify({ success: false, error: e.message }), {
       headers: { 'Content-Type': 'application/json' },

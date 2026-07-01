@@ -36,6 +36,20 @@ migrate_working_dir/
 android/key.properties
 android/upload-keystore.jks
 
+# Supabase temp
+supabase/.temp/
+
+# Environment files
+.env
+.env.*
+
+# Firebase service account (never commit)
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
+
+# Firebase debug log
+firebase-debug.log
+
 # Symbolication related
 app.*.symbols
 
