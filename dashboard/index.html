@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShipLink Admin</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="login-page">
+      <div class="login-card">
+        <h1>ShipLink Admin</h1>
+        <p class="login-sub">Sign in to manage your platform</p>
+        <form id="login-form">
+          <input type="email" id="email" placeholder="Email" required />
+          <input type="password" id="password" placeholder="Password" required />
+          <button type="submit" id="login-btn">Sign In</button>
+          <p id="login-error" class="error"></p>
+        </form>
+      </div>
+    </div>
+
+    <div id="dashboard" style="display:none">
+      <aside id="sidebar">
+        <div class="sidebar-header">
+          <h2>ShipLink</h2>
+          <span class="badge">Admin</span>
+        </div>
+        <nav>
+          <a href="#/" class="nav-item active" data-page="overview">
+            <span class="nav-icon">&#9632;</span> Overview
+          </a>
+          <a href="#/orders" class="nav-item" data-page="orders">
+            <span class="nav-icon">&#9776;</span> Orders
+          </a>
+          <a href="#/products" class="nav-item" data-page="products">
+            <span class="nav-icon">&#9733;</span> Products
+          </a>
+          <a href="#/users" class="nav-item" data-page="users">
+            <span class="nav-icon">&#9787;</span> Users
+          </a>
+          <a href="#/drivers" class="nav-item" data-page="drivers">
+            <span class="nav-icon">&#128666;</span> Drivers
+          </a>
+          <a href="#/settings" class="nav-item" data-page="settings">
+            <span class="nav-icon">&#9881;</span> Settings
+          </a>
+        </nav>
+        <div class="sidebar-footer">
+          <span id="admin-email"></span>
+          <button id="logout-btn">Logout</button>
+        </div>
+      </aside>
+      <main id="main-content">
+        <div id="page-content"></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
