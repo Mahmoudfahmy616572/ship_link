@@ -135,6 +135,7 @@ class CartServeicesImpl extends CartServeices {
     double? deliveryLat,
     double? deliveryLng,
     String? addressLabel,
+    String paymentMethod = 'cod',
   }) async {
     try {
       final uid = _supabase.auth.currentUser?.id;
@@ -161,6 +162,7 @@ class CartServeicesImpl extends CartServeices {
         'cart_id': cartId ?? id,
         'total_price': total,
         'status': 'pending',
+        'payment_method': paymentMethod,
       };
       if (deliveryAddress != null && deliveryAddress.isNotEmpty) {
         insertPayload['delivery_address'] = deliveryAddress;
@@ -181,8 +183,6 @@ class CartServeicesImpl extends CartServeices {
           'quantity': item['quantity'],
         });
       }
-      await _supabase.from('cart_items').delete().eq('user_id', uid);
-      await _cache.remove('cart_$uid');
       ConfirmCart confirmCart = ConfirmCart.fromJson({
         'success': 'Order confirmed',
         'order': order,

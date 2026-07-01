@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
 import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
 import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
@@ -89,6 +90,8 @@ class _OrdersCardState extends State<OrdersCard> {
                 ),
               ),
               _statusBadge(order.status ?? 'Pending'),
+              const SizedBox(width: 6),
+              _paymentBadge(order.paymentMethod ?? ''),
             ],
           ),
           SizedBox(height: 12.h),
@@ -257,6 +260,37 @@ class _OrdersCardState extends State<OrdersCard> {
         ),
       ),
     );
+  }
+
+  Widget _paymentBadge(String method) {
+    if (method == 'card') {
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFD1FAE5),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check_circle, size: 14, color: Color(0xFF059669)),
+            SizedBox(width: 4.w),
+            Text(context.t.tr('paid'), style: appStyle(12, FontWeight.w600, const Color(0xFF059669))),
+          ],
+        ),
+      );
+    }
+    if (method == 'cod') {
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFEF3C7),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Text(context.t.tr('cod'), style: appStyle(12, FontWeight.w600, const Color(0xFFD97706))),
+      );
+    }
+    return const SizedBox.shrink();
   }
 
   Widget _statusBadge(String status) {

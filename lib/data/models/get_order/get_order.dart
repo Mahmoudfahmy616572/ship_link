@@ -73,6 +73,7 @@ class Order {
   double? deliveryLat;
   double? deliveryLng;
   String? addressLabel;
+  String? paymentMethod;
 
   Order({
     this.id,
@@ -87,6 +88,7 @@ class Order {
     this.deliveryLat,
     this.deliveryLng,
     this.addressLabel,
+    this.paymentMethod,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) => Order(
@@ -106,6 +108,7 @@ class Order {
         deliveryLat: (json["delivery_lat"] as num?)?.toDouble(),
         deliveryLng: (json["delivery_lng"] as num?)?.toDouble(),
         addressLabel: json["address_label"],
+        paymentMethod: json["payment_method"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -121,6 +124,7 @@ class Order {
         "delivery_lat": deliveryLat,
         "delivery_lng": deliveryLng,
         "address_label": addressLabel,
+        "payment_method": paymentMethod,
       };
 }
 
