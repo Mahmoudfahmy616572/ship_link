@@ -14,6 +14,7 @@ import 'package:ship_link/views/shared/text_field.dart';
 import 'package:ship_link/views/shared/settings_screen.dart';
 import 'package:ship_link/cubitDriver/upDateUserData/up_date_user_data_cubit.dart';
 import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/utils/sizer.dart';
 
 class Body extends StatefulWidget {
@@ -51,32 +52,32 @@ class _BodyState extends State<Body> {
                         SizedBox(height: 24.h),
                         _buildMenuItem(
                           icon: Icons.person_outline,
-                          title: 'Personal Info',
-                          subtitle: 'Name, phone, email',
+                  title: context.t.tr('personal_info'),
+                  subtitle: context.t.tr('name_phone_email'),
                           onTap: () => _editDialog(context, data?.name ?? '', data?.phoneNumber ?? ''),
                         ),
                         _buildMenuItem(
                           icon: Icons.time_to_leave_outlined,
-                          title: 'Vehicle Info',
-                          subtitle: 'Vehicle type, number',
+                          title: context.t.tr('vehicle_info'),
+                          subtitle: context.t.tr('vehicle_type_number'),
                           onTap: () => _showVehicleInfo(context, data),
                         ),
                         _buildMenuItem(
                           icon: Icons.payment_outlined,
-                          title: 'Payment',
-                          subtitle: 'Bank account, earnings',
+                          title: context.t.tr('payment'),
+                          subtitle: context.t.tr('bank_account_earnings'),
                           onTap: () => _showPaymentInfo(context, data),
                         ),
                         _buildMenuItem(
                           icon: Icons.settings_outlined,
-                          title: 'Settings',
-                          subtitle: 'App preferences',
+                          title: context.t.tr('settings'),
+                          subtitle: context.t.tr('app_preferences'),
                           onTap: () => Navigator.pushNamed(context, SettingsScreen.routName),
                         ),
                         _buildMenuItem(
                           icon: Icons.headset_mic_outlined,
-                          title: 'Help & Support',
-                          subtitle: 'Contact us, FAQ',
+                          title: context.t.tr('help_support'),
+                          subtitle: context.t.tr('contact_us_faq'),
                         ),
                         SizedBox(height: 24.h),
                         _buildLogoutButton(context),
@@ -88,7 +89,7 @@ class _BodyState extends State<Body> {
             ),
           );
         }
-        return const Center(child: Text('Something went wrong'));
+        return Center(child: Text(context.t.tr('something_went_wrong_short')));
       },
     );
   }
@@ -110,7 +111,7 @@ class _BodyState extends State<Body> {
         children: [
           Row(
             children: [
-              Text('Profile',
+              Text(context.t.tr('profile'),
                   style: TextStyle(
                       fontSize: 22.sp,
                       fontWeight: FontWeight.w700,
@@ -154,7 +155,7 @@ class _BodyState extends State<Body> {
                   borderRadius: BorderRadius.circular(16.r),
                 ),
                 child: Center(
-                  child: Text('JD',
+                  child: Text(context.t.tr('initials_placeholder'),
                       style: TextStyle(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w700,
@@ -223,7 +224,7 @@ class _BodyState extends State<Body> {
       future: _getTripsCount(driverId),
       builder: (context, snapshot) {
         final count = snapshot.data ?? 0;
-        return _statItem(Icons.delivery_dining, '$count', 'Trips');
+        return _statItem(Icons.delivery_dining, '$count', context.t.tr('trips'));
       },
     );
   }
@@ -234,7 +235,7 @@ class _BodyState extends State<Body> {
       builder: (context, snapshot) {
         final avg = snapshot.data?['avg'] as double? ?? 0;
         final cnt = snapshot.data?['count'] as int? ?? 0;
-        return _statItem(Icons.star, '${avg.toStringAsFixed(1)} ($cnt)', 'Rating');
+        return _statItem(Icons.star, '${avg.toStringAsFixed(1)} ($cnt)', context.t.tr('rating'));
       },
     );
   }
@@ -242,13 +243,13 @@ class _BodyState extends State<Body> {
   Widget _earningsStatItem() {
     final driverId = Supabase.instance.client.auth.currentUser?.id;
     if (driverId == null) {
-      return _statItem(Icons.attach_money, '\$0', 'Week');
+      return _statItem(Icons.attach_money, '\$0', context.t.tr('week'));
     }
     return FutureBuilder<double>(
       future: DriverEarningsService(Supabase.instance.client).getWeekEarnings(driverId),
       builder: (context, snapshot) {
         final value = snapshot.data ?? 0;
-        return _statItem(Icons.attach_money, '\$${value.toStringAsFixed(0)}', 'Week');
+        return _statItem(Icons.attach_money, '\$${value.toStringAsFixed(0)}', context.t.tr('week'));
       },
     );
   }
@@ -283,23 +284,26 @@ class _BodyState extends State<Body> {
           BoxShadow(color: Color(0x04000000), blurRadius: 4, offset: Offset(0, 1)),
         ],
       ),
-      child: ListTile(
-        leading: Container(
-          width: 40.w, height: 40.h,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF0F0F0),
-            borderRadius: BorderRadius.circular(10.r),
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          leading: Container(
+            width: 40.w, height: 40.h,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F0F0),
+              borderRadius: BorderRadius.circular(10.r),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 20),
           ),
-          child: Icon(icon, color: AppColors.primary, size: 20),
+          title: Text(title,
+              style: appStyle(15, FontWeight.w600, const Color(0xFF111827))),
+          subtitle: Text(subtitle,
+              style: appStyle(12, FontWeight.w400, const Color(0xFF6B7280))),
+          trailing: const Icon(Icons.chevron_right, color: Color(0xFF9CA3AF)),
+          onTap: onTap,
+          contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         ),
-        title: Text(title,
-            style: appStyle(15, FontWeight.w600, const Color(0xFF111827))),
-        subtitle: Text(subtitle,
-            style: appStyle(12, FontWeight.w400, const Color(0xFF6B7280))),
-        trailing: const Icon(Icons.chevron_right, color: Color(0xFF9CA3AF)),
-        onTap: onTap,
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       ),
     );
   }
@@ -360,11 +364,11 @@ class _BodyState extends State<Body> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Vehicle Info',
+            Text(context.t.tr('vehicle_info_title'),
                 style: appStyle(20, FontWeight.w700, const Color(0xFF111827))),
             SizedBox(height: 20.h),
-            _infoRow('Type', data?.vehicleType ?? '—'),
-            _infoRow('Number', data?.vehicleNumber ?? '—'),
+            _infoRow(context.t.tr('type'), data?.vehicleType ?? '—'),
+            _infoRow(context.t.tr('number'), data?.vehicleNumber ?? '—'),
             SizedBox(height: 24.h),
             SizedBox(
               width: double.infinity,
@@ -374,7 +378,7 @@ class _BodyState extends State<Body> {
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 ),
-                child: const Text('Close', style: TextStyle(color: Colors.white)),
+                  child: Text(context.t.tr('close'), style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -402,7 +406,7 @@ class _BodyState extends State<Body> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Payment',
+                Text(context.t.tr('payment_title'),
                     style: appStyle(20, FontWeight.w700, const Color(0xFF111827))),
                 SizedBox(height: 20.h),
                 _infoRow('Today', '\$${today.toStringAsFixed(0)}'),
@@ -418,7 +422,7 @@ class _BodyState extends State<Body> {
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
-                    child: const Text('Close', style: TextStyle(color: Colors.white)),
+                child: Text(context.t.tr('close'), style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],
@@ -450,11 +454,11 @@ class _BodyState extends State<Body> {
         onPressed: () {
           context.read<AuthCubit>().signOutDriver();
           CustomSnackBar.displaySuccessMotionToast(
-              'Logged out successfully', context);
+              context.t.tr('logged_out_successfully'), context);
           Navigator.pushReplacementNamed(context, SignInDriver.routName);
         },
         icon: const Icon(Icons.logout, size: 18),
-        label: Text('Log Out',
+        label: Text(context.t.tr('log_out'),
             style: appStyle(15, FontWeight.w600, const Color(0xFFEF4444))),
         style: OutlinedButton.styleFrom(
           foregroundColor: const Color(0xFFEF4444),
@@ -473,19 +477,19 @@ class _BodyState extends State<Body> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        title: const Text('Edit Info'),
+        title: Text(context.t.tr('edit_info')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             BuildTextField(
               controller: nameCtrl,
-              hintText: 'Enter your name',
+              hintText: context.t.tr('enter_your_name'),
               obscureText: false,
             ),
             SizedBox(height: 12.h),
             BuildTextField(
               controller: phoneCtrl,
-              hintText: 'Enter phone number',
+              hintText: context.t.tr('enter_phone_number'),
               textInputType: TextInputType.phone,
               obscureText: false,
             ),
@@ -494,7 +498,7 @@ class _BodyState extends State<Body> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(context.t.tr('cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -504,7 +508,7 @@ class _BodyState extends State<Body> {
                   );
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            child: const Text('Save'),
+            child: Text(context.t.tr('save')),
           ),
         ],
       ),

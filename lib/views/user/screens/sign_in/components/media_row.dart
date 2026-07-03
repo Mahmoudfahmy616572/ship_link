@@ -12,19 +12,10 @@ class MediaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 50.0.w),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          MediaContainer(
-            img: "assets/icons/googel icon.svg",
-          ),
-          MediaContainer(
-            img: "assets/icons/apple icon.svg",
-          ),
-          MediaContainer(
-            img: "assets/icons/facebook icon.svg",
-          ),
-        ],
+      child: Center(
+        child: MediaContainer(
+          img: "assets/icons/googel icon.svg",
+        ),
       ),
     );
   }

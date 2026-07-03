@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,18 +73,31 @@ class CredentialsService {
   factory CredentialsService() => _instance;
   CredentialsService._();
 
-  Future<void> save(String email) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('saved_email', email);
+  final _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
+
+  Future<void> save(String email, {String? password}) async {
+    await _storage.write(key: 'saved_email', value: email);
+    if (password != null) {
+      await _storage.write(key: 'saved_password', value: password);
+    }
   }
 
   Future<String?> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('saved_email');
+    return _storage.read(key: 'saved_email');
+  }
+
+  Future<String?> loadEmail() async {
+    return _storage.read(key: 'saved_email');
+  }
+
+  Future<String?> loadPassword() async {
+    return _storage.read(key: 'saved_password');
   }
 
   Future<void> clear() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('saved_email');
+    await _storage.delete(key: 'saved_email');
+    await _storage.delete(key: 'saved_password');
   }
 }

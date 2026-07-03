@@ -9,6 +9,7 @@ import 'package:ship_link/data/services/DriverHomeServeices/driver_home_serveice
 import 'package:ship_link/views/driver/screens/DriverProfile/driver_profile.dart';
 import 'package:ship_link/views/driver/screens/ordersScreen/ordersScreen.dart';
 
+import 'package:ship_link/localization.dart';
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
 
 import '../DriverHome/driver_home.dart';
@@ -63,19 +64,19 @@ class _MainScreenDriverState extends State<MainScreenDriver> {
           barItems: [
             BarItem(
               icon: Icons.home_rounded,
-              title: 'Home',
+              title: context.t.tr('home_bottom'),
               activeColor: const Color(0xFF2563EB),
               inactiveColor: const Color(0xFF9CA3AF),
             ),
             BarItem(
               icon: Icons.delivery_dining_rounded,
-              title: 'Orders',
+              title: context.t.tr('orders_bottom'),
               activeColor: const Color(0xFF2563EB),
               inactiveColor: const Color(0xFF9CA3AF),
             ),
             BarItem(
               icon: Icons.person_rounded,
-              title: 'Profile',
+              title: context.t.tr('profile_bottom'),
               activeColor: const Color(0xFF2563EB),
               inactiveColor: const Color(0xFF9CA3AF),
             ),

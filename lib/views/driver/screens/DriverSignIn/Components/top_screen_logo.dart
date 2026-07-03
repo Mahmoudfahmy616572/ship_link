@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 
 import '../../../../shared/app_style.dart';
 
@@ -13,11 +14,11 @@ class TopScreenLogo extends StatelessWidget {
       child: Column(children: [
         Image.asset("assets/images/signin Logo.png"),
         Text(
-          "LOGIN Driver",
+          context.t.tr('login_driver'),
           style: appStyle(25, FontWeight.w600, Colors.black),
         ),
         Text(
-          "Enter your credentials to access your\n account",
+          context.t.tr('enter_your_credentials'),
           style: appStyle(14, FontWeight.w300, const Color(0xFF6C6C6C)),
           textAlign: TextAlign.center,
         ),

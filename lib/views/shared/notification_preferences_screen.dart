@@ -44,36 +44,45 @@ class _NotificationPreferencesScreenState extends State<NotificationPreferencesS
               padding: EdgeInsets.all(16.w),
               children: [
                 Card(
-                  child: SwitchListTile(
-                    title: Text(context.t.tr('order_updates')),
-                    value: _prefs.orderUpdates,
-                    onChanged: (v) => _update(NotificationPreferences(
-                      orderUpdates: v,
-                      chatMessages: _prefs.chatMessages,
-                      promotions: _prefs.promotions,
-                    )),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: SwitchListTile(
+                      title: Text(context.t.tr('order_updates')),
+                      value: _prefs.orderUpdates,
+                      onChanged: (v) => _update(NotificationPreferences(
+                        orderUpdates: v,
+                        chatMessages: _prefs.chatMessages,
+                        promotions: _prefs.promotions,
+                      )),
+                    ),
                   ),
                 ),
                 Card(
-                  child: SwitchListTile(
-                    title: Text(context.t.tr('chat_messages')),
-                    value: _prefs.chatMessages,
-                    onChanged: (v) => _update(NotificationPreferences(
-                      orderUpdates: _prefs.orderUpdates,
-                      chatMessages: v,
-                      promotions: _prefs.promotions,
-                    )),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: SwitchListTile(
+                      title: Text(context.t.tr('chat_messages')),
+                      value: _prefs.chatMessages,
+                      onChanged: (v) => _update(NotificationPreferences(
+                        orderUpdates: _prefs.orderUpdates,
+                        chatMessages: v,
+                        promotions: _prefs.promotions,
+                      )),
+                    ),
                   ),
                 ),
                 Card(
-                  child: SwitchListTile(
-                    title: Text(context.t.tr('promotions')),
-                    value: _prefs.promotions,
-                    onChanged: (v) => _update(NotificationPreferences(
-                      orderUpdates: _prefs.orderUpdates,
-                      chatMessages: _prefs.chatMessages,
-                      promotions: v,
-                    )),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: SwitchListTile(
+                      title: Text(context.t.tr('promotions')),
+                      value: _prefs.promotions,
+                      onChanged: (v) => _update(NotificationPreferences(
+                        orderUpdates: _prefs.orderUpdates,
+                        chatMessages: _prefs.chatMessages,
+                        promotions: v,
+                      )),
+                    ),
                   ),
                 ),
               ],

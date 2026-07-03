@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/services/profile_image_service.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -60,12 +61,12 @@ class _ProfileImageState extends State<ProfileImage> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from gallery'),
+              title: Text(context.t.tr('choose_from_gallery')),
               onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.gallery); },
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take a photo'),
+              title: Text(context.t.tr('take_a_photo')),
               onTap: () { Navigator.pop(ctx); _pickImage(ImageSource.camera); },
             ),
           ],

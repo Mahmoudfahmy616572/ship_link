@@ -11,6 +11,7 @@ import 'package:ship_link/services/referral_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/notification_screen.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/user/screens/address_book/address_book_screen.dart';
 import 'package:ship_link/views/user/screens/edit_profile/edit_profile_screen.dart';
 import 'package:ship_link/views/user/screens/chat/chat_screen.dart';
@@ -423,38 +424,41 @@ class _AccountSettings extends StatelessWidget {
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(18.r),
           ),
-          child: Column(
-            children: List.generate(items.length, (i) {
-              final item = items[i];
-              final isLast = i == items.length - 1;
-              return Column(
-                children: [
-                  ListTile(
-                    leading: Icon(item.icon, size: 22.r, color: AppColors.cta),
-                    title: Text(
-                      item.label,
-                      style: appStyle(15, FontWeight.w500, AppColors.textPrimary),
-                    ),
-                    trailing: Icon(
-                      Icons.chevron_right,
-                      size: 22.r,
-                      color: AppColors.textHint,
-                    ),
-                    onTap: item.onTap,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
-                  ),
-                  if (!isLast)
-                    Padding(
-                      padding: EdgeInsets.only(left: 54.w),
-                      child: Divider(
-                        height: 1,
-                        thickness: 1,
-                        color: AppColors.border,
+          child: Material(
+            type: MaterialType.transparency,
+            child: Column(
+              children: List.generate(items.length, (i) {
+                final item = items[i];
+                final isLast = i == items.length - 1;
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(item.icon, size: 22.r, color: AppColors.cta),
+                      title: Text(
+                        item.label,
+                        style: appStyle(15, FontWeight.w500, AppColors.textPrimary),
                       ),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        size: 22.r,
+                        color: AppColors.textHint,
+                      ),
+                      onTap: item.onTap,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
                     ),
-                ],
-              );
-            }),
+                    if (!isLast)
+                      Padding(
+                        padding: EdgeInsets.only(left: 54.w),
+                        child: Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: AppColors.border,
+                        ),
+                      ),
+                  ],
+                );
+              }),
+            ),
           ),
         ),
       ],
@@ -524,14 +528,17 @@ class _SupportSection extends StatelessWidget {
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(18.r),
           ),
-          child: Column(
-            children: [
-              _supportTile(context, context.t.tr('help_center'), Icons.help_outline, () {}),
-              _divider(),
-              _supportTile(context, context.t.tr('contact_us'), Icons.mail_outline, () => Navigator.pushNamed(context, Chat.routName)),
-              _divider(),
-              _supportTile(context, context.t.tr('about_shiplink'), Icons.info_outline, () {}),
-            ],
+          child: Material(
+            type: MaterialType.transparency,
+            child: Column(
+              children: [
+                _supportTile(context, context.t.tr('help_center'), Icons.help_outline, () {}),
+                _divider(),
+                _supportTile(context, context.t.tr('contact_us'), Icons.mail_outline, () => Navigator.pushNamed(context, Chat.routName)),
+                _divider(),
+                _supportTile(context, context.t.tr('about_shiplink'), Icons.info_outline, () {}),
+              ],
+            ),
           ),
         ),
       ],
@@ -680,12 +687,7 @@ class _LogoutButton extends StatelessWidget {
           if (confirmed == true && context.mounted) {
             await Supabase.instance.client.auth.signOut();
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.t.tr('logout_successful')),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              CustomSnackBar.success(context.t.tr('logout_successful'), context);
               Navigator.pushNamedAndRemoveUntil(
                   context, Splash.routName, (route) => false);
             }
@@ -753,12 +755,7 @@ class _ProfileAvatarState extends State<_ProfileAvatar> {
       setState(() => _avatarUrl = url);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to upload image: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        CustomSnackBar.error('Failed to upload image: $e', context);
       }
     }
   }

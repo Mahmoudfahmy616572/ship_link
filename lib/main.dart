@@ -36,11 +36,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: Consumer2<ThemeProvider, LocaleProvider>(
-        builder: (context, themeProvider, localeProvider, _) {
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) {
           return BlocProvider(
             create: (context) => AuthCubit(),
             child: MaterialApp(
@@ -53,7 +52,6 @@ class MyApp extends StatelessWidget {
                 settings: settings,
               ),
               debugShowCheckedModeBanner: false,
-              themeMode: themeProvider.themeMode,
               theme: ThemeData(
                 brightness: Brightness.light,
                 colorSchemeSeed: AppColors.primary,
@@ -65,22 +63,21 @@ class MyApp extends StatelessWidget {
                   },
                 ),
               ),
-              darkTheme: ThemeData(
-                brightness: Brightness.dark,
-                colorSchemeSeed: AppColors.primary,
-                useMaterial3: true,
-                pageTransitionsTheme: const PageTransitionsTheme(
-                  builders: <TargetPlatform, PageTransitionsBuilder>{
-                    TargetPlatform.android: _TopToBottomTransitionBuilder(),
-                    TargetPlatform.iOS: _TopToBottomTransitionBuilder(),
-                  },
-                ),
-              ),
               locale: localeProvider.locale,
-              localizationsDelegates: const [
+              localeResolutionCallback: (locale, supportedLocales) {
+                if (locale == null) return const Locale('en');
+                for (final supported in supportedLocales) {
+                  if (supported.languageCode == locale.languageCode) {
+                    return supported;
+                  }
+                }
+                return const Locale('en');
+              },
+              localizationsDelegates: [
                 AppLocalizations.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
               ],
               supportedLocales: const [
                 Locale('en'),

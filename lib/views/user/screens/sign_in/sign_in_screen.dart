@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
@@ -38,9 +40,13 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
   }
 
   Future<void> _loadSavedCredentials() async {
-    final email = await CredentialsService().load();
+    final email = await CredentialsService().loadEmail();
+    final password = await CredentialsService().loadPassword();
     if (email != null && mounted) {
       _emailController.text = email;
+    }
+    if (password != null && mounted) {
+      _passwordController.text = password;
     }
   }
 
@@ -54,7 +60,7 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
 
   void _signIn() {
     if (!_formKey.currentState!.validate()) return;
-    CredentialsService().save(_emailController.text.trim());
+    CredentialsService().save(_emailController.text.trim(), password: _passwordController.text.trim());
     AuthCubit.get(context).signIN(
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -72,13 +78,9 @@ class _SignInState extends State<SignIn> with TickerProviderStateMixin {
             Navigator.pushReplacementNamed(
                 context, LocationPicker.routName);
           } else if (state is SignInFaild && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            CustomSnackBar.error(state.message, context);
           } else if (state is ErrorState && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            CustomSnackBar.error(state.message, context);
           }
         },
         builder: (context, state) {

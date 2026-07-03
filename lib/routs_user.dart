@@ -27,8 +27,9 @@ import 'package:ship_link/views/user/screens/chat/chat_screen.dart';
 import 'package:ship_link/views/user/screens/edit_profile/edit_profile_screen.dart';
 import 'package:ship_link/views/user/screens/order_detail/order_detail.dart';
 import 'package:ship_link/views/user/screens/signup/register/User/user.dart';
+import 'package:ship_link/views/user/screens/signup/sign_up.dart';
 import 'package:ship_link/views/user/screens/tracking/driver_tracking_screen.dart';
-
+import 'package:ship_link/views/shared/set_new_password/set_new_password_screen.dart';
 final Map<String, WidgetBuilder> userRoutes = {
   Splash.routName: (context) => Splash(),
   Cart.routName: (context) => Cart(),
@@ -43,12 +44,13 @@ final Map<String, WidgetBuilder> userRoutes = {
   Order.routName: (context) => Order(),
   OtpScreen.routName: (context) => OtpScreen(),
   SignIn.routName: (context) => SignIn(),
+  SignUp.routName: (context) => SignUp(),
   UserRegister.routName: (context) => UserRegister(),
   Profile.routName: (context) => Profile(),
   TopSellerScreen.routName: (context) => TopSellerScreen(),
   SettingsScreen.routName: (context) => SettingsScreen(),
   LiveTrackingScreen.routName: (context) => LiveTrackingScreen(),
-  NotificationScreen.routName: (context) => NotificationScreen(),
+  NotificationScreen.routName: (context) => const NotificationScreen(),
   LocationPicker.routName: (context) => LocationPicker(),
   RegisterScreen.routName: (context) => RegisterScreen(),
   WelcomeScreen.routName: (context) => WelcomeScreen(),
@@ -56,6 +58,7 @@ final Map<String, WidgetBuilder> userRoutes = {
   CreateAccountScreen.routName: (context) => CreateAccountScreen(),
   ResetPasswordScreen.routName: (context) => ResetPasswordScreen(),
   SecurityScreen.routName: (context) => SecurityScreen(),
+  SetNewPasswordScreen.routName: (context) => const SetNewPasswordScreen(),
   AddressBookScreen.routName: (context) => AddressBookScreen(),
   EditProfileScreen.routName: (context) => EditProfileScreen(),
   CheckOutPage.routName: (context) => CheckOutPage(),

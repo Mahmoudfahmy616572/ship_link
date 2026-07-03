@@ -5,6 +5,7 @@ import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/services/profile_image_service.dart';
 import 'package:ship_link/views/shared/app_style.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/shared/shimmer/shimmer_loading.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -67,12 +68,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       setState(() => _avatarUrl = url);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to upload image: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        CustomSnackBar.error('Failed to upload image: $e', context);
       }
     }
   }
@@ -160,12 +156,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await supabase.from('profiles').upsert(updates);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.t.tr('profile_updated_successfully')),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        CustomSnackBar.success(context.t.tr('profile_updated_successfully'), context);
         Navigator.pop(context);
       }
     } catch (e) {
@@ -176,9 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: AppColors.error),
-    );
+    CustomSnackBar.error(msg, context);
   }
 
   @override

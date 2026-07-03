@@ -252,14 +252,19 @@ class _SearchSortBar extends StatelessWidget {
   final ValueChanged<String> onChanged;
   const _SearchSortBar({required this.selected, required this.onChanged});
 
-  static const _labels = {
-    '': 'Default',
-    'price_asc': 'Price ↑',
-    'price_desc': 'Price ↓',
-    'newest': 'Newest',
-    'name_az': 'A-Z',
-    'name_za': 'Z-A',
-  };
+  static const _keys = ['', 'price_asc', 'price_desc', 'newest', 'name_az', 'name_za'];
+
+  String _label(BuildContext context, String key) {
+    switch (key) {
+      case '': return context.t.tr('sort_default');
+      case 'price_asc': return context.t.tr('sort_price_asc');
+      case 'price_desc': return context.t.tr('sort_price_desc');
+      case 'newest': return context.t.tr('sort_newest');
+      case 'name_az': return context.t.tr('sort_name_az');
+      case 'name_za': return context.t.tr('sort_name_za');
+      default: return key;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -267,13 +272,13 @@ class _SearchSortBar extends StatelessWidget {
       height: 34.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _labels.length,
+        itemCount: _keys.length,
         separatorBuilder: (_, __) => SizedBox(width: 8.w),
         itemBuilder: (context, index) {
-          final entry = _labels.entries.elementAt(index);
-          final isSelected = selected == entry.key;
+          final key = _keys[index];
+          final isSelected = selected == key;
           return GestureDetector(
-            onTap: () => onChanged(entry.key),
+            onTap: () => onChanged(key),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w),
               decoration: BoxDecoration(
@@ -283,7 +288,7 @@ class _SearchSortBar extends StatelessWidget {
               ),
               alignment: Alignment.center,
               child: Text(
-                entry.value,
+                _label(context, key),
                 style: appStyle(12, FontWeight.w500, isSelected ? Colors.white : AppColors.textSecondary),
               ),
             ),

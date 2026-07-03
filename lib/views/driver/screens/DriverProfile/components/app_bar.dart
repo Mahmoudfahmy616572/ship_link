@@ -34,7 +34,7 @@ class CustomAppBar extends StatelessWidget {
                   onTap: () {
                     cubit.signOutDriver();
                     CustomSnackBar.displaySuccessMotionToast(
-                        "Logout Successfuly", context);
+                        context.t.tr('logout_successfully'), context);
                     Navigator.pushReplacementNamed(
                         context, SignInDriver.routName);
                   },
@@ -44,14 +44,14 @@ class CustomAppBar extends StatelessWidget {
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(10.r)),
                     child: Text(
-                      "LogOut",
+                      context.t.tr('logout_btn'),
                       style: appStyle(15, FontWeight.w600, Colors.white),
                     ),
                   ));
             },
           ),
           Text(
-            "Driver Profile",
+            context.t.tr('driver_profile'),
             style: appStyle(18, FontWeight.w600, Colors.white),
           ),
           BlocBuilder<AuthCubit, AuthState>(
@@ -99,7 +99,7 @@ class CustomAppBar extends StatelessWidget {
                         ),
                         BuildTextField(
                           controller: nameController,
-                          hintText: 'enter your name',
+                          hintText: context.t.tr('enter_your_name_hint'),
                           obscureText: false,
                         ),
                         SizedBox(
@@ -107,7 +107,7 @@ class CustomAppBar extends StatelessWidget {
                         ),
                         BuildTextField(
                           controller: phoneController,
-                          hintText: 'enter your PhoneNumber',
+                          hintText: context.t.tr('enter_phone_hint'),
                           textInputType: TextInputType.phone,
                           obscureText: false,
                         ),
@@ -122,7 +122,7 @@ class CustomAppBar extends StatelessWidget {
                   ),
                 );
               } else {
-                return const CustomErrorWidget(errMessage: "Error");
+                return CustomErrorWidget(errMessage: context.t.tr('error'));
               }
             },
           ),
@@ -137,7 +137,7 @@ class CustomAppBar extends StatelessWidget {
                     BlocProvider.of<GetUserdriverDataCubit>(context)
                         .getuserDriverData();
                     CustomSnackBar.displaySuccessMotionToast(
-                        "Update Info Successfully", context);
+                        context.t.tr('update_info_successfully'), context);
                   } else {
                     CustomSnackBar.displayErrorMotionToast(
                         state.errMessage, context);
@@ -183,8 +183,8 @@ class CustomAppBar extends StatelessWidget {
                                   )
                                 : Text(context.t.tr('edit')));
                       } else {
-                        return const CustomErrorWidget(
-                          errMessage: "error",
+                        return CustomErrorWidget(
+                          errMessage: context.t.tr('error'),
                         );
                       }
                     },

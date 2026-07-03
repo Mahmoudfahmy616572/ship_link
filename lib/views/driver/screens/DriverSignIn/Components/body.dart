@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/constant/constant.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
+import 'package:ship_link/localization.dart';
+import 'package:ship_link/providers.dart';
 import 'package:ship_link/services/cache_service.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/build_botton.dart';
@@ -29,6 +32,23 @@ class _BodyState extends State<Body> {
   final formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final savedEmail = await CredentialsService().loadEmail();
+    final savedPassword = await CredentialsService().loadPassword();
+    if (savedEmail != null) {
+      email.text = savedEmail;
+    }
+    if (savedPassword != null) {
+      password.text = savedPassword;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
@@ -37,11 +57,11 @@ class _BodyState extends State<Body> {
             Navigator.of(context).pushNamedAndRemoveUntil(
                 MainScreenDriver.routName, (Route<dynamic> routes) => false);
             CustomSnackBar.displaySuccessMotionToast(
-                "Welcome back, Captain!", context);
+                context.t.tr('welcome_back_captain'), context);
           }
         } else if (state is SignInDriverFaild) {
           CustomSnackBar.displayErrorMotionToast(
-              "Email or Password Incorrect", context);
+              context.t.tr('email_or_password_incorrect'), context);
         }
       },
       builder: (context, state) {
@@ -57,7 +77,8 @@ class _BodyState extends State<Body> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(height: 40.h),
+                      _LanguageSelector(),
+                      SizedBox(height: 24.h),
                       Container(
                         width: 80.w, height: 80.h,
                         decoration: BoxDecoration(
@@ -68,21 +89,21 @@ class _BodyState extends State<Body> {
                             size: 44, color: Colors.white),
                       ),
                       SizedBox(height: 24.h),
-                      Text("Welcome Back!",
+                      Text(context.t.tr('welcome_back'),
                           style: appStyle(
                               28, FontWeight.w700, const Color(0xFF111827))),
                       SizedBox(height: 8.h),
-                      Text("Sign in to start delivering",
+                      Text(context.t.tr('sign_in_to_start'),
                           style: appStyle(
                               15, FontWeight.w400, const Color(0xFF6B7280))),
                       SizedBox(height: 40.h),
                       BuildTextField(
                         controller: email,
                         validator: (value) {
-                          if (value!.isEmpty) return "Email is required";
+                          if (value!.isEmpty) return context.t.tr('email_is_required');
                           return null;
                         },
-                        hintText: 'Email address',
+                        hintText: context.t.tr('email_address'),
                         suffixIcon: const Icon(Icons.email_outlined,
                             color: Color(0xFF9CA3AF)),
                         obscureText: false,
@@ -92,11 +113,11 @@ class _BodyState extends State<Body> {
                       BuildTextField(
                         controller: password,
                         validator: (value) {
-                          if (value!.isEmpty) return "Password is required";
+                          if (value!.isEmpty) return context.t.tr('password_is_required');
                           return null;
                         },
                         obscureText: !isVisable,
-                        hintText: 'Password',
+                        hintText: context.t.tr('password_label'),
                         suffixIcon: IconButton(
                           onPressed: () =>
                               setState(() => isVisable = !isVisable),
@@ -114,7 +135,7 @@ class _BodyState extends State<Body> {
                           TextButton(
                             onPressed: () => Navigator.pushNamed(
                                 context, ResetPasswordScreen.routName),
-                            child: Text("Forgot Password?",
+                            child: Text(context.t.tr('forgot_password_q'),
                                 style: appStyle(
                                     14, FontWeight.w500, AppColors.primary)),
                           ),
@@ -123,8 +144,8 @@ class _BodyState extends State<Body> {
                       SizedBox(height: 8.h),
                       BuildButton(
                         text: state is SignInDriverLoading
-                            ? 'Signing in...'
-                            : 'Sign In',
+                            ? context.t.tr('signing_in')
+                            : context.t.tr('sign_in'),
                         color: AppColors.primary,
                         textStyle:
                             appStyle(16, FontWeight.w600, Colors.white),
@@ -133,7 +154,7 @@ class _BodyState extends State<Body> {
                             : () {
                                 if (formKey.currentState!.validate()) {
                                   CredentialsService()
-                                      .save(email.text);
+                                      .save(email.text, password: password.text);
                                   cubit.signINDriver(
                                       email: email.text,
                                       password: password.text);
@@ -147,7 +168,7 @@ class _BodyState extends State<Body> {
                               child: Divider(color: Color(0xFFE5E7EB))),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            child: Text("or continue with",
+                            child: Text(context.t.tr('or_continue_with'),
                                 style: appStyle(13, FontWeight.w400,
                                     const Color(0xFF9CA3AF))),
                           ),
@@ -156,27 +177,21 @@ class _BodyState extends State<Body> {
                         ],
                       ),
                       SizedBox(height: 24.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _socialBtn("assets/icons/googel icon.svg"),
-                          SizedBox(width: 16.w),
-                          _socialBtn("assets/icons/apple icon.svg"),
-                          SizedBox(width: 16.w),
-                          _socialBtn("assets/icons/facebook icon.svg"),
-                        ],
+                      GestureDetector(
+                        onTap: () => context.read<AuthCubit>().signInWithGoogleDriver(),
+                        child: _socialBtn("assets/icons/googel icon.svg", isGoogle: true),
                       ),
                       SizedBox(height: 32.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't have an account? ",
+                          Text(context.t.tr('dont_have_account_q'),
                               style: appStyle(14, FontWeight.w400,
                                   const Color(0xFF6B7280))),
                           GestureDetector(
                             onTap: () => Navigator.pushNamed(
                                 context, DriverRegister.routName),
-                            child: Text("Sign Up",
+                            child: Text(context.t.tr('sign_up'),
                                 style: appStyle(
                                     14, FontWeight.w600, AppColors.primary)),
                           ),
@@ -194,18 +209,54 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget _socialBtn(String asset) {
+  Widget _LanguageSelector() {
+    final locale = context.watch<LocaleProvider>().locale;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _langBtn('EN', const Locale('en'), locale == const Locale('en')),
+        SizedBox(width: 12.w),
+        _langBtn('AR', const Locale('ar'), locale == const Locale('ar')),
+      ],
+    );
+  }
+
+  Widget _langBtn(String label, Locale target, bool active) {
+    return GestureDetector(
+      onTap: () => context.read<LocaleProvider>().setLocale(target),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          color: active ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(
+            color: active ? AppColors.primary : const Color(0xFFE5E7EB),
+          ),
+        ),
+        child: Text(
+          label,
+          style: appStyle(
+            16,
+            FontWeight.w600,
+            active ? Colors.white : const Color(0xFF6B7280),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _socialBtn(String asset, {bool isGoogle = false}) {
     return Container(
-      width: 52.w,
+      width: isGoogle ? 56.w : 52.w,
       height: 52.h,
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Center(
-          child: SvgPicture.asset(asset,
-              width: 24, height: 24)),
+        child: SvgPicture.asset(asset, width: 24, height: 24),
+      ),
     );
   }
 }

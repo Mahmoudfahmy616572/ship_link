@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/localization.dart';
 
 import '../../../../shared/app_style.dart';
 import '../../DriverRegister/driver_register.dart';
@@ -15,7 +16,7 @@ class SignUpRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "First time here? ",
+          context.t.tr('first_time_here_q'),
           style: appStyle(14, FontWeight.w300, Colors.white),
         ),
         GestureDetector(
@@ -23,7 +24,7 @@ class SignUpRow extends StatelessWidget {
             Navigator.pushNamed(context, DriverRegister.routName);
           },
           child: Text(
-            "SignUp ",
+            context.t.tr('signup_'),
             style: appStyle(15, FontWeight.w500, AppColors.primary),
           ),
         ),

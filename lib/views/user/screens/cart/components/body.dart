@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/constant/services_locators.dart';
 import 'package:ship_link/cubits/getFromCart/get_from_cart_cubit.dart';
 import 'package:share_plus/share_plus.dart';
@@ -183,13 +184,7 @@ class _BodyState extends State<Body> {
                               .read<GetFromCartCubit>()
                               .deleteFromCart(cart_id: itemId, product_id: prodId);
                         }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${detail.product?.name ?? context.t.tr("item_removed_from_cart")} removed from cart',
-                            ),
-                          ),
-                        );
+                        CustomSnackBar.info('${detail.product?.name ?? context.t.tr("item_removed_from_cart")} removed from cart', context);
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 12.h),

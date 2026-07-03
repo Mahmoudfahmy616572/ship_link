@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 
 import 'components/body.dart';
@@ -50,7 +51,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         children: [
           Row(
             children: [
-              Text('Orders', style: appStyle(22, FontWeight.w700, const Color(0xFF111827))),
+              Text(context.t.tr('orders_tab'), style: appStyle(22, FontWeight.w700, const Color(0xFF111827))),
               const Spacer(),
               Container(
                 padding: EdgeInsets.all(8.w),
@@ -69,7 +70,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   Widget _buildTabs() {
-    const tabs = ['Available', 'Accepted', 'Completed'];
+    final tabs = [context.t.tr('available'), context.t.tr('accepted_tab'), context.t.tr('completed')];
     return Container(
       margin: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0.h),
       padding: EdgeInsets.all(4.w),

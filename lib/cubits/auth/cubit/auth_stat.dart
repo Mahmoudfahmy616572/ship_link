@@ -67,3 +67,16 @@ class SignOutDriverLoading extends AuthState {}
 class SignOutDriverSuccess extends AuthState {}
 
 class SignOutDriverFaild extends AuthState {}
+
+class PasswordRecoveryState extends AuthState {}
+
+class UpdatePasswordLoading extends AuthState {}
+
+class UpdatePasswordSuccess extends AuthState {}
+
+class UpdatePasswordFaild extends AuthState {
+  final String message;
+  UpdatePasswordFaild([this.message = '']);
+  @override
+  List<Object?> get props => [message];
+}

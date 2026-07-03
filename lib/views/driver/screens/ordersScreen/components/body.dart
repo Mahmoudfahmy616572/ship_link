@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/Errors/custom_error_widget.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
 import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
 import 'package:ship_link/views/shared/app_style.dart';
@@ -48,21 +49,21 @@ class Body extends StatelessWidget {
               ?.where((o) => o.status?.toLowerCase() == "pending")
               .toList();
           if (orders == null || orders.isEmpty) {
-            return _emptyState('No available orders', Icons.inbox_outlined);
+            return _emptyState(context.t.tr('no_available_orders'), Icons.inbox_outlined);
           }
           return ListView.builder(
             padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 80.h),
             itemCount: orders.length + (state.isOffline ? 1 : 0),
             itemBuilder: (_, i) {
               if (state.isOffline && i == 0) {
-                return _offlineBanner();
+                return _offlineBanner(context);
               }
               final idx = state.isOffline ? i - 1 : i;
               return OrdersCard(order: orders[idx], index: idx);
             },
           );
         }
-        return const Center(child: CustomErrorWidget(errMessage: 'Try Again Later'));
+        return Center(child: CustomErrorWidget(errMessage: context.t.tr('try_again_later')));
       },
     );
   }
@@ -79,7 +80,7 @@ class Body extends StatelessWidget {
               ?.where((o) => o.status?.toLowerCase() == "accepted" || o.status?.toLowerCase() == "picked_up" || o.status?.toLowerCase() == "shipped")
               .toList();
           if (orders == null || orders.isEmpty) {
-            return _emptyState('No accepted orders', Icons.check_circle_outline);
+            return _emptyState(context.t.tr('no_accepted_orders'), Icons.check_circle_outline);
           }
           return ListView.builder(
             padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 80.h),
@@ -87,7 +88,7 @@ class Body extends StatelessWidget {
             itemBuilder: (_, i) => AcceptedCard(order: orders[i]),
           );
         }
-        return const Center(child: Text('Something went wrong'));
+        return Center(child: Text(context.t.tr('something_went_wrong_short')));
       },
     );
   }
@@ -104,7 +105,7 @@ class Body extends StatelessWidget {
               ?.where((o) => o.status?.toLowerCase() == "delivered")
               .toList();
           if (orders == null || orders.isEmpty) {
-            return _emptyState('No completed orders yet', Icons.checklist);
+            return _emptyState(context.t.tr('no_completed_orders'), Icons.checklist);
           }
           return ListView.builder(
             padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 80.h),
@@ -112,7 +113,7 @@ class Body extends StatelessWidget {
             itemBuilder: (_, i) => AcceptedCard(order: orders[i]),
           );
         }
-        return const Center(child: Text('Something went wrong'));
+        return Center(child: Text(context.t.tr('something_went_wrong_short')));
       },
     );
   }
@@ -140,7 +141,7 @@ class Body extends StatelessWidget {
     );
   }
 
-  Widget _offlineBanner() {
+  Widget _offlineBanner(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 8.h),
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
@@ -153,7 +154,7 @@ class Body extends StatelessWidget {
         children: [
           const Icon(Icons.wifi_off, size: 16, color: Color(0xFFD97706)),
           SizedBox(width: 8.w),
-          Text("Offline — showing cached orders",
+          Text(context.t.tr('offline_cached_orders'),
               style: appStyle(13, FontWeight.w500, const Color(0xFF92400E))),
         ],
       ),

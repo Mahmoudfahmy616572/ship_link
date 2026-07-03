@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ship_link/services/directions_service.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/user/screens/chat/order_chat_screen.dart';
 import 'package:ship_link/widgets/adaptive_map.dart';
@@ -116,8 +117,8 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
             width: 4,
           ),
         ];
-        _distanceText = '${dist.toStringAsFixed(1)} km';
-        _durationText = '${(dist / 0.5).round().clamp(1, 999)} min';
+        _distanceText = '${dist.toStringAsFixed(1)} ${context.t.tr('km')}';
+        _durationText = '${(dist / 0.5).round().clamp(1, 999)} ${context.t.tr('min')}';
         _loadingRoute = false;
         _routeFailed = true;
       });
@@ -132,7 +133,7 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
         latitude: _driverLat!,
         longitude: _driverLng!,
         icon: buildDriverMarker(),
-        label: 'You',
+        label: context.t.tr('you'),
       ));
     }
     markers.add(MapMarker(
@@ -140,7 +141,7 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
       latitude: widget.destLat,
       longitude: widget.destLng,
       icon: buildDestinationMarker(),
-      label: widget.addressLabel ?? 'Delivery',
+      label: widget.addressLabel ?? context.t.tr('delivery'),
     ));
     setState(() => _markers = markers);
   }
@@ -170,7 +171,7 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.addressLabel ?? 'Order #${widget.orderId}'),
+        title: Text(widget.addressLabel ?? '${context.t.tr('order_no')}${widget.orderId}'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0.5,
@@ -212,7 +213,11 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
                   style: appStyle(13, FontWeight.w400, const Color(0xFF6B7280)),
                   maxLines: 2, overflow: TextOverflow.ellipsis),
             ),
-          Row(
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 8.h,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               if (_loadingRoute)
                 SizedBox(
@@ -220,72 +225,80 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               else ...[
-                _infoChip(Icons.directions_car,
-                    _distanceText ?? '—', 'Distance'),
-                SizedBox(width: 16.w),
-                _infoChip(Icons.access_time,
-                    _durationText ?? '—', 'Est. time'),
+                Flexible(
+                  child: _infoChip(Icons.directions_car,
+                      _distanceText ?? '—', context.t.tr('distance')),
+                ),
+                SizedBox(width: 8.w),
+                Flexible(
+                  child: _infoChip(Icons.access_time,
+                      _durationText ?? '—', context.t.tr('est_time')),
+                ),
               ],
-              const Spacer(),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => OrderChatScreen(
-                      orderId: int.tryParse(widget.orderId) ?? 0,
-                      driverId: Supabase.instance.client.auth.currentUser?.id ?? '',
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrderChatScreen(
+                          orderId: int.tryParse(widget.orderId) ?? 0,
+                          driverId: Supabase.instance.client.auth.currentUser?.id ?? '',
+                        ),
+                      ),
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2563EB),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.chat, size: 16, color: Colors.white),
+                          SizedBox(width: 4.w),
+                          Text(context.t.tr('chat'),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2563EB),
-                    borderRadius: BorderRadius.circular(10.r),
+                  SizedBox(width: 6.w),
+                  GestureDetector(
+                    onTap: _openGoogleMaps,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2563EB),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.navigation, size: 16, color: Colors.white),
+                          SizedBox(width: 4.w),
+                          Text(context.t.tr('navigate'),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.chat, size: 18, color: Colors.white),
-                      SizedBox(width: 6.w),
-                      Text('Chat',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              GestureDetector(
-                onTap: _openGoogleMaps,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2563EB),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.navigation, size: 18, color: Colors.white),
-                      SizedBox(width: 6.w),
-                      Text('Navigate',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ],
           ),
           if (_routeFailed)
             Padding(
               padding: EdgeInsets.only(top: 8.h),
-              child: Text('Straight-line estimate — open Google Maps for precise routing',
+              child: Text(context.t.tr('straight_line_estimate'),
                   style: appStyle(11, FontWeight.w400, const Color(0xFF9CA3AF))),
             ),
         ],

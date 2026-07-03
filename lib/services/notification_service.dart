@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../firebase_options.dart';
+import '../views/shared/snackBar/snack_bar.dart';
 import '../views/user/screens/chat/order_chat_screen.dart';
 import 'notification_preferences_service.dart';
 import 'order_mute_service.dart';
@@ -284,26 +285,7 @@ class NotificationService {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = navigatorKey.currentContext;
       if (context == null) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-            if (body.isNotEmpty) Text(body, style: TextStyle(fontSize: 13.sp)),
-          ],
-        ),
-        backgroundColor: const Color(0xFF1a1a2e),
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.fromLTRB(12.w, 0.h, 12.w, 80.h),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        duration: const Duration(seconds: 4),
-        action: SnackBarAction(
-          label: 'View',
-          textColor: Colors.orange,
-          onPressed: () => _handleTap(data != null ? {...data, 'type': type} : {'type': type}),
-        ),
-      ));
+      CustomSnackBar.info('$title${body.isNotEmpty ? '\n$body' : ''}', context);
     });
   }
 

@@ -98,8 +98,8 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
                       alignment: Alignment.center,
                       children: [
                         Container(
-                          width: 72 + _glowAnimation.value * 48,
-                          height: 72 + _glowAnimation.value * 48,
+                          width: 120.w + _glowAnimation.value * 60.w,
+                          height: 120.w + _glowAnimation.value * 60.w,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: const Color(0xFFF97316).withOpacity(
@@ -107,10 +107,10 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          size: 72,
-                          color: const Color(0xFFF97316),
+                        Image.asset(
+                          'assets/logos/user_logo.png',
+                          width: 120.w,
+                          fit: BoxFit.contain,
                         ),
                       ],
                     ),

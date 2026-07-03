@@ -135,6 +135,7 @@ class CartServeicesImpl extends CartServeices {
     double? deliveryLat,
     double? deliveryLng,
     String? addressLabel,
+    String? phoneNumber,
     String paymentMethod = 'cod',
   }) async {
     try {
@@ -173,6 +174,9 @@ class CartServeicesImpl extends CartServeices {
       }
       if (addressLabel != null && addressLabel.isNotEmpty) {
         insertPayload['address_label'] = addressLabel;
+      }
+      if (phoneNumber != null && phoneNumber.isNotEmpty) {
+        insertPayload['phone_number'] = phoneNumber;
       }
       final order = await _supabase.from('orders').insert(insertPayload).select().single();
       final orderId = order['id'] as int;

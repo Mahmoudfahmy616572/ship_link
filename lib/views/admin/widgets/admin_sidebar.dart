@@ -31,11 +31,11 @@ class AdminSidebar extends StatelessWidget {
           Container(
             height: 80.h,
             alignment: Alignment.center,
-            child: Text(context.t.tr('app_name'),
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: isWide ? 18 : 12,
-                    fontWeight: FontWeight.bold)),
+            child: Image.asset(
+              'assets/logos/admin_logo.png',
+              width: isWide ? 60 : 36,
+              fit: BoxFit.contain,
+            ),
           ),
           const Divider(color: Colors.white24),
           ...items.asMap().entries.map((entry) {

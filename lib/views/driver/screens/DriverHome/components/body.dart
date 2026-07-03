@@ -11,6 +11,7 @@ import 'package:ship_link/data/services/driverEarnings/driver_earnings_service.d
 import 'package:ship_link/views/driver/screens/OrdersMap/orders_map_screen.dart';
 import 'package:ship_link/views/driver/screens/chat/driver_chat_list_screen.dart';
 import 'package:ship_link/services/driver/driver_location_service.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/notification_bell.dart';
 import 'package:ship_link/utils/sizer.dart';
@@ -23,9 +24,12 @@ class Body extends StatefulWidget {
   State<Body> createState() => _BodyState();
 }
 
-class _BodyState extends State<Body> {
+class _BodyState extends State<Body> with AutomaticKeepAliveClientMixin {
   bool isOnline = false;
   final _locationService = DriverLocationService();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -39,6 +43,11 @@ class _BodyState extends State<Body> {
   void dispose() {
     _locationService.stop();
     super.dispose();
+  }
+
+  @override
+  void updateKeepAlive() {
+    super.updateKeepAlive();
   }
 
   void _refreshAll() {
@@ -98,10 +107,10 @@ class _BodyState extends State<Body> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Hello, $name',
+                          Text('${context.t.tr('hello')}, $name',
                               style: appStyle(20, FontWeight.w600, const Color(0xFF111827))),
                           SizedBox(height: 2.h),
-                          Text(isOnline ? 'Ready for deliveries' : 'You\'re offline',
+                          Text(isOnline ? context.t.tr('ready_for_deliveries') : context.t.tr('youre_offline'),
                               style: appStyle(14, FontWeight.w400, const Color(0xFF6B7280))),
                         ],
                       );
@@ -139,7 +148,7 @@ class _BodyState extends State<Body> {
                           ),
                         ),
                         SizedBox(width: 6.w),
-                        Text(isOnline ? 'Online' : 'Offline',
+                        Text(isOnline ? context.t.tr('online') : context.t.tr('offline'),
                             style: appStyle(13, FontWeight.w600, Colors.white)),
                       ],
                     ),
@@ -164,9 +173,9 @@ class _BodyState extends State<Body> {
                 : 0;
             return Row(
               children: [
-                _buildStatCard(Icons.delivery_dining, '$count', 'Active', AppColors.primary),
+                _buildStatCard(Icons.delivery_dining, '$count', context.t.tr('active'), AppColors.primary),
                 SizedBox(width: 12.w),
-                _buildStatCard(Icons.star, '4.9', 'Rating', AppColors.starFilled),
+                _buildStatCard(Icons.star, '4.9', context.t.tr('rating'), AppColors.starFilled),
                 SizedBox(width: 12.w),
                 _buildEarningsCard(),
               ],
@@ -180,13 +189,13 @@ class _BodyState extends State<Body> {
   Widget _buildEarningsCard() {
     final driverId = Supabase.instance.client.auth.currentUser?.id;
     if (driverId == null) {
-      return _buildStatCard(Icons.attach_money, '\$0', 'Today', AppColors.success);
+      return _buildStatCard(Icons.attach_money, '\$0', context.t.tr('today'), AppColors.success);
     }
     return FutureBuilder<double>(
       future: DriverEarningsService(Supabase.instance.client).getTodayEarnings(driverId),
       builder: (context, snapshot) {
         final value = snapshot.data ?? 0;
-        return _buildStatCard(Icons.attach_money, '\$${value.toStringAsFixed(0)}', 'Today', AppColors.success);
+        return _buildStatCard(Icons.attach_money, '\$${value.toStringAsFixed(0)}', context.t.tr('today'), AppColors.success);
       },
     );
   }
@@ -221,7 +230,7 @@ class _BodyState extends State<Body> {
             (state.getAcceptedOrder.data?.order?.length ?? 0) > 0) {
                   final order = state.getAcceptedOrder.data!.order!.first;
           final status = order.status?.toString().toLowerCase() ?? '';
-          final steps = ['Accepted', 'Picked Up', 'In Transit', 'Delivered'];
+          final steps = [context.t.tr('accepted'), context.t.tr('picked_up'), context.t.tr('in_transit'), context.t.tr('delivered')];
           final statusMap = {'accepted': 0, 'picked_up': 1, 'shipped': 2, 'delivered': 3};
           final currentStep = statusMap[status] ?? 0;
           return SliverToBoxAdapter(
@@ -249,7 +258,7 @@ class _BodyState extends State<Body> {
                           color: const Color(0xFFFEF3C7),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
-                        child: Text('Active Delivery',
+                        child: Text(context.t.tr('active_delivery'),
                             style: appStyle(12, FontWeight.w600, const Color(0xFFD97706))),
                       ),
                       const Spacer(),
@@ -267,11 +276,11 @@ class _BodyState extends State<Body> {
                       const Icon(Icons.person_outline, size: 18, color: Color(0xFF6B7280)),
                       SizedBox(width: 6.w),
                       Flexible(
-                        child: Text(order.user?.firstName ?? 'Customer',
+                        child: Text(order.user?.firstName ?? context.t.tr('customer'),
                             style: appStyle(15, FontWeight.w500, const Color(0xFF111827))),
                       ),
                       SizedBox(width: 8.w),
-                      Text('EGP ${order.totalPrice ?? '0'}',
+                      Text('${context.t.tr('egp')} ${order.totalPrice ?? '0'}',
                           style: appStyle(18, FontWeight.w700, const Color(0xFF10B981))),
                     ],
                   ),
@@ -312,7 +321,7 @@ class _BodyState extends State<Body> {
         children: [
           Expanded(
             child: _ActionBtn(
-              label: 'Mark Picked Up',
+              label: context.t.tr('mark_picked_up'),
               icon: const Icon(Icons.check_circle_outline, size: 18),
               backgroundColor: AppColors.primary,
               onAction: () async {
@@ -325,7 +334,7 @@ class _BodyState extends State<Body> {
           SizedBox(
             height: 44.h,
             child: _ActionBtn(
-              label: 'Cancel',
+              label: context.t.tr('cancel'),
               icon: const Icon(Icons.cancel_outlined, size: 18),
               isOutlined: true,
               fgColor: const Color(0xFFDC2626),
@@ -344,7 +353,7 @@ class _BodyState extends State<Body> {
         children: [
           Expanded(
             child: _ActionBtn(
-              label: 'Mark Shipped',
+              label: context.t.tr('mark_shipped'),
               icon: const Icon(Icons.local_shipping, size: 18),
               backgroundColor: const Color(0xFFD97706),
               onAction: () async {
@@ -357,7 +366,7 @@ class _BodyState extends State<Body> {
           SizedBox(
             height: 44.h,
             child: _ActionBtn(
-              label: 'Cancel',
+              label: context.t.tr('cancel'),
               icon: const Icon(Icons.cancel_outlined, size: 18),
               isOutlined: true,
               fgColor: const Color(0xFFDC2626),
@@ -376,7 +385,7 @@ class _BodyState extends State<Body> {
         children: [
           Expanded(
             child: _ActionBtn(
-              label: 'Mark Delivered',
+              label: context.t.tr('mark_delivered'),
               icon: const Icon(Icons.check_circle, size: 18),
               backgroundColor: const Color(0xFF059669),
               onAction: () async {
@@ -389,7 +398,7 @@ class _BodyState extends State<Body> {
           SizedBox(
             height: 44.h,
             child: _ActionBtn(
-              label: 'Cancel',
+              label: context.t.tr('cancel'),
               icon: const Icon(Icons.cancel_outlined, size: 18),
               isOutlined: true,
               fgColor: const Color(0xFFDC2626),
@@ -443,7 +452,7 @@ class _BodyState extends State<Body> {
                 padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 12.h),
                 child: Row(
                   children: [
-                    Text('Available Orders',
+                    Text(context.t.tr('available_orders'),
                         style: appStyle(18, FontWeight.w700, const Color(0xFF111827))),
                     const Spacer(),
                     GestureDetector(
@@ -453,7 +462,7 @@ class _BodyState extends State<Body> {
                         children: [
                           const Icon(Icons.map_outlined, size: 16, color: Color(0xFF6B7280)),
                           SizedBox(width: 4.w),
-                          Text('Map',
+                          Text(context.t.tr('map'),
                               style: appStyle(14, FontWeight.w500, const Color(0xFF6B7280))),
                         ],
                       ),
@@ -486,14 +495,14 @@ class _BodyState extends State<Body> {
                       children: [
                         const Icon(Icons.inbox_outlined, size: 48, color: Color(0xFFD1D5DB)),
                         SizedBox(height: 12.h),
-                        Text('No orders available',
+                        Text(context.t.tr('no_orders_available'),
                             style: appStyle(16, FontWeight.w500, const Color(0xFF9CA3AF))),
                         SizedBox(height: 4.h),
-                        Text('Check back later for new orders',
+                        Text(context.t.tr('check_back_later'),
                             style: appStyle(14, FontWeight.w400, const Color(0xFFD1D5DB))),
                         SizedBox(height: 16.h),
                         Text(
-                          'Switch to Orders tab to accept',
+                          context.t.tr('switch_to_orders_tab'),
                           style: appStyle(13, FontWeight.w400, const Color(0xFF9CA3AF)),
                         ),
                       ],
@@ -543,10 +552,10 @@ class _BodyState extends State<Body> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Order #${order.id ?? ''}',
+                    Text('${context.t.tr('order_no')}${order.id ?? ''}',
                         style: appStyle(15, FontWeight.w600, const Color(0xFF111827))),
                     SizedBox(height: 2.h),
-                    Text(order.user?.firstName ?? 'Customer',
+                    Text(order.user?.firstName ?? context.t.tr('customer'),
                         style: appStyle(13, FontWeight.w400, const Color(0xFF6B7280))),
                   ],
                 ),
@@ -557,7 +566,7 @@ class _BodyState extends State<Body> {
                   color: const Color(0xFFFEF3C7),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
-                child: Text(order.status ?? 'Pending',
+                child: Text(order.status ?? context.t.tr('pending'),
                     style: appStyle(12, FontWeight.w600, const Color(0xFFD97706))),
               ),
             ],
@@ -570,11 +579,11 @@ class _BodyState extends State<Body> {
               const Icon(Icons.person_outline, size: 16, color: Color(0xFF6B7280)),
               SizedBox(width: 6.w),
               Flexible(
-                child: Text(order.user?.firstName ?? 'Customer',
+                child: Text(order.user?.firstName ?? context.t.tr('customer'),
                     style: appStyle(13, FontWeight.w500, const Color(0xFF111827))),
               ),
               SizedBox(width: 8.w),
-              Text('EGP ${order.totalPrice ?? '0'}',
+              Text('${context.t.tr('egp')} ${order.totalPrice ?? '0'}',
                   style: appStyle(18, FontWeight.w700, const Color(0xFF10B981))),
             ],
           ),
