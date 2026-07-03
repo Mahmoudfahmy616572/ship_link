@@ -40,7 +40,7 @@ class _DriverChartsSectionState extends State<DriverChartsSection> {
 
     final dayNames = List.generate(7, (i) {
       final d = DateTime.now().subtract(Duration(days: 6 - i));
-      const abbr = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      final abbr = [context.t.tr('mon'), context.t.tr('tue'), context.t.tr('wed'), context.t.tr('thu'), context.t.tr('fri'), context.t.tr('sat'), context.t.tr('sun')];
       return abbr[d.weekday - 1];
     });
 
@@ -93,27 +93,71 @@ class _DriverChartsSectionState extends State<DriverChartsSection> {
               ),
             ),
           ),
+          SizedBox(height: 16.h),
+          _buildLegend(),
         ],
       ],
     );
   }
 
+  static const _statusColors = {
+    'delivered': Color(0xFF22C55E),
+    'accepted': Color(0xFF3B82F6),
+    'picked_up': Color(0xFFF59E0B),
+    'shipped': Color(0xFF8B5CF6),
+    'pending': Color(0xFF9CA3AF),
+    'cancelled': Color(0xFFEF4444),
+  };
+
+  Widget _buildLegend() {
+    final total = _statusCounts.values.fold(0, (a, b) => a + b);
+    if (total == 0) return const SizedBox.shrink();
+    final entries = _statusCounts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return Wrap(
+      spacing: 16.w,
+      runSpacing: 8.h,
+      children: entries.map((e) {
+        final pct = (e.value / total * 100).toStringAsFixed(0);
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 10.w, height: 10.h,
+              decoration: BoxDecoration(
+                color: _statusColors[e.key] ?? Colors.grey,
+                shape: BoxShape.circle,
+              ),
+            ),
+            SizedBox(width: 6.w),
+            Text('${_statusLabel(e.key)} ($pct%)',
+                style: appStyle(12, FontWeight.w500, AppColors.textSecondary)),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  String _statusLabel(String key) {
+    switch (key) {
+      case 'delivered': return context.t.tr('delivered');
+      case 'accepted': return context.t.tr('accepted');
+      case 'picked_up': return context.t.tr('picked_up');
+      case 'shipped': return context.t.tr('in_transit');
+      case 'pending': return context.t.tr('pending');
+      case 'cancelled': return context.t.tr('cancelled');
+      default: return key;
+    }
+  }
+
   List<PieChartSectionData> _buildPieSections() {
     final total = _statusCounts.values.fold(0, (a, b) => a + b);
     if (total == 0) return [];
-    const colors = {
-      'delivered': Color(0xFF22C55E),
-      'accepted': Color(0xFF3B82F6),
-      'picked_up': Color(0xFFF59E0B),
-      'shipped': Color(0xFF8B5CF6),
-      'pending': Color(0xFF9CA3AF),
-      'cancelled': Color(0xFFEF4444),
-    };
     return _statusCounts.entries.map((e) {
       final pct = (e.value / total * 100).toStringAsFixed(0);
       return PieChartSectionData(
         value: e.value.toDouble(),
-        color: colors[e.key] ?? Colors.grey,
+        color: _statusColors[e.key] ?? Colors.grey,
         title: '$pct%',
         titleStyle: appStyle(12, FontWeight.w700, Colors.white),
         radius: 50,

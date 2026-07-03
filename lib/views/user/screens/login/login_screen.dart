@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/localization.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/services/cache_service.dart';
@@ -32,9 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loadSavedCredentials() async {
-    final email = await CredentialsService().load();
+    final email = await CredentialsService().loadEmail();
+    final password = await CredentialsService().loadPassword();
     if (email != null && mounted) {
       _emailController.text = email;
+    }
+    if (password != null && mounted) {
+      _passwordController.text = password;
     }
   }
 
@@ -47,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() {
     if (!_formKey.currentState!.validate()) return;
-    CredentialsService().save(_emailController.text.trim());
+    CredentialsService().save(_emailController.text.trim(), password: _passwordController.text.trim());
     AuthCubit.get(context).signIN(
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -72,13 +77,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(
                 context, LocationPicker.routName);
           } else if (state is SignInFaild && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            CustomSnackBar.error(state.message, context);
           } else if (state is ErrorState && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            CustomSnackBar.error(state.message, context);
           }
         },
         builder: (context, state) {
@@ -323,24 +324,13 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
         SizedBox(height: 24.h),
-        Row(
-          children: [
-            Expanded(
-              child: _socialButton(
-                iconPath: 'assets/icons/googel icon.svg',
-                label: context.t.tr('google'),
-                onTap: () => AuthCubit.get(context).signInWithGoogle(),
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: _socialButton(
-                iconPath: 'assets/icons/apple icon.svg',
-                label: context.t.tr('apple'),
-                onTap: () {},
-              ),
-            ),
-          ],
+        SizedBox(
+          width: double.infinity,
+          child: _socialButton(
+            iconPath: 'assets/icons/googel icon.svg',
+            label: context.t.tr('google'),
+            onTap: () => AuthCubit.get(context).signInWithGoogle(),
+          ),
         ),
       ],
     );

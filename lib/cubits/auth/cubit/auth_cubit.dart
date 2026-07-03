@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/constant.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
+export 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/services/cache_service.dart';
 import 'package:ship_link/services/referral_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
@@ -24,6 +25,10 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void _onAuthStateChange(gotrue.AuthState authState) {
+    if (authState.event == gotrue.AuthChangeEvent.passwordRecovery) {
+      emit(PasswordRecoveryState());
+      return;
+    }
     if (!_googleInProgress) return;
     _googleInProgress = false;
 
@@ -34,7 +39,11 @@ class AuthCubit extends Cubit<AuthState> {
       return;
     }
     token = user.id;
-    _handleUserSession(user);
+    if (_googleSignInForDriver) {
+      _handleDriverGoogleSession(user);
+    } else {
+      _handleUserSession(user);
+    }
   }
 
   Future<void> _handleUserSession(User user) async {
@@ -54,6 +63,35 @@ class AuthCubit extends Cubit<AuthState> {
       }
     } catch (e) {
       print('AuthCubit._handleUserSession error: $e');
+      emit(ErrorState(e.toString()));
+    }
+  }
+
+  Future<void> _handleDriverGoogleSession(User user) async {
+    try {
+      final existing = await _supabase
+          .from('drivers')
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle();
+      if (existing == null) {
+        await _supabase.from('drivers').upsert({
+          'id': user.id,
+          'email': user.email ?? '',
+          'name': user.userMetadata?['full_name'] ?? user.email ?? '',
+        });
+        await _supabase.from('profiles').upsert({
+          'id': user.id,
+          'email': user.email ?? '',
+          'name': user.userMetadata?['full_name'] ?? user.email ?? '',
+          'role': 'driver',
+        });
+        emit(SignInDriverSuccess());
+      } else {
+        emit(SignInDriverSuccess());
+      }
+    } catch (e) {
+      print('AuthCubit._handleDriverGoogleSession error: $e');
       emit(ErrorState(e.toString()));
     }
   }
@@ -149,10 +187,39 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   // ============================================
+  // Password update
+  // ============================================
+
+  Future<void> updatePassword(String newPassword) async {
+    emit(UpdatePasswordLoading());
+    try {
+      await _supabase.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      await _supabase.auth.signOut();
+      emit(UpdatePasswordSuccess());
+    } catch (e) {
+      emit(UpdatePasswordFaild(e.toString()));
+    }
+  }
+
+  // ============================================
   // Google Sign-In (via Supabase OAuth)
   // ============================================
 
+  bool _googleSignInForDriver = false;
+
   Future<void> signInWithGoogle() async {
+    _googleSignInForDriver = false;
+    await _startGoogleSignIn();
+  }
+
+  Future<void> signInWithGoogleDriver() async {
+    _googleSignInForDriver = true;
+    await _startGoogleSignIn();
+  }
+
+  Future<void> _startGoogleSignIn() async {
     emit(LoadingState());
     try {
       _googleInProgress = true;

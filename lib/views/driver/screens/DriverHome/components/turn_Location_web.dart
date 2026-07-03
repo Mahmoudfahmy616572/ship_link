@@ -22,7 +22,7 @@ class WebLocation extends StatelessWidget {
     if (!_isTrustedDomain(url)) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Untrusted URL')),
+        body: Center(child: Text(context.t.tr('untrusted_url'))),
       );
     }
     Uri urls = Uri.parse(url);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ship_link/constant/constant.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/driver/screens/MainScreen/main_screen_driver.dart';
 import 'package:ship_link/views/driver/screens/DriverSignIn/signin_driver.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -41,17 +42,13 @@ class _DriverSplashState extends State<DriverSplash> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 80.w, height: 80.h,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2563EB),
-                borderRadius: BorderRadius.circular(20.r),
-              ),
-              child: const Icon(Icons.delivery_dining_rounded,
-                  size: 44, color: Colors.white),
+            Image.asset(
+              'assets/logos/driver_logo.png',
+              width: 120.w,
+              fit: BoxFit.contain,
             ),
             SizedBox(height: 24.h),
-            Text("ShipLink Driver",
+            Text(context.t.tr('ship_link_driver_splash'),
                 style: TextStyle(
                     fontSize: 24.sp, fontWeight: FontWeight.w700,
                     color: Color(0xFF111827))),

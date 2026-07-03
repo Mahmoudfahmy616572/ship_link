@@ -8,6 +8,7 @@ import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/views/user/screens/login/login_screen.dart';
 import 'package:ship_link/views/user/screens/create_account/create_account_screen.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/utils/sizer.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -208,9 +209,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       listener: (context, state) {
         if (state is LoadingState && mounted) {
         } else if (state is ErrorState && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          CustomSnackBar.error(state.message, context);
         } else if (state is SuccessState && mounted) {
         } else if (state is NewGoogleUser && mounted) {
           Navigator.pushReplacementNamed(

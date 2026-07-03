@@ -35,13 +35,13 @@ class _OrdersCardState extends State<OrdersCard> {
       context.read<GetOrdersCubit>().getOrder();
       context.read<GetAcceptedOrderCubit>().getAcceptedOrder();
       CustomSnackBar.displaySuccessMotionToast(
-          state.acceptOrder.message ?? 'Order accepted', context);
+          state.acceptOrder.message ?? context.t.tr('order_has_been_accepted'), context);
     } else if (state is AcceptOrderFailure) {
       if (state.errMessage == 'Selected order has been accepted') {
         context.read<GetOrdersCubit>().getOrder();
         context.read<GetAcceptedOrderCubit>().getAcceptedOrder();
         CustomSnackBar.displaySuccessMotionToast(
-            'Order has been accepted', context);
+            context.t.tr('order_has_been_accepted'), context);
       } else {
         CustomSnackBar.displayErrorMotionToast(state.errMessage, context);
       }
@@ -79,17 +79,17 @@ class _OrdersCardState extends State<OrdersCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Order #${order.id ?? ''}',
+                    Text('${context.t.tr('order_no')}${order.id ?? ''}',
                         style: appStyle(15, FontWeight.w600, const Color(0xFF111827)),
                         ),
                     SizedBox(height: 2.h),
-                    Text(order.user?.firstName ?? 'Customer',
+                    Text(order.user?.firstName ?? context.t.tr('customer'),
                         style: appStyle(13, FontWeight.w400, const Color(0xFF6B7280)),
                         ),
                   ],
                 ),
               ),
-              _statusBadge(order.status ?? 'Pending'),
+              _statusBadge(order.status ?? context.t.tr('pending')),
               const SizedBox(width: 6),
               _paymentBadge(order.paymentMethod ?? ''),
             ],
@@ -140,7 +140,7 @@ class _OrdersCardState extends State<OrdersCard> {
               child: OutlinedButton.icon(
                 onPressed: () => _openRoutePreview(order),
                 icon: const Icon(Icons.map, size: 16),
-                label: Text('Show Route',
+                label: Text(context.t.tr('show_route'),
                     style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF2563EB),
@@ -153,10 +153,10 @@ class _OrdersCardState extends State<OrdersCard> {
           SizedBox(height: 12.h),
           Row(
             children: [
-              Text('Total:',
+              Text('${context.t.tr('total_colon')}',
                   style: appStyle(14, FontWeight.w500, const Color(0xFF6B7280))),
               SizedBox(width: 4.w),
-              Text('EGP ${order.totalPrice ?? '0'}',
+              Text('${context.t.tr('egp')} ${order.totalPrice ?? '0'}',
                   style: appStyle(18, FontWeight.w700, const Color(0xFF10B981))),
               const Spacer(),
             ],
@@ -178,7 +178,7 @@ class _OrdersCardState extends State<OrdersCard> {
                       width: 20.w, height: 20.h,
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white))
-                  : Text('Accept Order',
+                  : Text(context.t.tr('accept_order'),
                       style: TextStyle(
                           fontSize: 15.sp, fontWeight: FontWeight.w600)),
             ),
@@ -495,11 +495,11 @@ class _AcceptedCardState extends State<AcceptedCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Order #${order.id ?? ''}',
+                    Text('${context.t.tr('order_no')}${order.id ?? ''}',
                         style: appStyle(15, FontWeight.w600, const Color(0xFF111827)),
                         ),
                     SizedBox(height: 2.h),
-                    Text(order.user?.firstName ?? 'Customer',
+                    Text(order.user?.firstName ?? context.t.tr('customer'),
                         style: appStyle(13, FontWeight.w400, const Color(0xFF6B7280)),
                         ),
                   ],
@@ -562,7 +562,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
               child: OutlinedButton.icon(
                 onPressed: () => _openAcceptedRoutePreview(order),
                 icon: const Icon(Icons.map, size: 16),
-                label: Text('Show Route',
+                label: Text(context.t.tr('show_route'),
                     style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: const Color(0xFF2563EB),
@@ -575,10 +575,10 @@ class _AcceptedCardState extends State<AcceptedCard> {
           SizedBox(height: 12.h),
           Row(
             children: [
-              Text('Total:',
+              Text('${context.t.tr('total_colon')}',
                   style: appStyle(14, FontWeight.w500, const Color(0xFF6B7280))),
               SizedBox(width: 4.w),
-              Text('EGP ${order.totalPrice ?? '0'}',
+              Text('${context.t.tr('egp')} ${order.totalPrice ?? '0'}',
                   style: appStyle(18, FontWeight.w700, const Color(0xFF10B981))),
             ],
           ),
@@ -596,7 +596,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
                       icon: _loadingPickedUp
                           ? SizedBox(width: 18.w, height: 18.h, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                           : const Icon(Icons.check_circle_outline, size: 18),
-                      label: const Text('Mark Picked Up'),
+                      label: Text(context.t.tr('mark_picked_up')),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -614,7 +614,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
                       icon: _loadingCancel
                           ? SizedBox(width: 18.w, height: 18.h, child: CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(Icons.cancel_outlined, size: 18),
-                      label: const Text('Cancel'),
+                      label: Text(context.t.tr('cancel')),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFFDC2626),
                         side: const BorderSide(color: Color(0xFFDC2626)),
@@ -640,7 +640,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
                       icon: _loadingShipped
                           ? SizedBox(width: 18.w, height: 18.h, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                           : const Icon(Icons.local_shipping, size: 18),
-                      label: const Text('Mark Shipped'),
+                      label: Text(context.t.tr('mark_shipped')),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD97706),
                         foregroundColor: Colors.white,
@@ -658,7 +658,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
                       icon: _loadingCancel
                           ? SizedBox(width: 18.w, height: 18.h, child: CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(Icons.cancel_outlined, size: 18),
-                      label: const Text('Cancel'),
+                      label: Text(context.t.tr('cancel')),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFFDC2626),
                         side: const BorderSide(color: Color(0xFFDC2626)),
@@ -684,7 +684,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
                       icon: _loadingDelivered
                           ? SizedBox(width: 18.w, height: 18.h, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                           : const Icon(Icons.check_circle, size: 18),
-                      label: const Text('Mark Delivered'),
+                      label: Text(context.t.tr('mark_delivered')),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF059669),
                         foregroundColor: Colors.white,
@@ -702,7 +702,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
                       icon: _loadingCancel
                           ? SizedBox(width: 18.w, height: 18.h, child: CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(Icons.cancel_outlined, size: 18),
-                      label: const Text('Cancel'),
+                      label: Text(context.t.tr('cancel')),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFFDC2626),
                         side: const BorderSide(color: Color(0xFFDC2626)),
@@ -748,7 +748,7 @@ class _DistanceLabelState extends State<_DistanceLabel> {
             ) / 1000;
         if (mounted) {
           setState(() {
-            _distance = '${dist.toStringAsFixed(1)} km';
+            _distance = '${dist.toStringAsFixed(1)} ${context.t.tr('km')}';
             _loading = false;
           });
         }
@@ -765,7 +765,7 @@ class _DistanceLabelState extends State<_DistanceLabel> {
           ) / 1000;
       if (mounted) {
         setState(() {
-          _distance = '${dist.toStringAsFixed(1)} km';
+          _distance = '${dist.toStringAsFixed(1)} ${context.t.tr('km')}';
           _loading = false;
         });
       }
@@ -785,7 +785,7 @@ class _DistanceLabelState extends State<_DistanceLabel> {
       children: [
         const Icon(Icons.directions_car, size: 12, color: Color(0xFF6B7280)),
         SizedBox(width: 3.w),
-        Text('$_distance away',
+            Text('$_distance ${context.t.tr('away')}',
             style: appStyle(11, FontWeight.w500, const Color(0xFF6B7280))),
       ],
     );

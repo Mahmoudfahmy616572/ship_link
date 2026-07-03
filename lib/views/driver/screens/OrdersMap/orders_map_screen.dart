@@ -6,6 +6,7 @@ import 'package:ship_link/cubitDriver/acceptOrder/accept_order_cubit.dart';
 import 'package:ship_link/cubitDriver/getAcceptedOrders/get_accepted_order_cubit.dart';
 import 'package:ship_link/cubitDriver/get_orders/get_orders_cubit.dart';
 import 'package:ship_link/views/driver/screens/ordersScreen/components/order_route_screen.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/widgets/adaptive_map.dart';
@@ -78,7 +79,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
         latitude: _driverLat!,
         longitude: _driverLng!,
         icon: buildDriverMarker(),
-        label: 'You',
+        label: context.t.tr('you'),
       ));
     }
 
@@ -121,7 +122,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
       ),
       builder: (ctx) {
         final profile = order['profiles'] as Map<String, dynamic>?;
-        final name = profile?['first_name'] ?? 'Customer';
+        final name = profile?['first_name'] ?? context.t.tr('customer');
         final phone = profile?['phone_number'] ?? '';
         final total = order['total_price'] ?? '0';
         return Padding(
@@ -140,7 +141,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
                 ),
               ),
               SizedBox(height: 16.h),
-              Text('Order #${order['id']}',
+              Text('${context.t.tr('order_no')}${order['id']}',
                   style: appStyle(18, FontWeight.w600, const Color(0xFF111827))),
               SizedBox(height: 12.h),
               _infoRow(Icons.person_outline, name),
@@ -149,7 +150,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
                 _infoRow(Icons.phone_outlined, phone),
               ],
               SizedBox(height: 6.h),
-              _infoRow(Icons.receipt_outlined, 'EGP $total'),
+              _infoRow(Icons.receipt_outlined, '${context.t.tr('egp')} $total'),
               if (order['address_label'] != null) ...[
                 SizedBox(height: 6.h),
                 _infoRow(Icons.label_outline, order['address_label']),
@@ -173,7 +174,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.r)),
                   ),
-                  child: Text('Accept Order',
+                  child: Text(context.t.tr('accept_order'),
                       style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600)),
                 ),
               ),
@@ -250,7 +251,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
                       style: appStyle(13, FontWeight.w400, const Color(0xFF6B7280)),
                       maxLines: 2, overflow: TextOverflow.ellipsis),
                 if (hasLocation)
-                  Text('View Route →',
+                  Text('${context.t.tr('view_route')} →',
                       style: appStyle(12, FontWeight.w600, const Color(0xFF2563EB))),
               ],
             ),
@@ -268,7 +269,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
     if (state is AcceptOrderSuccess) {
       context.read<GetOrdersCubit>().getOrder();
       context.read<GetAcceptedOrderCubit>().getAcceptedOrder();
-      CustomSnackBar.displaySuccessMotionToast('Order accepted', context);
+      CustomSnackBar.displaySuccessMotionToast(context.t.tr('order_accepted'), context);
     } else if (state is AcceptOrderFailure) {
       CustomSnackBar.displayErrorMotionToast(state.errMessage, context);
     }
@@ -281,7 +282,7 @@ class _OrdersMapScreenState extends State<OrdersMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Orders Map'),
+        title: Text(context.t.tr('orders_map')),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0.5,

@@ -8,6 +8,7 @@ import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/user/screens/MainScreen/main_screen.dart';
 import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/widgets/adaptive_map.dart';
@@ -201,9 +202,7 @@ class _LocationPickerState extends State<LocationPicker> {
             Navigator.pushNamedAndRemoveUntil(
                 context, MainScreen.routName, (route) => false);
           } else if (state is ErrorState && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            CustomSnackBar.error(state.message, context);
           }
         },
         builder: (context, state) {

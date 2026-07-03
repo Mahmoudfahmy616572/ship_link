@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/localization.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/shimmer/shimmer_loading.dart';
 import 'package:ship_link/views/user/screens/tracking/driver_tracking_screen.dart';
@@ -70,9 +71,7 @@ class _DeliveredState extends State<Delivered> {
           .eq('order_id', orderId);
       if (!mounted) return;
       if (items.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No items found for this order')),
-        );
+        CustomSnackBar.info('No items found for this order', context);
         return;
       }
       for (final item in items) {
@@ -106,15 +105,11 @@ class _DeliveredState extends State<Delivered> {
         }
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.t.tr('items_added_to_cart'))),
-        );
+        CustomSnackBar.success(context.t.tr('items_added_to_cart'), context);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$e')),
-        );
+        CustomSnackBar.error('$e', context);
       }
     }
   }

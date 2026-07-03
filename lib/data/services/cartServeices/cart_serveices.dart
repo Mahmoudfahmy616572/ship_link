@@ -17,6 +17,7 @@ abstract class CartServeices {
     double? deliveryLat,
     double? deliveryLng,
     String? addressLabel,
+    String? phoneNumber,
     String paymentMethod = 'cod',
   });
   Future<Either<Failure, String>> deletefromCart({required int cart_id, required int product_id});

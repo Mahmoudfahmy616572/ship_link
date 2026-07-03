@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
@@ -75,15 +76,13 @@ class _RegisterScreenState extends State<RegisterScreen>
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Registersuccess && mounted) {
-            CredentialsService().save(_emailController.text.trim());
+            CredentialsService().save(_emailController.text.trim(), password: _passwordController.text.trim());
             Navigator.pushReplacementNamed(
                 context, LocationPicker.routName);
           } else if (state is Registerfaild && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message.isNotEmpty
-                  ? state.message
-                  : context.t.tr('registration_failed'))),
-            );
+            CustomSnackBar.error(state.message.isNotEmpty
+                ? state.message
+                : context.t.tr('registration_failed'), context);
           }
         },
         builder: (context, state) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/localization.dart';
 
 class DividerRow extends StatelessWidget {
   const DividerRow({
@@ -21,8 +22,8 @@ class DividerRow extends StatelessWidget {
               color: Colors.transparent,
             ),
           )),
-          const Text(
-            "Or continue with",
+          Text(
+            context.t.tr('or_continue_with'),
             style: TextStyle(
               color: Color(0xFFB6B6B6),
             ),

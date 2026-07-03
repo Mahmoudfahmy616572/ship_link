@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/localization.dart';
+import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/views/shared/app_style.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/user/screens/reset_password/reset_password_screen.dart';
@@ -39,36 +41,37 @@ class SecurityScreen extends StatelessWidget {
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(18.r),
               ),
-              child: Column(
-                children: [
-                  _securityTile(context, context.t.tr('two_factor_auth'), Icons.security_outlined, AppColors.cta, () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(context.t.tr('share_feature_coming_soon'))),
-                    );
-                  }),
-                  _divider(context),
-                  _securityTile(context, context.t.tr('change_password'), Icons.lock_outline, AppColors.primary, () {
-                    Navigator.pushNamed(context, ResetPasswordScreen.routName);
-                  }),
-                  _divider(context),
-                  _securityTile(context, context.t.tr('active_sessions'), Icons.devices_outlined, AppColors.success, () {
-                    final user = Supabase.instance.client.auth.currentUser;
-                    if (user == null) return;
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: Text(context.t.tr('active_sessions')),
-                        content: Text('Signed in as:\n${user.email}'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
+              child: Material(
+                type: MaterialType.transparency,
+                child: Column(
+                  children: [
+                    _securityTile(context, context.t.tr('two_factor_auth'), Icons.security_outlined, AppColors.cta, () {
+                      CustomSnackBar.info(context.t.tr('share_feature_coming_soon'), context);
+                    }),
+                    _divider(context),
+                    _securityTile(context, context.t.tr('change_password'), Icons.lock_outline, AppColors.primary, () {
+                      Navigator.pushNamed(context, ResetPasswordScreen.routName);
+                    }),
+                    _divider(context),
+                    _securityTile(context, context.t.tr('active_sessions'), Icons.devices_outlined, AppColors.success, () {
+                      final user = Supabase.instance.client.auth.currentUser;
+                      if (user == null) return;
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: Text(context.t.tr('active_sessions')),
+                          content: Text('Signed in as:\n${user.email}'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
             SizedBox(height: 24.h),

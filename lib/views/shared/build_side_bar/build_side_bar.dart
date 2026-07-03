@@ -33,10 +33,10 @@ class _SideBarState extends State<SideBar> {
       builder: (context, state) {
         var cubit = AuthCubit.get(context);
         return Scaffold(
+          backgroundColor: AppColors.background,
           body: Container(
             width: 288.w,
             height: double.infinity,
-            color: AppColors.background,
             child: SafeArea(
               child: Column(
                 children: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/cubitDriver/get_user_driver_data/get_userdriver_data_cubit.dart';
+import 'package:ship_link/localization.dart';
 
 import '../../../../../constant/Errors/custom_error_widget.dart';
 import '../../../../shared/app_style.dart';
@@ -53,7 +54,7 @@ class ProfileInfo extends StatelessWidget {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Text(
-                          'Phone Number : +2${state.getuserDriverData.data?.phoneNumber ?? "0**********"}',
+                          '${context.t.tr('phone_number_label')}${state.getuserDriverData.data?.phoneNumber ?? "0**********"}',
                           style: appStyle(
                               16, FontWeight.normal, const Color(0xFF000000)),
                         ),
@@ -65,8 +66,8 @@ class ProfileInfo extends StatelessWidget {
             ),
           );
         } else {
-          return const CustomErrorWidget(
-            errMessage: "someThing error please try again later",
+          return CustomErrorWidget(
+            errMessage: context.t.tr('some_error_try_again'),
           );
         }
       },

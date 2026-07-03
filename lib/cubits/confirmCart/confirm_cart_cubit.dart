@@ -15,6 +15,7 @@ class ConfirmCartCubit extends Cubit<ConfirmCartState> {
     double? deliveryLat,
     double? deliveryLng,
     String? addressLabel,
+    String? phoneNumber,
     String paymentMethod = 'cod',
   }) async {
     if (!isClosed) emit(ConfirmCartLoading());
@@ -25,6 +26,7 @@ class ConfirmCartCubit extends Cubit<ConfirmCartState> {
       deliveryLat: deliveryLat,
       deliveryLng: deliveryLng,
       addressLabel: addressLabel,
+      phoneNumber: phoneNumber,
       paymentMethod: paymentMethod,
     );
     result.fold(

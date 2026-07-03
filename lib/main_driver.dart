@@ -8,10 +8,12 @@ import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/localization.dart';
 import 'package:ship_link/providers.dart';
 import 'package:ship_link/routs_driver.dart';
+
 import 'package:ship_link/services/notification_service.dart';
 import 'package:ship_link/services/supabase_service.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/views/driver/screens/Splash/driver_splash.dart';
+import 'package:ship_link/views/shared/set_new_password/set_new_password_screen.dart';
 
 import 'firebase_options.dart';
 
@@ -37,14 +39,22 @@ class DriverApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: Consumer2<ThemeProvider, LocaleProvider>(
-        builder: (context, themeProvider, localeProvider, _) {
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) {
           return BlocProvider(
             create: (context) => AuthCubit(),
-            child: MaterialApp(
+            child: BlocListener<AuthCubit, AuthState>(
+              listenWhen: (prev, cur) => cur is PasswordRecoveryState,
+              listener: (context, state) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const SetNewPasswordScreen()),
+                );
+              },
+              child: MaterialApp(
               navigatorKey: NotificationService.navigatorKey,
               title: 'ShipLink - Driver',
               builder: (context, child) {
@@ -58,7 +68,6 @@ class DriverApp extends StatelessWidget {
                 settings: settings,
               ),
               debugShowCheckedModeBanner: false,
-              themeMode: themeProvider.themeMode,
               theme: ThemeData(
                 brightness: Brightness.light,
                 colorSchemeSeed: const Color(0xFF242424),
@@ -70,27 +79,29 @@ class DriverApp extends StatelessWidget {
                   },
                 ),
               ),
-              darkTheme: ThemeData(
-                brightness: Brightness.dark,
-                colorSchemeSeed: const Color(0xFF242424),
-                useMaterial3: true,
-                pageTransitionsTheme: const PageTransitionsTheme(
-                  builders: <TargetPlatform, PageTransitionsBuilder>{
-                    TargetPlatform.android: _DriverTransitionBuilder(),
-                    TargetPlatform.iOS: _DriverTransitionBuilder(),
-                  },
-                ),
-              ),
               locale: localeProvider.locale,
-              localizationsDelegates: const [
+              localeListResolutionCallback: (locales, supportedLocales) {
+                if (locales == null || locales.isEmpty) return const Locale('en');
+                for (final locale in locales) {
+                  for (final supported in supportedLocales) {
+                    if (supported.languageCode == locale.languageCode) {
+                      return supported;
+                    }
+                  }
+                }
+                return const Locale('en');
+              },
+              localizationsDelegates: [
                 AppLocalizations.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
               ],
               supportedLocales: const [
                 Locale('en'),
                 Locale('ar'),
               ],
+            ),
             ),
           );
         },

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/localization.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/user/screens/Home/home_screen.dart';
 import 'package:ship_link/views/user/screens/Profile/profile.dart';
 import 'package:ship_link/views/user/screens/cart/cart.dart';
@@ -44,12 +45,7 @@ class _MainScreenState extends State<MainScreen> {
             DateTime.now().difference(_lastBackPress!) >
                 const Duration(seconds: 2)) {
           _lastBackPress = DateTime.now();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.t.tr('press_back_again_exit')),
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          CustomSnackBar.info(context.t.tr('press_back_again_exit'), context);
         } else {
           exit(0);
         }

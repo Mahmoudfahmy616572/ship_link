@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:ship_link/constant/colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/localization.dart';
+import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/views/shared/app_style.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/views/shared/shimmer/shimmer_loading.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/views/user/screens/location_picker/location_picker.dart';
@@ -48,13 +50,23 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
   Future<void> _setDefault(String id) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    await Supabase.instance.client
-        .from('user_addresses')
-        .update({'is_default': false}).eq('user_id', user.id);
-    await Supabase.instance.client
-        .from('user_addresses')
-        .update({'is_default': true}).eq('id', id);
-    _loadAddresses();
+    try {
+      await Supabase.instance.client
+          .from('user_addresses')
+          .update({'is_default': false}).eq('user_id', user.id);
+      await Supabase.instance.client
+          .from('user_addresses')
+          .update({'is_default': true}).eq('id', id);
+      _loadAddresses();
+      if (mounted) {
+        CustomSnackBar.displaySuccessMotionToast(
+            context.t.tr('set_default_success'), context);
+      }
+    } catch (e) {
+      if (mounted) {
+        CustomSnackBar.displayErrorMotionToast(e.toString(), context);
+      }
+    }
   }
 
   @override
@@ -260,10 +272,7 @@ class _AddressBookScreenState extends State<AddressBookScreen> {
                                   _loadAddresses();
                                 } catch (e) {
                                   if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(e.toString()),
-                                          backgroundColor: AppColors.error),
-                                    );
+                                    CustomSnackBar.error(e.toString(), context);
                                   }
                                 } finally {
                                   setSheetState(() => saving = false);
@@ -348,73 +357,109 @@ class _AddressCard extends StatelessWidget {
     final isDefault = address['is_default'] == true;
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(
           color: isDefault ? AppColors.cta : AppColors.border,
           width: isDefault ? 1.5 : 1,
         ),
+        color: AppColors.surface,
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.location_on_outlined,
-                  size: 20.r, color: isDefault ? AppColors.cta : AppColors.textHint),
-              SizedBox(width: 8.w),
-              Text(
-                address['label'] ?? 'Address',
-                style: appStyle(15, FontWeight.w600, AppColors.textPrimary),
-              ),
-              if (isDefault) ...[
-                SizedBox(width: 8.w),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.cta.withAlpha(20),
-                    borderRadius: BorderRadius.circular(6.r),
-                  ),
-                  child: Text(context.t.tr('default_address'),
-                      style: appStyle(10, FontWeight.w600, AppColors.cta)),
+          Expanded(
+            child: GestureDetector(
+              onTap: isDefault ? null : onSetDefault,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 2.h),
+                      child: Icon(
+                        isDefault
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        size: 22.r,
+                        color: isDefault ? AppColors.cta : AppColors.textHint,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.location_on_outlined,
+                                  size: 18.r, color: isDefault ? AppColors.cta : AppColors.textHint),
+                              SizedBox(width: 6.w),
+                              Flexible(
+                                child: Text(
+                                  address['label'] ?? 'Address',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: appStyle(15, FontWeight.w600, AppColors.textPrimary),
+                                ),
+                              ),
+                              if (isDefault) ...[
+                                SizedBox(width: 6.w),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.cta.withAlpha(20),
+                                    borderRadius: BorderRadius.circular(6.r),
+                                  ),
+                                  child: Text(context.t.tr('default_address'),
+                                      style: appStyle(10, FontWeight.w600, AppColors.cta)),
+                                ),
+                              ],
+                            ],
+                          ),
+                          SizedBox(height: 6.h),
+                          _detail(context.t.tr('city'), address['city'] ?? ''),
+                          if ((address['street'] ?? '').isNotEmpty)
+                            _detail(context.t.tr('street'), address['street']),
+                          if ((address['building'] ?? '').isNotEmpty ||
+                              (address['apartment'] ?? '').isNotEmpty)
+                            _detail('${context.t.tr('building')}/${context.t.tr('apt')}',
+                                '${address['building'] ?? ''}${address['apartment'] != null ? ' / ${context.t.tr('apt')} ${address['apartment']}' : ''}'),
+                          if ((address['full_address'] ?? '').isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(top: 6.h),
+                              child: Text(address['full_address'],
+                                  style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-              const Spacer(),
-              PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert, size: 20.r, color: AppColors.textHint),
-                onSelected: (v) {
-                  if (v == 'edit') onEdit();
-                  if (v == 'default') onSetDefault();
-                  if (v == 'delete') onDelete();
-                },
-                itemBuilder: (_) => [
-                  if (!isDefault)
-                    PopupMenuItem(value: 'default', child: Text(context.t.tr('set_as_default'))),
-                  PopupMenuItem(value: 'edit', child: Text(context.t.tr('edit'))),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Text(context.t.tr('delete'), style: TextStyle(color: AppColors.error)),
-                  ),
-                ],
+              ),
+            ),
+          ),
+          PopupMenuButton<String>(
+            icon: Padding(
+              padding: EdgeInsets.only(top: 12.h, right: 8.w, left: 8.w),
+              child: Icon(Icons.more_vert, size: 20.r, color: AppColors.textHint),
+            ),
+            onSelected: (v) {
+              if (v == 'edit') onEdit();
+              if (v == 'default') onSetDefault();
+              if (v == 'delete') onDelete();
+            },
+            itemBuilder: (_) => [
+              if (!isDefault)
+                PopupMenuItem(value: 'default', child: Text(context.t.tr('set_as_default'))),
+              PopupMenuItem(value: 'edit', child: Text(context.t.tr('edit'))),
+              PopupMenuItem(
+                value: 'delete',
+                child: Text(context.t.tr('delete'), style: TextStyle(color: AppColors.error)),
               ),
             ],
           ),
-          SizedBox(height: 8.h),
-          _detail(context.t.tr('city'), address['city'] ?? ''),
-          if ((address['street'] ?? '').isNotEmpty)
-            _detail(context.t.tr('street'), address['street']),
-          if ((address['building'] ?? '').isNotEmpty ||
-              (address['apartment'] ?? '').isNotEmpty)
-            _detail('${context.t.tr('building')}/${context.t.tr('apt')}',
-                '${address['building'] ?? ''}${address['apartment'] != null ? ' / ${context.t.tr('apt')} ${address['apartment']}' : ''}'),
-          if ((address['full_address'] ?? '').isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(top: 6.h),
-              child: Text(address['full_address'],
-                  style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
-            ),
         ],
       ),
     );
@@ -425,10 +470,14 @@ class _AddressCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: 2.h),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('$label: ',
               style: appStyle(12, FontWeight.w500, AppColors.textHint)),
-          Text(value, style: appStyle(13, FontWeight.w500, AppColors.textPrimary)),
+          Expanded(
+            child: Text(value,
+                style: appStyle(13, FontWeight.w500, AppColors.textPrimary)),
+          ),
         ],
       ),
     );

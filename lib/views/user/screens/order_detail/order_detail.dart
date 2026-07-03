@@ -4,6 +4,7 @@ import 'package:ship_link/localization.dart';
 import 'package:ship_link/services/order_mute_service.dart';
 import 'package:ship_link/services/pdf_invoice_service.dart';
 import 'package:ship_link/services/supabase_service.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/shimmer/shimmer_loading.dart';
@@ -257,9 +258,7 @@ class _OrderDetailState extends State<OrderDetail> {
               await PdfInvoiceService().share(orderId);
             } catch (e) {
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Invoice error: $e')),
-                );
+                CustomSnackBar.error('Invoice error: $e', context);
               }
             }
           },
@@ -286,13 +285,9 @@ class _OrderDetailState extends State<OrderDetail> {
             await OrderMuteService().toggle(widget.orderId.toString());
             if (mounted) setState(() => _isMuted = !_isMuted);
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(_isMuted
-                      ? context.t.tr('notifications_muted_for_order')
-                      : context.t.tr('notifications_unmuted_for_order')),
-                ),
-              );
+              CustomSnackBar.info(_isMuted
+                  ? context.t.tr('notifications_muted_for_order')
+                  : context.t.tr('notifications_unmuted_for_order'), context);
             }
           },
           icon: Icon(_isMuted ? Icons.notifications_off : Icons.notifications),
@@ -500,9 +495,7 @@ class _OrderDetailState extends State<OrderDetail> {
               .eq('id', order['id']);
           if (mounted) {
             setState(() {});
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(context.t.tr('order_cancelled'))),
-            );
+            CustomSnackBar.success(context.t.tr('order_cancelled'), context);
           }
         },
         icon: const Icon(Icons.cancel_outlined, color: AppColors.error),

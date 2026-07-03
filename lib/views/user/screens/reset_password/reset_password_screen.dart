@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/localization.dart';
-import 'package:ship_link/views/user/screens/login/login_screen.dart';
+import 'package:ship_link/constant/colors.dart';
+import 'package:ship_link/views/shared/app_style.dart';
+import 'package:ship_link/views/shared/build_elevation_button.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/utils/sizer.dart';
+import 'package:ship_link/views/user/screens/login/login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -31,13 +34,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     try {
       await Supabase.instance.client.auth.resetPasswordForEmail(
         _emailController.text.trim(),
+        redirectTo: 'io.supabase.flutter://callback',
       );
       if (mounted) setState(() => _isSent = true);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${context.t.tr('failed_send_reset')}: $e')),
-        );
+        CustomSnackBar.error('${context.t.tr('failed_send_reset')}: $e', context);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

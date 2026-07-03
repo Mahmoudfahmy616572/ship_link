@@ -5,6 +5,7 @@ import 'package:ship_link/constant/colors.dart';
 import 'package:ship_link/constant/constant.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/cubits/auth/cubit/auth_stat.dart';
+import 'package:ship_link/localization.dart';
 import 'package:ship_link/views/shared/app_style.dart';
 import 'package:ship_link/views/shared/build_botton.dart';
 import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
@@ -47,8 +48,8 @@ class _DriverBodyState extends State<DriverBody> {
   bool get _needsVehicleNumber => true;
 
   String _vehicleNumberHint() {
-    if (selectedVehicleType == 'Bike') return 'Bike type (e.g. Mountain, Electric)';
-    return 'Vehicle number';
+    if (selectedVehicleType == 'Bike') return context.t.tr('bike_type_hint');
+    return context.t.tr('vehicle_number');
   }
 
   @override
@@ -60,11 +61,11 @@ class _DriverBodyState extends State<DriverBody> {
             Navigator.of(context).pushNamedAndRemoveUntil(
                 MainScreenDriver.routName, (Route<dynamic> route) => false);
             CustomSnackBar.displaySuccessMotionToast(
-                "Driver registered successfully", context);
+                context.t.tr('driver_registered_success'), context);
           }
         } else if (state is RegisterDriverfaild) {
           CustomSnackBar.displayErrorMotionToast(
-              "Something went wrong. Please try again later.", context);
+              context.t.tr('something_went_wrong'), context);
         }
       },
       builder: (context, state) {
@@ -88,24 +89,24 @@ class _DriverBodyState extends State<DriverBody> {
                         size: 38, color: Colors.white),
                   ),
                   SizedBox(height: 20.h),
-                  Text("Create Driver Account",
+                  Text(context.t.tr('create_driver_account'),
                       style: appStyle(
                           24, FontWeight.w700, const Color(0xFF111827))),
                   SizedBox(height: 6.h),
-                  Text("Fill in your details to get started",
+                  Text(context.t.tr('fill_details_to_start'),
                       style: appStyle(
                           14, FontWeight.w400, const Color(0xFF6B7280))),
                   SizedBox(height: 32.h),
-                  _buildSectionTitle('Personal Information'),
+                  _buildSectionTitle(context.t.tr('personal_information')),
                   SizedBox(height: 12.h),
                   BuildTextField(
                     validator: (v) {
-                      if (v == null || v.isEmpty) return "Name is required";
-                      if (v.length < 3) return 'Name must be more than 2 characters';
+                      if (v == null || v.isEmpty) return context.t.tr('name_is_required');
+                      if (v.length < 3) return context.t.tr('name_min_2_chars');
                       return null;
                     },
                     controller: name,
-                    hintText: "Full name",
+                    hintText: context.t.tr('full_name'),
                     suffixIcon: const Icon(Icons.person_outline,
                         color: Color(0xFF9CA3AF)),
                     obscureText: false,
@@ -113,13 +114,13 @@ class _DriverBodyState extends State<DriverBody> {
                   SizedBox(height: 14.h),
                   BuildTextField(
                     validator: (value) {
-                      if (value!.isEmpty) { return 'Email is required'; }
+                      if (value!.isEmpty) { return context.t.tr('email_is_required_2'); }
                       if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$')
-                          .hasMatch(value)) { return 'Invalid email'; }
+                          .hasMatch(value)) { return context.t.tr('invalid_email'); }
                       return null;
                     },
                     controller: email,
-                    hintText: "Email address",
+                    hintText: context.t.tr('email_address_2'),
                     suffixIcon: const Icon(Icons.email_outlined,
                         color: Color(0xFF9CA3AF)),
                     obscureText: false,
@@ -128,7 +129,7 @@ class _DriverBodyState extends State<DriverBody> {
                   SizedBox(height: 14.h),
                   BuildTextField(
                     validator: (val) {
-                      if (val!.length != 11) return 'Phone must be 11 digits';
+                      if (val!.length != 11) return context.t.tr('phone_11_digits');
                       return null;
                     },
                     inputFormatters: [
@@ -136,18 +137,18 @@ class _DriverBodyState extends State<DriverBody> {
                       FilteringTextInputFormatter.digitsOnly,
                     ],
                     controller: phoneNumber,
-                    hintText: "Phone number",
+                    hintText: context.t.tr('phone_number'),
                     suffixIcon: const Icon(Icons.phone_outlined,
                         color: Color(0xFF9CA3AF)),
                     obscureText: false,
                     textInputType: TextInputType.phone,
                   ),
                   SizedBox(height: 24.h),
-                  _buildSectionTitle('Vehicle Information'),
+                  _buildSectionTitle(context.t.tr('vehicle_information')),
                   SizedBox(height: 12.h),
                   DropdownButtonFormField<String>(
                     initialValue: selectedVehicleType,
-                    decoration: _inputDec("Vehicle type", Icons.time_to_leave_outlined),
+                    decoration: _inputDec(context.t.tr('vehicle_type'), Icons.time_to_leave_outlined),
                     dropdownColor: Colors.white,
                     style: TextStyle(
                         fontSize: 15.sp, color: Color(0xFF111827)),
@@ -161,13 +162,13 @@ class _DriverBodyState extends State<DriverBody> {
                     onChanged: (v) =>
                         setState(() => selectedVehicleType = v),
                     validator: (v) =>
-                        v == null ? 'Select vehicle type' : null,
+                        v == null ? context.t.tr('select_vehicle_type') : null,
                   ),
                   if (_needsVehicleNumber) ...[
                     SizedBox(height: 14.h),
                     BuildTextField(
                       validator: (v) {
-                        if (v == null || v.isEmpty) return 'Required';
+                        if (v == null || v.isEmpty) return context.t.tr('required_field');
                         return null;
                       },
                       controller: vehicleNumber,
@@ -180,7 +181,7 @@ class _DriverBodyState extends State<DriverBody> {
                   SizedBox(height: 14.h),
                   DropdownButtonFormField<String>(
                     initialValue: selectedState,
-                    decoration: _inputDec("Governorate", Icons.location_on_outlined),
+                    decoration: _inputDec(context.t.tr('governorate'), Icons.location_on_outlined),
                     dropdownColor: Colors.white,
                     style: TextStyle(
                         fontSize: 15.sp, color: Color(0xFF111827)),
@@ -192,19 +193,19 @@ class _DriverBodyState extends State<DriverBody> {
                                     fontSize: 15.sp, color: Color(0xFF111827)))))
                         .toList(),
                     onChanged: (v) => setState(() => selectedState = v),
-                    validator: (v) => v == null ? 'Select governorate' : null,
+                    validator: (v) => v == null ? context.t.tr('select_governorate') : null,
                   ),
                   SizedBox(height: 24.h),
-                  _buildSectionTitle('Security'),
+                  _buildSectionTitle(context.t.tr('security_section')),
                   SizedBox(height: 12.h),
                   BuildTextField(
                     validator: (v) {
-                      if (v == null || v.isEmpty) return "Password required";
-                      if (v.length < 6) return "Min 6 characters";
+                      if (v == null || v.isEmpty) return context.t.tr('password_required_2');
+                      if (v.length < 6) return context.t.tr('min_6_characters');
                       return null;
                     },
                     controller: password,
-                    hintText: "Password",
+                    hintText: context.t.tr('password'),
                     obscureText: !isVisiable,
                     suffixIcon: IconButton(
                       onPressed: () =>
@@ -219,12 +220,12 @@ class _DriverBodyState extends State<DriverBody> {
                   SizedBox(height: 14.h),
                   BuildTextField(
                     validator: (val) {
-                      if (val == null || val.isEmpty) return 'Confirm password';
-                      if (val != password.text) return 'Passwords do not match';
+                      if (val == null || val.isEmpty) return context.t.tr('confirm_password');
+                      if (val != password.text) return context.t.tr('passwords_do_not_match');
                       return null;
                     },
                     controller: confirmPassword,
-                    hintText: "Confirm password",
+                    hintText: context.t.tr('confirm_password'),
                     obscureText: !isVisiableConfirm,
                     suffixIcon: IconButton(
                       onPressed: () => setState(
@@ -239,8 +240,8 @@ class _DriverBodyState extends State<DriverBody> {
                   SizedBox(height: 32.h),
                   BuildButton(
                     text: state is RegisterDriverLoading
-                        ? 'Creating account...'
-                        : 'Create Account',
+                        ? context.t.tr('creating_account')
+                        : context.t.tr('create_account'),
                     color: AppColors.primary,
                     textStyle: appStyle(16, FontWeight.w600, Colors.white),
                     ontap: state is RegisterDriverLoading
@@ -264,12 +265,12 @@ class _DriverBodyState extends State<DriverBody> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Already have an account? ",
+                      Text(context.t.tr('already_have_account_q'),
                           style: appStyle(
                               14, FontWeight.w400, const Color(0xFF6B7280))),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: Text("Sign In",
+                        child: Text(context.t.tr('sign_in_short'),
                             style: appStyle(
                                 14, FontWeight.w600, AppColors.primary)),
                       ),

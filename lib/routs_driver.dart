@@ -12,6 +12,7 @@ import 'package:ship_link/views/shared/live_tracking_screen.dart';
 import 'package:ship_link/views/shared/notification_screen.dart';
 import 'package:ship_link/views/shared/settings_screen.dart';
 import 'package:ship_link/views/user/screens/reset_password/reset_password_screen.dart';
+import 'package:ship_link/views/shared/set_new_password/set_new_password_screen.dart';
 
 final Map<String, WidgetBuilder> driverRoutes = {
   DriverSplash.routName: (context) => const DriverSplash(),
@@ -27,6 +28,7 @@ final Map<String, WidgetBuilder> driverRoutes = {
   SettingsScreen.routName: (context) => SettingsScreen(),
   DriverChatListScreen.routName: (context) => const DriverChatListScreen(),
   ResetPasswordScreen.routName: (context) => ResetPasswordScreen(),
+  SetNewPasswordScreen.routName: (context) => const SetNewPasswordScreen(),
 };
 
 Route<dynamic>? onGenerateDriverRoute(RouteSettings settings) {

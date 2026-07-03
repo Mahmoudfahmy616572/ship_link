@@ -10,6 +10,7 @@ import 'package:ship_link/data/models/allProducts/all_products.dart';
 import 'package:ship_link/data/models/review/review_model.dart';
 import 'package:ship_link/data/services/cartServeices/cart_serveicesimpl.dart';
 import 'package:ship_link/data/services/favouriteServices/favourite_services_impl.dart';
+import 'package:ship_link/views/shared/snackBar/snack_bar.dart';
 import 'package:ship_link/data/services/review/review_service.dart';
 import 'package:ship_link/utils/sizer.dart';
 import 'package:ship_link/views/shared/product_image_carousel.dart';
@@ -232,47 +233,9 @@ class _ProductScreenState extends State<ProductScreen>
   }
 
   void _showAddToCartPopUp(Product product) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child:               CachedNetworkImage(
-                imageUrl: product.image ?? "",
-                width: 32.w,
-                height: 32.w,
-                fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => Container(
-                  color: AppColors.surface,
-                  child: Icon(Icons.image, color: AppColors.textHint, size: 18.r),
-                ),
-              ),
-            ),
-            SizedBox(width: 10.r),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(product.name ?? "",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: appStyle(13.sp, FontWeight.w600, Colors.white)),
-                  Text("\$${product.price ?? 0}",
-                      style: appStyle(13.sp, FontWeight.w700, AppColors.cta)),
-                ],
-              ),
-            ),
-            Icon(Icons.check_circle, color: AppColors.success, size: 22.sp),
-          ],
-        ),
-        backgroundColor: const Color(0xFF1A1A2E),
-        padding: EdgeInsets.symmetric(horizontal: 16.r, vertical: 10.r),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-        duration: const Duration(seconds: 2),
-      ),
+    CustomSnackBar.success(
+      '${product.name ?? 'Item'} added to cart — \$${product.price ?? 0}',
+      context,
     );
   }
 
