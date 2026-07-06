@@ -7,10 +7,10 @@
 -- Drop the overly-restrictive driver-only update policy
 DROP POLICY IF EXISTS "Drivers can update orders" ON orders;
 
--- Recreate: drivers can update orders assigned to them
+-- Recreate: drivers can update orders assigned to them OR available orders
 CREATE POLICY "Drivers can update orders" ON orders
   FOR UPDATE
-  USING (auth.uid() = driver_id)
+  USING (auth.uid() = driver_id OR driver_id IS NULL)
   WITH CHECK (auth.uid() = driver_id);
 
 -- NEW: users can update their own orders (payment_method, cancel, etc.)
