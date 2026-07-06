@@ -4,7 +4,16 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const SERVICE_ACCOUNT_JSON = Deno.env.get('FIREBASE_SERVICE_ACCOUNT') ?? ''
 const FCM_SERVER_KEY = Deno.env.get('FCM_SERVER_KEY') ?? ''
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey',
+}
+
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders })
+  }
   try {
     const body = await req.json()
     // Handle both direct invoke and Supabase Webhook payload
@@ -13,9 +22,21 @@ serve(async (req) => {
     const title = payload.title
     const innerBody = payload.body
     const type = payload.type ?? 'general'
+    let orderId = payload.orderId
+    let driverId = payload.driverId
+    let rawType = type
+    // Parse webhook payload where type is a JSON string
+    if (typeof type === 'string' && type.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(type)
+        orderId = orderId ?? parsed.orderId
+        driverId = driverId ?? parsed.driverId
+        rawType = parsed.type ?? 'general'
+      } catch (_) {}
+    }
 
     if (!userId || !title || !innerBody) {
-      return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 })
+      return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400, headers: corsHeaders })
     }
 
     const supabase = createClient(
@@ -29,9 +50,26 @@ serve(async (req) => {
       .eq('id', userId)
       .maybeSingle()
 
-    const token = profile?.fcm_token
+    let token = profile?.fcm_token
+    let tokenSource = 'profiles'
     if (!token) {
-      return new Response(JSON.stringify({ error: 'No FCM token' }), { status: 200 })
+      const { data: driverProfile } = await supabase
+        .from('drivers')
+        .select('fcm_token')
+        .eq('id', userId)
+        .maybeSingle()
+      token = driverProfile?.fcm_token ?? null
+      tokenSource = 'drivers'
+      if (token) {
+        try { await supabase.from('profiles').upsert({ id: userId, fcm_token: token }) } catch (_) {}
+        try { await supabase.from('drivers').update({ fcm_token: null }).eq('id', userId) } catch (_) {}
+      }
+    }
+    if (!token) {
+      if (body.record?.id) {
+        try { await supabase.from('notifications').update({ push_sent: false }).eq('id', body.record.id) } catch (_) {}
+      }
+      return new Response(JSON.stringify({ error: 'No FCM token', tokenSource }), { status: 200, headers: corsHeaders })
     }
 
     // Try FCM v1 with service account first, fallback to legacy
@@ -50,12 +88,18 @@ serve(async (req) => {
         body: JSON.stringify({
           message: {
             token,
-            notification: { title, body: innerBody },
-            data: { type, userId },
+            android: {
+              priority: 'high',
+              ttl: '86400s',
+            },
+            data: { type: rawType, title, body: innerBody, userId, orderId: orderId?.toString() ?? '', driverId: driverId ?? '' },
           },
         }),
       })
       result = await fcmRes.json()
+      if (body.record?.id) {
+        try { await supabase.from('notifications').update({ push_sent: true }).eq('id', body.record.id) } catch (_) {}
+      }
     } else if (FCM_SERVER_KEY) {
       fcmRes = await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
@@ -65,20 +109,23 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           to: token,
-          notification: { title, body: innerBody },
-          data: { type, userId },
+          priority: 'high',
+          data: { type: rawType, title, body: innerBody, userId, orderId: orderId?.toString() ?? '', driverId: driverId ?? '' },
         }),
       })
       result = await fcmRes.json()
+      if (body.record?.id) {
+        try { await supabase.from('notifications').update({ push_sent: true }).eq('id', body.record.id) } catch (_) {}
+      }
     } else {
-      return new Response(JSON.stringify({ error: 'No FCM credentials configured' }), { status: 500 })
+      return new Response(JSON.stringify({ error: 'No FCM credentials configured' }), { status: 500, headers: corsHeaders })
     }
 
     return new Response(JSON.stringify(result), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
     })
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders })
   }
 })
 

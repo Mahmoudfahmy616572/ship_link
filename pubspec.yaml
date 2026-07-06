@@ -41,7 +41,6 @@ dependencies:
   flutter_bloc: ^8.1.5
   flutter_localizations:
     sdk: flutter
-  flutter_credit_card: ^4.0.1
   flutter_slidable: ^3.1.0
 
   flutter_svg: ^2.0.9
@@ -54,10 +53,9 @@ dependencies:
   http: ^1.2.1
   lottie: ^3.1.0
   supabase_flutter: ^2.8.0
-  motion_toast: ^2.10.0
   permission_handler: ^11.3.1
   provider: ^6.1.2
-  rive: ^0.13.0
+  rive: ^0.14.9
   shared_preferences: ^2.2.2
   sqflite: ^2.3.0
   path: ^1.8.3
@@ -73,7 +71,19 @@ dependencies:
   image_picker: ^1.1.2
   share_plus: ^13.2.0
   pdf: ^3.12.0
+  workmanager: ^0.9.0
+  flutter_inappwebview: ^6.1.5
+  mobile_scanner: ^5.2.3
+  qr_flutter: ^4.1.0
 
+
+dependency_overrides:
+  device_info_plus: 13.2.0
+  package_info_plus: 10.2.0
+  shared_preferences_android: 2.4.26
+  webview_flutter_android: 4.13.0
+  workmanager_android:
+    path: patched/workmanager_android
 
 dev_dependencies:
   flutter_lints: ^3.0.1

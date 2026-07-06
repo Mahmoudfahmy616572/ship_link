@@ -2,11 +2,14 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const PAYMOB_API_KEY = Deno.env.get('PAYMOB_API_KEY') ?? ''
 const PAYMOB_INTEGRATION_ID = Deno.env.get('PAYMOB_INTEGRATION_ID') ?? ''
+const PAYMOB_IFRAME_ID = Deno.env.get('PAYMOB_IFRAME_ID') ?? '1054329'
 const PAYMOB_BASE = 'https://accept.paymob.com'
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
+const CALLBACK_URL = `${SUPABASE_URL}/functions/v1/paymob-callback`
 
 Deno.serve(async (req) => {
   try {
-    const { totalPrice, orderId, userId } = await req.json()
+    const { totalPrice, orderId, userId, redirectUri } = await req.json()
     if (!totalPrice || !orderId || !userId) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 })
     }
@@ -75,7 +78,10 @@ Deno.serve(async (req) => {
     }
 
     // 5. Build iframe URL
-    const url = `${PAYMOB_BASE}/api/acceptance/iframes/1054329?payment_token=${paymentKey}`
+    const callbackWithRedirect = redirectUri
+      ? `${CALLBACK_URL}?redirect_uri=${encodeURIComponent(redirectUri)}`
+      : CALLBACK_URL
+    const url = `${PAYMOB_BASE}/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentKey}&callback=${encodeURIComponent(callbackWithRedirect)}`
 
     // 6. Store paymob_order_id for callback matching
     await supabase.from('orders').update({ paymob_order_id: paymobOrderId }).eq('id', orderId)
