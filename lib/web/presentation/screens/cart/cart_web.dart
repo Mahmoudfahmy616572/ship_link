@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/screens/checkout/checkout_web.dart';
-import 'package:ship_link/web/presentation/screens/login/login_web.dart';
+import 'package:ship_link/web/presentation/screens/welcome/welcome_web.dart';
 import 'package:ship_link/web/presentation/shared/shimmer.dart';
 import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/web/data/models/getFromCart/get_from_cart.dart';
+import 'package:ship_link/web/presentation/cubits/getFromCart/get_from_cart_cubit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CartWeb extends StatefulWidget {
@@ -17,41 +20,10 @@ class CartWeb extends StatefulWidget {
 }
 
 class _CartWebState extends State<CartWeb> {
-  List<Map<String, dynamic>> _items = [];
-  bool _loading = true;
-
   @override
   void initState() {
     super.initState();
-    _fetch();
-  }
-
-  Future<void> _fetch() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) { if (mounted) setState(() => _loading = false); return; }
-    try {
-      final data = await Supabase.instance.client
-          .from('cart_items')
-          .select('*, products(*)')
-          .eq('user_id', user.id);
-      if (mounted) setState(() => _items = List<Map<String, dynamic>>.from(data));
-    } catch (_) {}
-    if (mounted) setState(() => _loading = false);
-  }
-
-  Future<void> _remove(int id) async {
-    await Supabase.instance.client.from('cart_items').delete().eq('id', id);
-    _fetch();
-  }
-
-  double get _total {
-    double t = 0;
-    for (final item in _items) {
-      final product = item['products'] as Map<String, dynamic>?;
-      final price = (product?['price'] as num? ?? 0).toDouble();
-      t += price * (item['quantity'] as int? ?? 1);
-    }
-    return t;
+    context.read<GetFromCartCubit>().getProductFromCart();
   }
 
   @override
@@ -68,7 +40,7 @@ class _CartWebState extends State<CartWeb> {
                 style: appStyle(16, FontWeight.w500, const Color(0xFF9CA3AF))),
             SizedBox(height: 16.h),
             ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, LoginWeb.routName),
+              onPressed: () => Navigator.pushNamed(context, WelcomeWeb.routName),
               style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
               child: Text(context.t.tr('sign_in')),
             ),
@@ -77,7 +49,9 @@ class _CartWebState extends State<CartWeb> {
       );
     }
 
-    if (_loading) {
+    final state = context.watch<GetFromCartCubit>().state;
+
+    if (state is GetFromCartLoading) {
       return ListView.builder(
         padding: EdgeInsets.all(16),
         itemCount: 3,
@@ -101,7 +75,9 @@ class _CartWebState extends State<CartWeb> {
       );
     }
 
-    if (_items.isEmpty) {
+    final items = state is GetFromCartSuccess ? (state.getProductFromCart.details ?? []) : <Detail>[];
+
+    if (items.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -115,12 +91,17 @@ class _CartWebState extends State<CartWeb> {
       );
     }
 
+    final total = items.fold<double>(0, (sum, item) {
+      final price = (item.product?.price ?? 0).toDouble();
+      return sum + price * (item.qty ?? 1);
+    });
+
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
             padding: EdgeInsets.all(16),
-            itemCount: _items.length,
+            itemCount: items.length,
             itemBuilder: (context, i) => TweenAnimationBuilder<double>(
               tween: Tween(begin: 0.0, end: 1.0),
               duration: Duration(milliseconds: 300 + (i * 80)),
@@ -128,7 +109,13 @@ class _CartWebState extends State<CartWeb> {
               builder: (context, value, child) => Opacity(opacity: value, child: Transform.translate(
                 offset: Offset(0, 20 * (1 - value)), child: child,
               )),
-              child: _CartItemCard(item: _items[i], onRemove: () => _remove(_items[i]['id'] as int)),
+              child: _CartItemCard(
+                item: items[i],
+                onRemove: () => context.read<GetFromCartCubit>().deleteFromCart(
+                  cart_id: items[i].id ?? 0,
+                  product_id: items[i].product?.id ?? 0,
+                ),
+              ),
             ),
           ),
         ),
@@ -146,7 +133,7 @@ class _CartWebState extends State<CartWeb> {
                   children: [
                     Text(context.t.tr('total_colon'),
                         style: appStyle(14, FontWeight.w400, const Color(0xFF6B7280))),
-                    Text('${context.t.tr('egp')} ${_total.toStringAsFixed(0)}',
+                    Text('${context.t.tr('egp')} ${total.toStringAsFixed(0)}',
                         style: appStyle(24, FontWeight.w700, AppColors.cta)),
                   ],
                 ),
@@ -174,18 +161,18 @@ class _CartWebState extends State<CartWeb> {
 }
 
 class _CartItemCard extends StatelessWidget {
-  final Map<String, dynamic> item;
+  final Detail item;
   final VoidCallback onRemove;
 
   const _CartItemCard({required this.item, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
-    final product = item['products'] as Map<String, dynamic>?;
-    final name = product?['name'] as String? ?? '';
-    final price = product?['price'] as num? ?? 0;
-    final image = product?['image'] as String? ?? '';
-    final qty = item['quantity'] as int? ?? 1;
+    final product = item.product;
+    final name = product?.name ?? '';
+    final price = product?.price ?? 0;
+    final image = product?.image ?? '';
+    final qty = item.qty ?? 1;
     final currency = context.t.tr('egp');
 
     return Card(

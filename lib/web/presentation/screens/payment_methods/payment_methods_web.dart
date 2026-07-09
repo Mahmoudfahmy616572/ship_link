@@ -26,7 +26,8 @@ class _PaymentMethodsWebState extends State<PaymentMethodsWeb> {
   }
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    _loading = true;
+    if (mounted) setState(() {});
     try {
       final uid = Supabase.instance.client.auth.currentUser?.id;
       if (uid != null) {
@@ -37,37 +38,43 @@ class _PaymentMethodsWebState extends State<PaymentMethodsWeb> {
             .order('is_default', ascending: false)
             .order('created_at', ascending: false);
         if (mounted) {
-          setState(() => _methods = List<Map<String, dynamic>>.from(data));
+          _methods = List<Map<String, dynamic>>.from(data);
         }
       }
     } catch (_) {}
-    if (mounted) setState(() => _loading = false);
+    if (mounted) { _loading = false; setState(() {}); }
   }
 
   Future<void> _addCard() async {
-    setState(() => _addingCard = true);
+    _addingCard = true;
+    if (mounted) setState(() {});
     try {
       final uid = Supabase.instance.client.auth.currentUser?.id;
       if (uid == null) return;
-      final origin = Uri.base.origin;
+      var origin = Uri.base.origin;
+      if (origin.startsWith('http://')) {
+        origin = origin.replaceFirst('http://', 'https://');
+      }
       final result = await Supabase.instance.client.functions.invoke(
         'paymob-add-card',
         body: {'userId': uid, 'redirectUri': '$origin/payment-methods'},
       );
-      final data = (result as dynamic).data as Map<String, dynamic>;
-      final url = data['url'] as String?;
+      final data = (result as dynamic).data as Map<String, dynamic>?;
+      final url = data?['url'] as String?;
       if (url == null) {
-        if (mounted) _showSnack('Failed to start card setup');
+        if (mounted) _showSnack(context.t.tr('failed_card_setup'));
         return;
       }
-      html.window.open(url, 'paymob_add_card');
+      final secureUrl = url.replaceFirst('http://', 'https://');
+      html.window.open(secureUrl, 'paymob_add_card');
       if (mounted) {
-        _showSnack('Complete card setup in the new tab, then come back here');
+        _showSnack(context.t.tr('complete_card_setup'));
       }
     } catch (e) {
-      if (mounted) _showSnack(e.toString());
+      final msg = e.toString();
+      if (mounted) _showSnack(msg.contains('fetch') ? context.t.tr('payment_network_error') : msg);
     } finally {
-      if (mounted) setState(() => _addingCard = false);
+      if (mounted) { _addingCard = false; setState(() {}); }
     }
   }
 
@@ -94,12 +101,15 @@ class _PaymentMethodsWebState extends State<PaymentMethodsWeb> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  String _brandLabel(String brand) => brand.isEmpty ? 'Card' : brand;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.t.tr('payment_methods'))),
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        title: Text(context.t.tr('payment_methods'), style: appStyle(18, FontWeight.w600, const Color(0xFF111827))),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _methods.isEmpty
@@ -107,11 +117,11 @@ class _PaymentMethodsWebState extends State<PaymentMethodsWeb> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.credit_card_outlined, size: 64, color: AppColors.textSecondary),
+                      Icon(Icons.credit_card_outlined, size: 64, color: const Color(0xFFD1D5DB)),
                       SizedBox(height: 16),
-                      Text('No saved payment methods', style: appStyle(16, FontWeight.w500, AppColors.textSecondary)),
+                      Text(context.t.tr('no_payment_methods'), style: appStyle(16, FontWeight.w500, const Color(0xFF6B7280))),
                       SizedBox(height: 8),
-                      Text('Add a card to pay faster next time', style: appStyle(14, FontWeight.w400, AppColors.textSecondary)),
+                      Text(context.t.tr('add_card_hint'), style: appStyle(14, FontWeight.w400, const Color(0xFFD1D5DB))),
                     ],
                   ),
                 )
@@ -126,10 +136,16 @@ class _PaymentMethodsWebState extends State<PaymentMethodsWeb> {
                     final isDefault = card['is_default'] == true;
                     return Card(
                       margin: EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                      color: Colors.white,
                       child: ListTile(
-                        leading: const Icon(Icons.credit_card, size: 28),
-                        title: Text('${_brandLabel(brand)} •••• $lastFour'),
-                        subtitle: isDefault ? Text('Default', style: TextStyle(color: AppColors.primary)) : null,
+                        leading: Icon(Icons.credit_card, size: 28, color: AppColors.primary),
+                        title: Text('${_brandLabel(brand)} •••• $lastFour',
+                            style: appStyle(15, FontWeight.w600, const Color(0xFF111827))),
+                        subtitle: isDefault
+                            ? Text(context.t.tr('default'), style: appStyle(13, FontWeight.w500, AppColors.primary))
+                            : null,
                         trailing: PopupMenuButton<String>(
                           onSelected: (v) {
                             if (v == 'default') _setDefault(id);
@@ -137,8 +153,8 @@ class _PaymentMethodsWebState extends State<PaymentMethodsWeb> {
                           },
                           itemBuilder: (_) => [
                             if (!isDefault)
-                              const PopupMenuItem(value: 'default', child: Text('Set as default')),
-                            const PopupMenuItem(value: 'delete', child: Text('Delete', style: TextStyle(color: Colors.red))),
+                              PopupMenuItem(value: 'default', child: Text(context.t.tr('set_default'))),
+                            PopupMenuItem(value: 'delete', child: Text(context.t.tr('delete'), style: TextStyle(color: Colors.red))),
                           ],
                         ),
                       ),
@@ -147,11 +163,15 @@ class _PaymentMethodsWebState extends State<PaymentMethodsWeb> {
                 ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _addingCard ? null : _addCard,
+        backgroundColor: AppColors.cta,
+        foregroundColor: Colors.white,
         icon: _addingCard
             ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
             : const Icon(Icons.add),
-        label: const Text('Add Card'),
+        label: Text(context.t.tr('add_card')),
       ),
     );
   }
+
+  String _brandLabel(String brand) => brand.isEmpty ? 'Card' : brand;
 }

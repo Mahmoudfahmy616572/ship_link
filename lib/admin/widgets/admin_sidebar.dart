@@ -32,7 +32,7 @@ class AdminSidebar extends StatelessWidget {
             height: 80.h,
             alignment: Alignment.center,
             child: Image.asset(
-              'assets/logos/admin_logo.png',
+              'assets/logos/admin_logo.webp',
               width: isWide ? 60 : 36,
               fit: BoxFit.contain,
             ),

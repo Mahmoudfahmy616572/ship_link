@@ -1,14 +1,24 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
-import 'package:ship_link/web/presentation/screens/login/login_web.dart';
+import 'package:ship_link/web/presentation/screens/welcome/welcome_web.dart';
 import 'package:ship_link/web/presentation/screens/favourite/favourite_web.dart';
 import 'package:ship_link/web/presentation/screens/notifications/notifications_web.dart';
 import 'package:ship_link/web/presentation/shared/shimmer.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
 import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/web/data/models/allProducts/all_products.dart';
+import 'package:ship_link/web/domain/repositories/home_repository.dart';
+import 'package:ship_link/web/domain/repositories/cart_repository.dart';
+import 'package:ship_link/web/data/services_locators.dart';
+import 'package:ship_link/web/presentation/cubits/getAllProducts/get_all_prouducts_cubit.dart';
+import 'package:ship_link/web/presentation/cubits/addToCart/add_to_cart_cubit.dart';
+import 'package:ship_link/web/presentation/cubits/getFromCart/get_from_cart_cubit.dart';
+import 'package:ship_link/web/presentation/cubits/search/search_cubit.dart';
+import 'package:ship_link/web/presentation/cubits/homeFilter/home_filter_cubit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeWeb extends StatefulWidget {
@@ -20,18 +30,12 @@ class HomeWeb extends StatefulWidget {
 }
 
 class _HomeWebState extends State<HomeWeb> {
-  List<Map<String, dynamic>> _products = [];
-  bool _loading = true;
-  String _searchQuery = '';
-  String _selectedCategory = '';
-  String _sortBy = 'newest';
   final _searchCtrl = TextEditingController();
-  Timer? _debounce;
-  final _scrollCtrl = ScrollController();
-  int _currentBanner = 0;
   Timer? _bannerTimer;
-  List<String> _categories = [];
+  int _currentBanner = 0;
   bool _showDrawer = false;
+  List<Product> _allProducts = [];
+  bool _loaded = false;
 
   final _banners = [
     {'title': '30% OFF', 'subtitle': 'Summer Sale!', 'color': const Color(0xFFF97316), 'icon': Icons.wb_sunny},
@@ -39,10 +43,27 @@ class _HomeWebState extends State<HomeWeb> {
     {'title': 'New Arrivals', 'subtitle': 'Check out latest products', 'color': const Color(0xFF10B981), 'icon': Icons.new_releases},
   ];
 
+  List<Product> get _filtered {
+    final searchState = context.read<SearchCubit>().state;
+    final filterState = context.read<HomeFilterCubit>().state;
+    final category = filterState.selectedCategories.isEmpty ? null : filterState.selectedCategories.first;
+    if (searchState is SearchLoaded) return searchState.results;
+    var results = List<Product>.from(_allProducts);
+    if (category != null) {
+      results = results.where((p) => p.category == category).toList();
+    }
+    switch (filterState.sortBy) {
+      case 'price_low': results.sort((a, b) => (a.price ?? 0).compareTo(b.price ?? 0)); break;
+      case 'price_high': results.sort((a, b) => (b.price ?? 0).compareTo(a.price ?? 0)); break;
+      case 'name': results.sort((a, b) => (a.name ?? '').compareTo(b.name ?? '')); break;
+    }
+    return results;
+  }
+
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+    context.read<GetAllProuductsCubit>().getAllproducts();
     _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (mounted) setState(() => _currentBanner = (_currentBanner + 1) % _banners.length);
     });
@@ -51,54 +72,33 @@ class _HomeWebState extends State<HomeWeb> {
   @override
   void dispose() {
     _searchCtrl.dispose();
-    _debounce?.cancel();
     _bannerTimer?.cancel();
-    _scrollCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _fetchProducts() async {
-    try {
-      final data = await Supabase.instance.client
-          .from('products')
-          .select('*')
-          .order('created_at', ascending: false);
-      if (mounted) {
-        final products = List<Map<String, dynamic>>.from(data);
-        final cats = products.map((p) => p['category'] as String? ?? '').where((c) => c.isNotEmpty).toSet().toList()..sort();
-        setState(() { _products = products; _categories = cats; });
-      }
-    } catch (_) {}
-    if (mounted) setState(() => _loading = false);
-  }
-
-  List<Map<String, dynamic>> get _filtered {
-    var result = _products.where((p) {
-      if (_selectedCategory.isNotEmpty && (p['category'] as String? ?? '') != _selectedCategory) return false;
-      if (_searchQuery.isEmpty) return true;
-      final q = _searchQuery.toLowerCase();
-      final name = (p['name'] as String? ?? '').toLowerCase();
-      final cat = (p['category'] as String? ?? '').toLowerCase();
-      return name.contains(q) || cat.contains(q);
-    }).toList();
-
-    switch (_sortBy) {
-      case 'price_low': result.sort((a, b) => ((a['price'] as num? ?? 0)).compareTo((b['price'] as num? ?? 0))); break;
-      case 'price_high': result.sort((a, b) => ((b['price'] as num? ?? 0)).compareTo((a['price'] as num? ?? 0))); break;
-      case 'name': result.sort((a, b) => ((a['name'] as String? ?? '')).compareTo((b['name'] as String? ?? ''))); break;
-      case 'newest': break;
-    }
-    return result;
+  Set<String> _extractCategories() {
+    return _allProducts
+        .where((p) => p.category != null && p.category!.isNotEmpty)
+        .map((p) => p.category!)
+        .toSet();
   }
 
   @override
   Widget build(BuildContext context) {
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
+    final user = Supabase.instance.client.auth.currentUser;
     final isLoggedIn = user != null;
     final isWide = MediaQuery.of(context).size.width > 900;
+    final productsState = context.watch<GetAllProuductsCubit>().state;
 
-    if (_loading) {
+    if (productsState is GetAllProuductsSuccess && !_loaded) {
+      final all = productsState.products.products?.products ?? [];
+      _allProducts = all;
+      _loaded = true;
+    }
+
+    final loading = productsState is GetAllProuductsLoading || productsState is GetAllProuductsInitial;
+
+    if (loading && !_loaded) {
       return SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -201,7 +201,8 @@ class _HomeWebState extends State<HomeWeb> {
                     children: [
                       _drawerItem(context, Icons.home_rounded, context.t.tr('home'), () => setState(() => _showDrawer = false)),
                       _drawerItem(context, Icons.category_rounded, context.t.tr('categories'), () {
-                        setState(() { _selectedCategory = ''; _showDrawer = false; });
+                        context.read<HomeFilterCubit>().clearFilter();
+                        setState(() => _showDrawer = false);
                       }),
                       _drawerItem(context, Icons.favorite_outline, context.t.tr('my_favourites'), () {
                         _showDrawer = false;
@@ -349,21 +350,26 @@ class _HomeWebState extends State<HomeWeb> {
   }
 
   Widget _buildCategoryChips() {
-    if (_categories.isEmpty) return const SizedBox.shrink();
+    final cats = _extractCategories().toList()..sort();
+    final filterState = context.watch<HomeFilterCubit>().state;
+    if (cats.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: SizedBox(
         height: 38,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
-          itemCount: _categories.length + 1,
+          itemCount: cats.length + 1,
           separatorBuilder: (_, __) => SizedBox(width: 8),
           itemBuilder: (_, i) {
             final isAll = i == 0;
-            final isSelected = isAll ? _selectedCategory.isEmpty : _selectedCategory == _categories[i - 1];
-            final label = isAll ? context.t.tr('all') : _categories[i - 1];
+            final selectedCat = filterState.selectedCategories.isEmpty ? null : filterState.selectedCategories.first;
+            final isSelected = isAll ? selectedCat == null : selectedCat == cats[i - 1];
+            final label = isAll ? context.t.tr('all') : cats[i - 1];
             return HoverScale(
-              onTap: () => setState(() => _selectedCategory = isAll ? '' : _categories[i - 1]),
+              onTap: () => isAll
+                  ? context.read<HomeFilterCubit>().clearFilter()
+                  : context.read<HomeFilterCubit>().toggleCategory(cats[i - 1]),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
@@ -392,26 +398,24 @@ class _HomeWebState extends State<HomeWeb> {
         decoration: InputDecoration(
           hintText: context.t.tr('search_products'),
           prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9CA3AF)),
-          suffixIcon: _searchQuery.isNotEmpty
-              ? IconButton(
+          suffixIcon: context.watch<SearchCubit>().state is SearchInitial
+              ? null
+              : IconButton(
                   icon: const Icon(Icons.clear_rounded, size: 20),
-                  onPressed: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); },
-                )
-              : null,
+                  onPressed: () { _searchCtrl.clear(); context.read<SearchCubit>().search('', _allProducts); },
+                ),
           filled: true,
           fillColor: Colors.white,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           contentPadding: EdgeInsets.symmetric(vertical: 12),
         ),
-        onChanged: (v) {
-          _debounce?.cancel();
-          _debounce = Timer(const Duration(milliseconds: 300), () => setState(() => _searchQuery = v));
-        },
+        onChanged: (v) => context.read<SearchCubit>().search(v, _allProducts),
       ),
     );
   }
 
   Widget _buildSortBar() {
+    final sortBy = context.watch<HomeFilterCubit>().state.sortBy;
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
@@ -421,7 +425,7 @@ class _HomeWebState extends State<HomeWeb> {
           Text(context.t.tr('sort_by'), style: appStyle(13, FontWeight.w500, const Color(0xFF6B7280))),
           SizedBox(width: 8),
           DropdownButton<String>(
-            value: _sortBy,
+            value: sortBy.isEmpty ? 'newest' : sortBy,
             underline: const SizedBox(),
             isDense: true,
             style: appStyle(13, FontWeight.w500, const Color(0xFF111827)),
@@ -431,7 +435,7 @@ class _HomeWebState extends State<HomeWeb> {
               DropdownMenuItem(value: 'price_high', child: Text(context.t.tr('price_high_to_low'))),
               DropdownMenuItem(value: 'name', child: Text(context.t.tr('name'))),
             ],
-            onChanged: (v) => setState(() => _sortBy = v ?? 'newest'),
+            onChanged: (v) => context.read<HomeFilterCubit>().setSortBy(v ?? ''),
           ),
         ],
       ),
@@ -440,17 +444,17 @@ class _HomeWebState extends State<HomeWeb> {
 }
 
 class _ProductCard extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
   final bool isLoggedIn;
 
   const _ProductCard({required this.product, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
-    final id = product['id'] as int? ?? 0;
-    final name = product['name'] as String? ?? '';
-    final price = (product['price'] as num? ?? 0).toDouble();
-    final image = product['image'] as String? ?? '';
+    final id = product.id ?? 0;
+    final name = product.name ?? '';
+    final price = (product.price ?? 0).toDouble();
+    final image = product.image ?? '';
     final currency = context.t.tr('egp');
 
     return HoverScale(
@@ -523,31 +527,14 @@ class _ProductCard extends StatelessWidget {
 
   void _addToCart(BuildContext context) async {
     if (!isLoggedIn) {
-      Navigator.pushNamed(context, LoginWeb.routName);
+      Navigator.pushNamed(context, WelcomeWeb.routName);
       return;
     }
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    final productId = product['id'] as int;
-    final existing = await Supabase.instance.client
-        .from('cart_items')
-        .select('id, quantity')
-        .eq('user_id', user.id)
-        .eq('product_id', productId)
-        .maybeSingle();
-    if (existing != null) {
-      await Supabase.instance.client.from('cart_items')
-          .update({'quantity': (existing['quantity'] as int) + 1})
-          .eq('id', existing['id']);
-    } else {
-      await Supabase.instance.client.from('cart_items').insert({
-        'user_id': user.id, 'product_id': productId, 'quantity': 1,
-      });
-    }
+    context.read<AddToCartCubit>().addToCart(id: product.id, quantity: 1);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${product['name'] as String? ?? ''} ${context.t.tr('added_to_cart')}'),
+          content: Text('${product.name ?? ''} ${context.t.tr('added_to_cart')}'),
           duration: const Duration(seconds: 1),
         ),
       );
@@ -565,7 +552,7 @@ class _ProductCard extends StatelessWidget {
 }
 
 class _ProductDetail extends StatefulWidget {
-  final Map<String, dynamic> product;
+  final Product product;
   final bool isLoggedIn;
   const _ProductDetail({required this.product, required this.isLoggedIn});
 
@@ -595,13 +582,13 @@ class _ProductDetailState extends State<_ProductDetail> with SingleTickerProvide
 
   @override
   Widget build(BuildContext context) {
-    final id = widget.product['id'] as int? ?? 0;
-    final name = widget.product['name'] as String? ?? '';
-    final price = (widget.product['price'] as num? ?? 0).toDouble();
+    final id = widget.product.id ?? 0;
+    final name = widget.product.name ?? '';
+    final price = (widget.product.price ?? 0).toDouble();
     final currency = context.t.tr('egp');
-    final description = widget.product['description'] as String? ?? '';
-    final image = widget.product['image'] as String? ?? '';
-    final category = widget.product['category'] as String? ?? '';
+    final description = widget.product.description ?? '';
+    final image = widget.product.image ?? '';
+    final category = widget.product.category ?? '';
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -741,28 +728,11 @@ class _ProductDetailState extends State<_ProductDetail> with SingleTickerProvide
 
   void _addToCart() async {
     if (!widget.isLoggedIn) {
-      Navigator.pushNamed(context, LoginWeb.routName);
+      Navigator.pushNamed(context, WelcomeWeb.routName);
       return;
     }
     setState(() => _adding = true);
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    final productId = widget.product['id'] as int;
-    final existing = await Supabase.instance.client
-        .from('cart_items')
-        .select('id, quantity')
-        .eq('user_id', user.id)
-        .eq('product_id', productId)
-        .maybeSingle();
-    if (existing != null) {
-      await Supabase.instance.client.from('cart_items')
-          .update({'quantity': (existing['quantity'] as int) + _qty})
-          .eq('id', existing['id']);
-    } else {
-      await Supabase.instance.client.from('cart_items').insert({
-        'user_id': user.id, 'product_id': productId, 'quantity': _qty,
-      });
-    }
+    context.read<AddToCartCubit>().addToCart(id: widget.product.id, quantity: _qty);
     if (mounted) {
       setState(() { _adding = false; _added = true; });
       _animCtrl.forward();

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ship_link/core/widgets/notification_screen.dart';
@@ -43,35 +44,44 @@ class _NotificationBellState extends State<NotificationBell> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Icon(Icons.notifications_outlined, color: widget.iconColor ?? Colors.white, size: 28.sp),
-          ValueListenableBuilder<int>(
-            valueListenable: _unread,
-            builder: (context, unread, _) {
-              if (unread <= 0) return const SizedBox.shrink();
-              return Positioned(
-                right: -4,
-                top: -4,
-                child: Container(
-                  padding: EdgeInsets.all(4.w),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
+    final color = widget.iconColor ?? Colors.white;
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, NotificationScreen.routName),
+      child: Padding(
+        padding: EdgeInsets.only(right: 12.w),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/NotificationBell.svg',
+              height: 24.h,
+              width: 24.w,
+              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+            ),
+            ValueListenableBuilder<int>(
+              valueListenable: _unread,
+              builder: (context, unread, _) {
+                if (unread <= 0) return const SizedBox.shrink();
+                return Positioned(
+                  right: -4.w,
+                  top: -4.h,
+                  child: Container(
+                    padding: EdgeInsets.all(4.w),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      unread > 99 ? '99+' : '$unread',
+                      style: TextStyle(color: Colors.white, fontSize: 9.sp, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  child: Text(
-                    unread > 99 ? '99+' : '$unread',
-                    style: TextStyle(color: Colors.white, fontSize: 9.sp, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
-      onPressed: () => Navigator.pushNamed(context, NotificationScreen.routName),
     );
   }
 }

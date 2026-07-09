@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rive/rive.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/user/presentation/cubits/getAllProducts/get_all_prouducts_cubit.dart';
@@ -13,6 +14,7 @@ import 'package:ship_link/core/widgets/notification_bell.dart';
 import 'package:ship_link/user/presentation/screens/Home/components/carousel_banner.dart';
 import 'package:ship_link/user/presentation/screens/Home/components/favourite_brands.dart';
 import 'package:ship_link/user/presentation/screens/Home/components/main_row_category.dart';
+import 'package:ship_link/user/presentation/screens/Home/components/menu_btn.dart';
 import 'package:ship_link/user/presentation/screens/Home/components/top_seller_screen.dart';
 import 'package:ship_link/user/presentation/screens/Home/components/grid_cart.dart';
 import 'package:ship_link/user/presentation/screens/chat/chat_list_screen.dart';
@@ -21,7 +23,10 @@ import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/widgets/shimmer/shimmer_loading.dart';
 
 class Body extends StatefulWidget {
-  const Body({super.key});
+  final RiveWidgetController? menuController;
+  final VoidCallback? onMenuTap;
+
+  const Body({super.key, this.menuController, this.onMenuTap});
 
   @override
   State<Body> createState() => _BodyState();
@@ -184,19 +189,24 @@ class _BodyState extends State<Body> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: MediaQuery.of(context).size.height * 0.11),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                const NotificationBell(iconColor: AppColors.headerIcons),
-                SizedBox(width: 8.w),
-                IconButton(
-                  icon: const Icon(Icons.chat_bubble_outline, color: AppColors.headerIcons),
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatListScreen())),
-                ),
-              ],
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              child: Row(
+                children: [
+                  MenuBTN(
+                    controller: widget.menuController,
+                    onTap: widget.onMenuTap,
+                  ),
+                  const Spacer(),
+                  const NotificationBell(iconColor: AppColors.headerIcons),
+                  SizedBox(width: 4.w),
+                  IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline, color: AppColors.headerIcons),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatListScreen())),
+                  ),
+                ],
+              ),
             ),
           ),
           Expanded(

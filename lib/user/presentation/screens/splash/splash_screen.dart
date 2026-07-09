@@ -112,7 +112,7 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
                           ),
                         ),
                         Image.asset(
-                          'assets/logos/user_logo.png',
+                          'assets/logos/user_logo.webp',
                           width: 120.w,
                           fit: BoxFit.contain,
                         ),

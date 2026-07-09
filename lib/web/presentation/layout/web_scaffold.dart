@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_link/core/localization.dart';
-import 'package:ship_link/web/presentation/services/auth_service_web.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
+import 'package:ship_link/core/providers.dart';
 import 'package:ship_link/web/presentation/screens/home/home_web.dart';
 import 'package:ship_link/web/presentation/screens/cart/cart_web.dart';
 import 'package:ship_link/web/presentation/screens/orders/orders_web.dart';
 import 'package:ship_link/web/presentation/screens/profile/profile_web.dart';
+import 'package:ship_link/web/presentation/cubits/auth/cubit/auth_cubit.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 class WebScaffold extends StatefulWidget {
   static String routName = '/';
@@ -20,8 +23,13 @@ class WebScaffold extends StatefulWidget {
 
 class _WebScaffoldState extends State<WebScaffold> {
   int _selectedIndex = 0;
-  late List<_NavItem> _navItems;
-  final _titles = <String>['home_bottom', 'cart', 'orders', 'profile'];
+
+  static const _navConfig = [
+    (Icons.home_rounded, 'home'),
+    (Icons.shopping_cart_rounded, 'cart'),
+    (Icons.receipt_long_rounded, 'orders'),
+    (Icons.person_rounded, 'profile'),
+  ];
 
   Widget _buildPage() {
     switch (_selectedIndex) {
@@ -33,40 +41,29 @@ class _WebScaffoldState extends State<WebScaffold> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _navItems = [];
-  }
-
-  void _initNav() {
-    if (_navItems.isNotEmpty) return;
-    final t = context.t;
-    _navItems = [
-      _NavItem(Icons.home_rounded, t.tr('home'), 0),
-      _NavItem(Icons.shopping_cart_rounded, t.tr('cart'), 1),
-      _NavItem(Icons.receipt_long_rounded, t.tr('orders'), 2),
-      _NavItem(Icons.person_rounded, t.tr('profile'), 3),
-    ];
-  }
-
   void _onNavTap(int index) {
     setState(() => _selectedIndex = index);
   }
 
-  Future<bool> _onBack() async {
-    if (_selectedIndex != 0) {
-      setState(() => _selectedIndex = 0);
-      return false;
-    }
-    return true;
+  bool _isAuthenticated(AuthState state) {
+    return state is SignInSuccess || state is SuccessState || state is Registersuccess || state is NewGoogleUser || state is SignInDriverSuccess;
+  }
+
+  String _getUserName() {
+    final user = Supabase.instance.client.auth.currentUser;
+    return user?.userMetadata?['full_name'] ?? user?.email ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
-    _initNav();
+    final localeProvider = context.watch<LocaleProvider>();
     final isWide = MediaQuery.of(context).size.width > 900;
-    final auth = context.watch<AuthServiceWeb>();
+    final authState = context.watch<AuthCubit>().state;
+    final isLoggedIn = _isAuthenticated(authState);
+    final t = context.t;
+
+    final navItems = _navConfig.map((e) => _NavItem(e.$1, t.tr(e.$2))).toList();
+    final titles = [t.tr('home_bottom'), t.tr('cart'), t.tr('orders'), t.tr('profile')];
 
     return PopScope(
       canPop: false,
@@ -76,23 +73,25 @@ class _WebScaffoldState extends State<WebScaffold> {
           setState(() => _selectedIndex = 0);
         }
       },
-      child: isWide ? _buildWide(context, auth) : _buildNarrow(context, auth),
+      child: isWide
+          ? _buildWide(context, isLoggedIn, navItems, titles)
+          : _buildNarrow(context, isLoggedIn, navItems, titles),
     );
   }
 
-  Widget _buildWide(BuildContext context, AuthServiceWeb auth) {
+  Widget _buildWide(BuildContext context, bool isLoggedIn, List<_NavItem> navItems, List<String> titles) {
     return Row(
       children: [
         _SideNav(
           selectedIndex: _selectedIndex,
-          items: _navItems,
+          items: navItems,
           onTap: _onNavTap,
-          isLoggedIn: auth.status == WebAuthStatus.authenticated,
-          userName: auth.user?.userMetadata?['full_name'] ?? '',
+          isLoggedIn: isLoggedIn,
+          userName: _getUserName(),
         ),
         Expanded(
           child: Scaffold(
-            appBar: _buildAppBar(context),
+            appBar: _buildAppBar(titles),
             body: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
@@ -104,9 +103,9 @@ class _WebScaffoldState extends State<WebScaffold> {
     );
   }
 
-  Widget _buildNarrow(BuildContext context, AuthServiceWeb auth) {
+  Widget _buildNarrow(BuildContext context, bool isLoggedIn, List<_NavItem> navItems, List<String> titles) {
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: _buildAppBar(titles),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
@@ -118,7 +117,7 @@ class _WebScaffoldState extends State<WebScaffold> {
         selectedItemColor: AppColors.primary,
         unselectedItemColor: const Color(0xFF9CA3AF),
         type: BottomNavigationBarType.fixed,
-        items: _navItems
+        items: navItems
             .map((e) => BottomNavigationBarItem(
                   icon: Icon(e.icon),
                   label: e.label,
@@ -128,12 +127,12 @@ class _WebScaffoldState extends State<WebScaffold> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(List<String> titles) {
     return AppBar(
       backgroundColor: Colors.white,
       foregroundColor: const Color(0xFF111827),
       elevation: 0.5,
-      title: Text(_titles[_selectedIndex],
+      title: Text(titles[_selectedIndex],
           style: appStyle(18, FontWeight.w600, const Color(0xFF111827))),
       actions: [
         IconButton(
@@ -248,7 +247,7 @@ class _SideNav extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.logout, size: 20, color: Color(0xFF6B7280)),
                     onPressed: () {
-                      context.read<AuthServiceWeb>().signOut();
+                      context.read<AuthCubit>().signOut();
                     },
                   ),
                 ],
@@ -264,6 +263,5 @@ class _SideNav extends StatelessWidget {
 class _NavItem {
   final IconData icon;
   final String label;
-  final int index;
-  _NavItem(this.icon, this.label, this.index);
+  _NavItem(this.icon, this.label);
 }

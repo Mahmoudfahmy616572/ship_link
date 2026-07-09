@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_link/core/constants/colors.dart';
@@ -10,6 +9,7 @@ import 'package:ship_link/core/services/profile_image_service.dart';
 import 'package:ship_link/core/services/referral_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
+import 'package:ship_link/core/widgets/notification_bell.dart';
 import 'package:ship_link/core/widgets/notification_screen.dart';
 import 'package:ship_link/core/widgets/snackBar/snack_bar.dart';
 import 'package:ship_link/user/presentation/screens/address_book/address_book_screen.dart';
@@ -65,19 +65,7 @@ class _ProfileState extends State<Profile> {
           style: appStyle(22, FontWeight.w700, AppColors.textPrimary),
         ),
         actions: [
-          GestureDetector(
-            onTap: () =>
-                Navigator.pushNamed(context, NotificationScreen.routName),
-            child: Padding(
-              padding: EdgeInsets.only(right: 16.w),
-              child: SvgPicture.asset(
-                'assets/icons/NotificationBell.svg',
-                height: 24.h,
-                width: 24.w,
-                color: AppColors.headerIcons,
-              ),
-            ),
-          ),
+          NotificationBell(iconColor: AppColors.headerIcons),
         ],
         backgroundColor: AppColors.background,
         elevation: 0,

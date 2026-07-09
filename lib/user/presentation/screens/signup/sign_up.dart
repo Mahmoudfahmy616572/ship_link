@@ -22,7 +22,7 @@ class SignUp extends StatelessWidget {
               height: MediaQuery.of(context).size.height,
               decoration: const BoxDecoration(
                   image: DecorationImage(
-                      image: AssetImage("assets/images/background_image.jpg"),
+                      image: AssetImage("assets/images/background_image.webp"),
                       fit: BoxFit.cover)),
               child: Column(children: [
                 const SizedBox(
