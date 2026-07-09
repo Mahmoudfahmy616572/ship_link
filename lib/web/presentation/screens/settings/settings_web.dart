@@ -3,11 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/providers.dart';
-import 'package:ship_link/web/presentation/services/auth_service_web.dart';
+import 'package:ship_link/web/presentation/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
 import 'package:ship_link/core/utils/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SettingsWeb extends StatefulWidget {
   const SettingsWeb({super.key});
@@ -92,7 +91,7 @@ class _SettingsWebState extends State<SettingsWeb> with SingleTickerProviderStat
           ElevatedButton(
             onPressed: () async {
               if (newCtrl.text.length < 6) return;
-              await context.read<AuthServiceWeb>().updatePassword(newCtrl.text);
+              await context.read<AuthCubit>().updatePassword(newCtrl.text);
               if (ctx.mounted) Navigator.pop(ctx);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(

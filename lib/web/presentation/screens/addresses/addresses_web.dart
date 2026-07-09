@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/screens/addresses/location_picker_web.dart';
 import 'package:ship_link/web/presentation/shared/shimmer.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
+import 'package:ship_link/web/presentation/cubits/address/address_cubit.dart';
 import 'package:ship_link/core/utils/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AddressesWeb extends StatefulWidget {
   const AddressesWeb({super.key});
@@ -17,36 +18,19 @@ class AddressesWeb extends StatefulWidget {
 }
 
 class _AddressesWebState extends State<AddressesWeb> with SingleTickerProviderStateMixin {
-  List<Map<String, dynamic>> _addresses = [];
-  bool _loading = true;
   late AnimationController _animCtrl;
 
   @override
   void initState() {
     super.initState();
     _animCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _load();
+    context.read<AddressCubit>().load();
   }
 
   @override
   void dispose() {
     _animCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user != null) {
-      final data = await Supabase.instance.client
-          .from('user_addresses')
-          .select()
-          .eq('user_id', user.id)
-          .order('is_default', ascending: false)
-          .order('created_at', ascending: false);
-      if (mounted) setState(() => _addresses = List<Map<String, dynamic>>.from(data));
-    }
-    if (mounted) { setState(() => _loading = false); _animCtrl.forward(); }
   }
 
   Future<void> _delete(String id) async {
@@ -62,16 +46,13 @@ class _AddressesWebState extends State<AddressesWeb> with SingleTickerProviderSt
       ),
     );
     if (confirmed != true) return;
-    await Supabase.instance.client.from('user_addresses').delete().eq('id', id);
-    _load();
+    if (!mounted) return;
+    context.read<AddressCubit>().delete(id);
   }
 
   Future<void> _setDefault(String id) async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    await Supabase.instance.client.from('user_addresses').update({'is_default': false}).eq('user_id', user.id);
-    await Supabase.instance.client.from('user_addresses').update({'is_default': true}).eq('id', id);
-    _load();
+    if (!mounted) return;
+    context.read<AddressCubit>().setDefault(id);
   }
 
   void _showForm({Map<String, dynamic>? address}) {
@@ -80,7 +61,10 @@ class _AddressesWebState extends State<AddressesWeb> with SingleTickerProviderSt
       isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => _AddressForm(address: address, onSaved: _load),
+      builder: (ctx) => _AddressForm(
+        address: address,
+        onSaved: () => context.read<AddressCubit>().load(),
+      ),
     );
   }
 
@@ -101,50 +85,60 @@ class _AddressesWebState extends State<AddressesWeb> with SingleTickerProviderSt
           child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
-      body: _loading
-          ? Padding(
+      body: BlocBuilder<AddressCubit, AddressState>(
+        builder: (context, state) {
+          if (state is AddressLoading) {
+            return Padding(
               padding: EdgeInsets.all(16),
               child: Column(children: List.generate(3, (_) => Padding(
                 padding: EdgeInsets.only(bottom: 12),
                 child: ShimmerBox(height: 100, radius: 16),
               ))),
-            )
-          : _addresses.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.location_off_outlined, size: 64, color: const Color(0xFFD1D5DB)),
-                      SizedBox(height: 16),
-                      Text(context.t.tr('no_addresses'),
-                          style: appStyle(16, FontWeight.w500, const Color(0xFF9CA3AF))),
-                      SizedBox(height: 8),
-                      Text(context.t.tr('tap_add_address'),
-                          style: appStyle(13, FontWeight.w400, const Color(0xFFD1D5DB))),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: EdgeInsets.fromLTRB(16, 12, 16, 80),
-                  itemCount: _addresses.length,
-                  itemBuilder: (_, i) {
-                    final addr = _addresses[i];
-                    return TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: Duration(milliseconds: 300 + (i * 80)),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, child) => Opacity(opacity: value, child: Transform.translate(
-                        offset: Offset(0, 20 * (1 - value)), child: child,
-                      )),
-                      child: _AddressCard(
-                        address: addr,
-                        onDelete: () => _delete(addr['id']),
-                        onSetDefault: () => _setDefault(addr['id']),
-                        onEdit: () => _showForm(address: addr),
-                      ),
-                    );
-                  },
+            );
+          }
+          if (state is AddressError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is AddressLoaded && state.addresses.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.location_off_outlined, size: 64, color: const Color(0xFFD1D5DB)),
+                  SizedBox(height: 16),
+                  Text(context.t.tr('no_addresses'),
+                      style: appStyle(16, FontWeight.w500, const Color(0xFF9CA3AF))),
+                  SizedBox(height: 8),
+                  Text(context.t.tr('tap_add_address'),
+                      style: appStyle(13, FontWeight.w400, const Color(0xFFD1D5DB))),
+                ],
+              ),
+            );
+          }
+          final addresses = (state as AddressLoaded).addresses;
+          return ListView.builder(
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 80),
+            itemCount: addresses.length,
+            itemBuilder: (_, i) {
+              final addr = addresses[i];
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: Duration(milliseconds: 300 + (i * 80)),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) => Opacity(opacity: value, child: Transform.translate(
+                  offset: Offset(0, 20 * (1 - value)), child: child,
+                )),
+                child: _AddressCard(
+                  address: addr,
+                  onDelete: () => _delete(addr['id']),
+                  onSetDefault: () => _setDefault(addr['id']),
+                  onEdit: () => _showForm(address: addr),
                 ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -322,10 +316,7 @@ class _AddressFormState extends State<_AddressForm> {
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) return;
       final data = {
-        'user_id': user.id,
         'label': _labelCtrl.text.trim(),
         'city': _cityCtrl.text.trim(),
         'street': _streetCtrl.text.trim(),
@@ -336,15 +327,9 @@ class _AddressFormState extends State<_AddressForm> {
         'longitude': _lng,
       };
       if (widget.address == null) {
-        final existing = await Supabase.instance.client
-            .from('user_addresses')
-            .select('id')
-            .eq('user_id', user.id)
-            .limit(1);
-        if (existing.isEmpty) data['is_default'] = true;
-        await Supabase.instance.client.from('user_addresses').insert(data);
+        await context.read<AddressCubit>().add(data);
       } else {
-        await Supabase.instance.client.from('user_addresses').update(data).eq('id', widget.address!['id']);
+        await context.read<AddressCubit>().update(widget.address!['id'], data);
       }
       if (mounted) Navigator.pop(context);
       widget.onSaved();

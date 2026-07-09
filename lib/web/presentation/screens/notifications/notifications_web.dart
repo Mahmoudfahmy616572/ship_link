@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
 import 'package:ship_link/core/utils/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ship_link/web/presentation/cubits/notification/notification_cubit.dart';
 
 class NotificationsWeb extends StatefulWidget {
   const NotificationsWeb({super.key});
@@ -15,45 +16,20 @@ class NotificationsWeb extends StatefulWidget {
 }
 
 class _NotificationsWebState extends State<NotificationsWeb> with SingleTickerProviderStateMixin {
-  List<Map<String, dynamic>> _notifications = [];
-  bool _loading = true;
   late AnimationController _animCtrl;
 
   @override
   void initState() {
     super.initState();
     _animCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-    _load();
+    context.read<NotificationCubit>().listen();
+    _animCtrl.forward();
   }
 
   @override
   void dispose() {
     _animCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _load() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    try {
-      final data = await Supabase.instance.client
-          .from('notifications')
-          .select()
-          .eq('user_id', user.id)
-          .order('created_at', ascending: false);
-      if (mounted) setState(() => _notifications = List<Map<String, dynamic>>.from(data));
-    } catch (_) {}
-    if (mounted) { setState(() => _loading = false); _animCtrl.forward(); }
-  }
-
-  Future<void> _markRead(String id) async {
-    await Supabase.instance.client.from('notifications').update({'is_read': true}).eq('id', id);
-    _load();
-  }
-
-  Future<void> _delete(String id) async {
-    await Supabase.instance.client.from('notifications').delete().eq('id', id);
-    _load();
   }
 
   IconData _typeIcon(String type) {
@@ -76,6 +52,10 @@ class _NotificationsWebState extends State<NotificationsWeb> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<NotificationCubit>().state;
+    final loading = state is NotificationLoading;
+    final notifications = state is NotificationLoaded ? state.notifications : <Map<String, dynamic>>[];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.tr('notifications')),
@@ -83,9 +63,9 @@ class _NotificationsWebState extends State<NotificationsWeb> with SingleTickerPr
         foregroundColor: const Color(0xFF111827),
         elevation: 0.5,
       ),
-      body: _loading
+      body: loading
           ? const Center(child: CircularProgressIndicator())
-          : _notifications.isEmpty
+          : notifications.isEmpty
               ? Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -99,13 +79,13 @@ class _NotificationsWebState extends State<NotificationsWeb> with SingleTickerPr
                 )
               : ListView.builder(
                   padding: EdgeInsets.all(16),
-                  itemCount: _notifications.length,
+                  itemCount: notifications.length,
                   itemBuilder: (_, i) {
-                    final n = _notifications[i];
+                    final n = notifications[i];
                     final type = n['type'] as String? ?? '';
                     final title = n['title'] as String? ?? '';
                     final body = n['body'] as String? ?? '';
-                    final isRead = n['is_read'] as bool? ?? false;
+                    final isRead = n['read'] as bool? ?? false;
                     final createdAt = n['created_at'] as String? ?? '';
                     final date = createdAt.length >= 10 ? createdAt.substring(0, 10) : '';
 
@@ -118,7 +98,7 @@ class _NotificationsWebState extends State<NotificationsWeb> with SingleTickerPr
                       )),
                       child: HoverScale(
                         scale: 1.01,
-                        onTap: isRead ? null : () => _markRead(n['id']),
+                        onTap: isRead ? null : () => context.read<NotificationCubit>().markRead(n['id']),
                         child: Container(
                           margin: EdgeInsets.only(bottom: 8),
                           padding: EdgeInsets.all(12),
@@ -173,8 +153,8 @@ class _NotificationsWebState extends State<NotificationsWeb> with SingleTickerPr
                               PopupMenuButton<String>(
                                 icon: Icon(Icons.more_vert, size: 18, color: const Color(0xFF9CA3AF)),
                                 onSelected: (v) {
-                                  if (v == 'read' && !isRead) _markRead(n['id']);
-                                  if (v == 'delete') _delete(n['id']);
+                                  if (v == 'read' && !isRead) context.read<NotificationCubit>().markRead(n['id']);
+                                  if (v == 'delete') context.read<NotificationCubit>().deleteNotification(n['id']);
                                 },
                                 itemBuilder: (_) => [
                                   if (!isRead)

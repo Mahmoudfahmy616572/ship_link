@@ -142,7 +142,7 @@ class _BodyState extends State<Body> {
                   decoration: const BoxDecoration(
                       image: DecorationImage(
                           image:
-                              AssetImage("assets/images/background_image.jpg"),
+                              AssetImage("assets/images/background_image.webp"),
                           colorFilter: ColorFilter.mode(
                               Colors.black, BlendMode.softLight),
                           fit: BoxFit.cover),

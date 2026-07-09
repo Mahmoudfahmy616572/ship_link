@@ -12,7 +12,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.example.ship_link"
-    compileSdk flutter.compileSdkVersion
+    compileSdk 36
     ndkVersion "28.2.13676358"
 
     buildFeatures {
@@ -71,6 +71,8 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/shared/shimmer.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
 import 'package:ship_link/core/utils/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ship_link/web/data/models/favourite/favourite_model.dart';
+import 'package:ship_link/web/presentation/cubits/favourite/favourite_cubit.dart';
+import 'package:ship_link/web/presentation/cubits/addToCart/add_to_cart_cubit.dart';
 
 class FavouriteWeb extends StatefulWidget {
   const FavouriteWeb({super.key});
@@ -16,65 +19,22 @@ class FavouriteWeb extends StatefulWidget {
 }
 
 class _FavouriteWebState extends State<FavouriteWeb> {
-  List<Map<String, dynamic>> _items = [];
-  bool _loading = true;
-
   @override
   void initState() {
     super.initState();
-    _load();
+    context.read<FavouriteCubit>().getFavourites();
   }
 
-  Future<void> _load() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    try {
-      final data = await Supabase.instance.client
-          .from('favourites')
-          .select('*, products(*)')
-          .eq('user_id', user.id);
-      if (mounted) setState(() => _items = List<Map<String, dynamic>>.from(data));
-    } catch (_) {}
-    if (mounted) setState(() => _loading = false);
-  }
-
-  Future<void> _remove(int productId) async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    await Supabase.instance.client
-        .from('favourites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('product_id', productId);
-    _load();
-  }
-
-  Future<void> _addToCart(Map<String, dynamic> product) async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    final existing = await Supabase.instance.client
-        .from('cart_items')
-        .select('id, quantity')
-        .eq('user_id', user.id)
-        .eq('product_id', product['id'])
-        .maybeSingle();
-    if (existing != null) {
-      await Supabase.instance.client.from('cart_items')
-          .update({'quantity': (existing['quantity'] as int) + 1})
-          .eq('id', existing['id']);
-    } else {
-      await Supabase.instance.client.from('cart_items').insert({
-        'user_id': user.id, 'product_id': product['id'], 'quantity': 1,
-      });
-    }
+  void _addToCart(int productId, String name) async {
+    context.read<AddToCartCubit>().addToCart(id: productId, quantity: 1);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${product['name']} ${context.t.tr('added_to_cart')}')),
+        SnackBar(content: Text('$name ${context.t.tr('added_to_cart')}')),
       );
     }
   }
 
-  void _showProductDetail(BuildContext context, Map<String, dynamic> product) {
+  void _showProductDetail(BuildContext context, FavouriteItem item) {
     showDialog(
       context: context,
       builder: (_) => Dialog(
@@ -88,7 +48,7 @@ class _FavouriteWebState extends State<FavouriteWeb> {
               ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 child: Image.network(
-                  product['image'] as String? ?? '',
+                  item.productImage ?? '',
                   height: 250,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
@@ -103,10 +63,10 @@ class _FavouriteWebState extends State<FavouriteWeb> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(product['name'] as String? ?? '',
+                    Text(item.productName ?? '',
                         style: appStyle(18, FontWeight.w600, const Color(0xFF111827))),
                     SizedBox(height: 8),
-                    Text('${context.t.tr('egp')} ${(product['price'] as num? ?? 0).toStringAsFixed(0)}',
+                    Text('${context.t.tr('egp')} ${(item.productPrice ?? 0).toStringAsFixed(0)}',
                         style: appStyle(22, FontWeight.w700, AppColors.cta)),
                     SizedBox(height: 16),
                     SizedBox(
@@ -114,7 +74,7 @@ class _FavouriteWebState extends State<FavouriteWeb> {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Navigator.pop(context);
-                          _addToCart(product);
+                          _addToCart(item.productId, item.productName ?? '');
                         },
                         icon: Icon(Icons.add_shopping_cart),
                         label: Text(context.t.tr('add_to_cart')),
@@ -138,6 +98,10 @@ class _FavouriteWebState extends State<FavouriteWeb> {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<FavouriteCubit>().state;
+    final loading = state is FavouriteLoading;
+    final items = state is FavouriteLoaded ? state.items : <FavouriteItem>[];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(context.t.tr('my_favourites')),
@@ -145,12 +109,12 @@ class _FavouriteWebState extends State<FavouriteWeb> {
         foregroundColor: const Color(0xFF111827),
         elevation: 0.5,
       ),
-      body: _loading
+      body: loading
           ? Padding(
               padding: EdgeInsets.all(16),
               child: ShimmerGrid(count: 4),
             )
-          : _items.isEmpty
+          : items.isEmpty
               ? Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -170,14 +134,13 @@ class _FavouriteWebState extends State<FavouriteWeb> {
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                   ),
-                  itemCount: _items.length,
+                  itemCount: items.length,
                   itemBuilder: (_, i) {
-                    final item = _items[i];
-                    final product = item['products'] as Map<String, dynamic>? ?? {};
-                    final name = product['name'] as String? ?? '';
-                    final price = (product['price'] as num? ?? 0).toDouble();
-                    final image = product['image'] as String? ?? '';
-                    final productId = product['id'] as int? ?? 0;
+                    final item = items[i];
+                    final name = item.productName ?? '';
+                    final price = (item.productPrice ?? 0).toDouble();
+                    final image = item.productImage ?? '';
+                    final productId = item.productId;
                     return TweenAnimationBuilder<double>(
                       tween: Tween(begin: 0.0, end: 1.0),
                       duration: Duration(milliseconds: 200 + (i * 60)),
@@ -186,7 +149,7 @@ class _FavouriteWebState extends State<FavouriteWeb> {
                         offset: Offset(0, 15 * (1 - value)), child: child,
                       )),
                       child: HoverScale(
-                        onTap: () => _showProductDetail(context, product),
+                        onTap: () => _showProductDetail(context, item),
                         child: Card(
                           elevation: 0,
                           color: Colors.white,
@@ -206,7 +169,7 @@ class _FavouriteWebState extends State<FavouriteWeb> {
                                     Positioned(
                                       top: 4, right: 4,
                                       child: HoverScale(
-                                        onTap: () => _remove(productId),
+                                        onTap: () => context.read<FavouriteCubit>().toggleFavourite(productId),
                                         child: Container(
                                           padding: EdgeInsets.all(6),
                                           decoration: BoxDecoration(
@@ -236,7 +199,7 @@ class _FavouriteWebState extends State<FavouriteWeb> {
                                         SizedBox(
                                           height: 32, width: 32,
                       child: HoverScale(
-                        onTap: () => _addToCart(product),
+                        onTap: () => _addToCart(productId, name),
                         child: Container(
                                               decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(8)),
                                               child: Icon(Icons.add_shopping_cart, color: Colors.white, size: 16),

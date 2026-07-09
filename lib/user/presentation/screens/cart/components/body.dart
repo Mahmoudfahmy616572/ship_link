@@ -134,32 +134,41 @@ class _BodyState extends State<Body> {
       },
       builder: (context, state) {
         if (state is GetFromCartLoading || state is DeleteFromCartLoading) {
-          return ShimmerLoading.list();
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: ShimmerLoading.list(),
+          );
         } else if (state is GetFromCartFailure) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.shopping_cart_outlined,
-                    size: 80.sp, color: AppColors.textHint),
-                SizedBox(height: 16.h),
-                Text(context.t.tr('your_cart_is_empty'),
-                    style: appStyle(
-                        18, FontWeight.w600, AppColors.textPrimary)),
-                SizedBox(height: 8.h),
-                Text(state.errMessage,
-                    style: appStyle(
-                        14, FontWeight.normal, AppColors.textSecondary)),
-                SizedBox(height: 20.h),
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                      context, MainScreen.routName, (route) => false),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white),
-                  child: Text(context.t.tr('start_shopping')),
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.shopping_cart_outlined,
+                        size: 80.sp, color: AppColors.textHint),
+                    SizedBox(height: 16.h),
+                    Text(context.t.tr('your_cart_is_empty'),
+                        style: appStyle(
+                            18, FontWeight.w600, AppColors.textPrimary)),
+                    SizedBox(height: 8.h),
+                    Text(state.errMessage,
+                        style: appStyle(
+                            14, FontWeight.normal, AppColors.textSecondary)),
+                    SizedBox(height: 20.h),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                          context, MainScreen.routName, (route) => false),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white),
+                      child: Text(context.t.tr('start_shopping')),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           );
         } else if (state is GetFromCartSuccess) {
@@ -169,31 +178,37 @@ class _BodyState extends State<Body> {
               valueListenable: _state,
               builder: (context, cartState, _) {
                 if (cartState.savedItems.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.shopping_cart_outlined,
-                            size: 80.sp, color: Colors.grey[400]),
-                        SizedBox(height: 16.h),
-                        Text(context.t.tr('your_cart_is_empty'),
-                            style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[600])),
-                        SizedBox(height: 8.h),
-                        Text(context.t.tr('not_added_anything'),
-                            style: TextStyle(fontSize: 14.sp, color: Colors.grey[500])),
-                        SizedBox(height: 20.h),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                              context, MainScreen.routName, (route) => false),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white),
-                          child: Text(context.t.tr('start_shopping')),
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.shopping_cart_outlined,
+                                size: 80.sp, color: Colors.grey[400]),
+                            SizedBox(height: 16.h),
+                            Text(context.t.tr('your_cart_is_empty'),
+                                style: TextStyle(
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[600])),
+                            SizedBox(height: 8.h),
+                            Text(context.t.tr('not_added_anything'),
+                                style: TextStyle(fontSize: 14.sp, color: Colors.grey[500])),
+                            SizedBox(height: 20.h),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                                  context, MainScreen.routName, (route) => false),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white),
+                              child: Text(context.t.tr('start_shopping')),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   );
                 }

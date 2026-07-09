@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
-import 'package:ship_link/web/presentation/screens/login/login_web.dart';
+import 'package:ship_link/web/presentation/screens/welcome/welcome_web.dart';
+import 'package:ship_link/web/presentation/screens/chat/chat_list_web.dart';
 import 'package:ship_link/web/presentation/screens/orders/order_detail_web.dart';
 import 'package:ship_link/web/presentation/shared/shimmer.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
 import 'package:ship_link/core/utils/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ship_link/web/presentation/cubits/orderHistory/order_history_cubit.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 class OrdersWeb extends StatefulWidget {
   const OrdersWeb({super.key});
@@ -18,27 +21,10 @@ class OrdersWeb extends StatefulWidget {
 }
 
 class _OrdersWebState extends State<OrdersWeb> {
-  List<Map<String, dynamic>> _orders = [];
-  bool _loading = true;
-
   @override
   void initState() {
     super.initState();
-    _fetch();
-  }
-
-  Future<void> _fetch() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) { if (mounted) setState(() => _loading = false); return; }
-    try {
-      final data = await Supabase.instance.client
-          .from('orders')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', ascending: false);
-      if (mounted) setState(() => _orders = List<Map<String, dynamic>>.from(data));
-    } catch (_) {}
-    if (mounted) setState(() => _loading = false);
+    context.read<OrderHistoryCubit>().loadOrders();
   }
 
   Color _statusColor(String status) {
@@ -66,7 +52,7 @@ class _OrdersWebState extends State<OrdersWeb> {
                 style: appStyle(16, FontWeight.w500, const Color(0xFF9CA3AF))),
             SizedBox(height: 16.h),
             ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, LoginWeb.routName),
+              onPressed: () => Navigator.pushNamed(context, WelcomeWeb.routName),
               style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
               child: Text(context.t.tr('sign_in')),
             ),
@@ -75,7 +61,11 @@ class _OrdersWebState extends State<OrdersWeb> {
       );
     }
 
-    if (_loading) {
+    final state = context.watch<OrderHistoryCubit>().state;
+    final loading = state is OrderHistoryLoading;
+    final orders = state is OrderHistoryLoaded ? state.orders : <Map<String, dynamic>>[];
+
+    if (loading) {
       return ListView.builder(
         padding: EdgeInsets.all(16),
         itemCount: 3,
@@ -86,7 +76,7 @@ class _OrdersWebState extends State<OrdersWeb> {
       );
     }
 
-    if (_orders.isEmpty) {
+    if (orders.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -100,9 +90,29 @@ class _OrdersWebState extends State<OrdersWeb> {
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: _orders.length,
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => Navigator.pushNamed(context, ChatListWeb.routName),
+              icon: Icon(Icons.chat_outlined, size: 18),
+              label: Text(context.t.tr('my_chats')),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                side: BorderSide(color: const Color(0xFFE5E7EB)),
+                foregroundColor: AppColors.primary,
+                padding: EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.all(16),
+            itemCount: orders.length,
       itemBuilder: (context, i) => TweenAnimationBuilder<double>(
         tween: Tween(begin: 0.0, end: 1.0),
         duration: Duration(milliseconds: 300 + (i * 100)),
@@ -110,9 +120,12 @@ class _OrdersWebState extends State<OrdersWeb> {
         builder: (context, value, child) => Opacity(opacity: value, child: Transform.translate(
           offset: Offset(0, 20 * (1 - value)), child: child,
         )),
-        child: _OrderCard(order: _orders[i], statusColor: _statusColor(_orders[i]['status'] as String? ?? '')),
+        child: _OrderCard(order: orders[i], statusColor: _statusColor(orders[i]['status'] as String? ?? '')),
       ),
-    );
+            ),
+          ),
+        ],
+      );
   }
 }
 

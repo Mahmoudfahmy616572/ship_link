@@ -17,8 +17,6 @@ import 'package:ship_link/user/domain/repositories/home_repository.dart';
 import 'package:ship_link/user/presentation/screens/Home/components/body.dart';
 import 'package:ship_link/user/presentation/widgets/build_side_bar/build_side_bar.dart';
 
-import 'package:ship_link/user/presentation/screens/Home/components/menu_btn.dart';
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   static String routName = '/homeScreen';
@@ -64,6 +62,18 @@ class _HomeScreenState extends State<HomeScreen>
     isSideBarClosed = _menuController?.stateMachine?.boolean("isOpen");
     isSideBarClosed?.value = true;
     setState(() {});
+  }
+
+  void _toggleMenu() {
+    isSideBarClosed?.value = !isSideBarClosed!.value;
+    if (isSideMenuClosed) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
+    setState(() {
+      isSideMenuClosed = isSideBarClosed!.value;
+    });
   }
 
   @override
@@ -125,27 +135,10 @@ class _HomeScreenState extends State<HomeScreen>
                   scale: scaleanimation.value,
                   child: ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                      child: const Body())),
-            ),
-          ),
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 200),
-            top: 16,
-            left: isSideMenuClosed ? 0 : 220,
-            curve: Curves.fastOutSlowIn,
-            child: MenuBTN(
-              controller: _menuController,
-              onTap: () {
-                isSideBarClosed?.value = !isSideBarClosed!.value;
-                if (isSideMenuClosed) {
-                  _animationController.forward();
-                } else {
-                  _animationController.reverse();
-                }
-                setState(() {
-                  isSideMenuClosed = isSideBarClosed!.value;
-                });
-              },
+                      child: Body(
+                        menuController: _menuController,
+                        onMenuTap: _toggleMenu,
+                      ))),
             ),
           ),
         ]),

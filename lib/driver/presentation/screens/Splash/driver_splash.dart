@@ -60,7 +60,7 @@ class _DriverSplashState extends State<DriverSplash> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/logos/driver_logo.png',
+              'assets/logos/driver_logo.webp',
               width: 120.w,
               fit: BoxFit.contain,
             ),

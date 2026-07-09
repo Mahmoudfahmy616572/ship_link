@@ -1,13 +1,15 @@
 import 'dart:html' as html;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/screens/checkout/congrats_web.dart';
 import 'package:ship_link/web/presentation/shared/shimmer.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
+import 'package:ship_link/web/presentation/cubits/checkout/checkout_cubit.dart';
 import 'package:ship_link/core/utils/sizer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CheckoutWeb extends StatefulWidget {
   const CheckoutWeb({super.key});
@@ -18,15 +20,7 @@ class CheckoutWeb extends StatefulWidget {
 }
 
 class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStateMixin {
-  List<Map<String, dynamic>> _items = [];
-  List<Map<String, dynamic>> _addresses = [];
-  bool _loading = true;
-  bool _placing = false;
-  int _selectedMethod = 0;
-  String? _selectedAddressId;
-
   final _phoneCtrl = TextEditingController();
-
   late AnimationController _animCtrl;
   late Animation<double> _fadeAnim;
 
@@ -35,7 +29,29 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
     super.initState();
     _animCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
     _fadeAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic);
-    _fetch();
+    final cubit = context.read<CheckoutCubit>();
+    cubit.load();
+    cubit.stream.listen((state) {
+      if (!mounted) return;
+      if (state is CheckoutLoaded && _phoneCtrl.text.isEmpty) {
+        _phoneCtrl.text = state.phone;
+      }
+      if (state is CheckoutLoaded) {
+        _animCtrl.forward();
+      }
+      if (state is CheckoutSuccess) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => CongratsWeb(userEmail: state.userEmail)),
+        );
+      }
+      if (state is CheckoutPaymentOpened) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.t.tr('payment_opened_new_tab'))),
+        );
+        Navigator.pushNamedAndRemoveUntil(context, '/orders', (_) => false);
+      }
+    });
   }
 
   @override
@@ -45,198 +61,8 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
     super.dispose();
   }
 
-  Future<void> _fetch() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    try {
-      final itemsFuture = Supabase.instance.client
-          .from('cart_items')
-          .select('*, products(*)')
-          .eq('user_id', user.id);
-
-      final addressesFuture = Supabase.instance.client
-          .from('user_addresses')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('is_default', ascending: false);
-
-      final profileFuture = Supabase.instance.client
-          .from('profiles')
-          .select('phone_number')
-          .eq('id', user.id)
-          .maybeSingle();
-
-      final results = await Future.wait([itemsFuture, addressesFuture, profileFuture]);
-      final items = List<Map<String, dynamic>>.from(results[0] as List);
-      final addresses = List<Map<String, dynamic>>.from(results[1] as List);
-      final profile = results[2] as Map<String, dynamic>?;
-
-      final defaultAddr = addresses.cast<Map<String, dynamic>?>().firstWhere(
-        (a) => a?['is_default'] == true,
-        orElse: () => addresses.isNotEmpty ? addresses.first : null,
-      );
-
-      if (mounted) {
-        setState(() {
-          _items = items;
-          _addresses = addresses;
-          _selectedAddressId = defaultAddr?['id'] as String?;
-          _phoneCtrl.text = profile?['phone_number'] as String? ?? '';
-        });
-      }
-    } catch (_) {}
-    if (mounted) { setState(() => _loading = false); _animCtrl.forward(); }
-  }
-
-  Map<String, dynamic>? get _selectedAddress {
-    if (_selectedAddressId == null) return null;
-    try {
-      return _addresses.firstWhere((a) => a['id'] == _selectedAddressId);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  double get _total {
-    double t = 0;
-    for (final item in _items) {
-      final product = item['products'] as Map<String, dynamic>?;
-      final price = (product?['price'] as num? ?? 0).toDouble();
-      final qty = (item['quantity'] as int? ?? 1);
-      t += price * qty;
-    }
-    return t;
-  }
-
-  Future<void> _placeOrder() async {
-    setState(() => _placing = true);
-    try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      if (user == null) return;
-      final userEmail = user.email ?? '';
-
-      final profile = await supabase
-          .from('profiles')
-          .select('name')
-          .eq('id', user.id)
-          .maybeSingle();
-
-      final isCard = _selectedMethod == 1;
-      final order = await supabase.from('orders').insert({
-        'user_id': user.id,
-        'total_price': _total,
-        'status': isCard ? 'awaiting_payment' : 'pending',
-        'payment_method': isCard ? 'card' : 'cod',
-        'delivery_address': _selectedAddress?.containsKey('full_address') == true
-            ? (_selectedAddress!['full_address'] as String? ?? '')
-            : '',
-        'phone_number': _phoneCtrl.text,
-        'customer_name': profile?['name'],
-        'created_at': DateTime.now().toIso8601String(),
-      }).select().single();
-
-      for (final item in _items) {
-        await supabase.from('order_items').insert({
-          'order_id': order['id'],
-          'product_id': item['product_id'],
-          'quantity': item['quantity'],
-        });
-      }
-
-      await supabase.from('cart_items').delete().eq('user_id', user.id);
-
-      if (mounted) {
-        if (_selectedMethod == 0) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => CongratsWeb(userEmail: userEmail)),
-          );
-        } else {
-          // Check for saved payment methods
-          final savedCards = await supabase
-              .from('payment_methods')
-              .select()
-              .eq('user_id', user.id)
-              .order('is_default', ascending: false)
-              .limit(20);
-          final savedList = List<Map<String, dynamic>>.from(savedCards);
-          String? selectedToken;
-
-          if (savedList.isNotEmpty && mounted) {
-            selectedToken = await showDialog<String>(
-              context: context,
-              builder: (ctx) => SimpleDialog(
-                title: Text('Pay with'),
-                children: [
-                  ...savedList.map((card) {
-                    final token = card['paymob_token'] as String;
-                    final lastFour = card['last_four'] as String? ?? '****';
-                    final brand = card['card_brand'] as String? ?? '';
-                    final isDefault = card['is_default'] == true;
-                    return SimpleDialogOption(
-                      onPressed: () => Navigator.of(ctx).pop(token),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.credit_card, size: 20),
-                          const SizedBox(width: 12),
-                          Text('$brand •••• $lastFour${isDefault ? ' (Default)' : ''}'),
-                        ],
-                      ),
-                    );
-                  }),
-                  SimpleDialogOption(
-                    onPressed: () => Navigator.of(ctx).pop(null),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.add_circle_outline, size: 20),
-                        SizedBox(width: 12),
-                        Text('Pay with new card'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          try {
-            final origin = Uri.base.origin;
-            String? url;
-            if (selectedToken != null && mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Enter your card details to complete payment')),
-              );
-            }
-            final result = await supabase.functions.invoke('paymob-checkout', body: {
-              'totalPrice': _total.round(),
-              'orderId': order['id'],
-              'userId': user.id,
-              'redirectUri': '$origin/orders',
-            }) as Map<String, dynamic>;
-            url = result['url'] as String?;
-            if (url != null && url.isNotEmpty) {
-              html.window.open(url, '_blank');
-            }
-          } catch (e) {
-            debugPrint('Paymob checkout error: $e');
-          }
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Payment page opened in a new tab. Complete payment there.')),
-            );
-          }
-          Navigator.pushNamedAndRemoveUntil(context, '/orders', (_) => false);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${context.t.tr('order_failed')}: $e')),
-        );
-      }
-    }
-    if (mounted) setState(() => _placing = false);
+  Future<void> _placeOrder(String phone) async {
+    await context.read<CheckoutCubit>().placeOrder(phone: phone);
   }
 
   @override
@@ -245,7 +71,7 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
     if (user == null) {
       return Scaffold(
         appBar: AppBar(title: Text(context.t.tr('checkout'))),
-        body: const Center(child: Text('Please login')),
+        body: Center(child: Text(context.t.tr('sign_in_to_continue'))),
       );
     }
 
@@ -256,8 +82,10 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
         foregroundColor: const Color(0xFF111827),
         elevation: 0.5,
       ),
-      body: _loading
-          ? Padding(
+      body: BlocBuilder<CheckoutCubit, CheckoutState>(
+        builder: (context, state) {
+          if (state is CheckoutLoading) {
+            return Padding(
               padding: EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,51 +103,62 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
                   ShimmerBox(height: 52),
                 ],
               ),
-            )
-          : FadeTransition(
-              opacity: _fadeAnim,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildDeliverySection(),
-                    SizedBox(height: 24),
-                    _buildOrderSummary(),
-                    SizedBox(height: 24),
-                    Text(context.t.tr('payment_method'),
-                        style: appStyle(18, FontWeight.w600, const Color(0xFF111827))),
-                    SizedBox(height: 12),
-                    _paymentCard(0, Icons.money_rounded, context.t.tr('cash_on_delivery'),
-                        context.t.tr('pay_when_receive')),
-                    SizedBox(height: 10),
-                    _paymentCard(1, Icons.credit_card_rounded, context.t.tr('pay_with_paymob'),
-                        context.t.tr('pay_online_card')),
-                    SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity, height: 52,
-                      child: ElevatedButton(
-                        onPressed: (_selectedAddress == null || _phoneCtrl.text.trim().isEmpty || _placing) ? null : _placeOrder,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.cta,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                        ),
-                        child: _placing
-                            ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : Text(context.t.tr('place_order'), style: appStyle(16, FontWeight.w600, Colors.white)),
+            );
+          }
+          if (state is CheckoutError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is! CheckoutLoaded) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final cubit = context.read<CheckoutCubit>();
+
+          return FadeTransition(
+            opacity: _fadeAnim,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDeliverySection(state.addresses, state.selectedAddressId, cubit),
+                  SizedBox(height: 24),
+                  _buildOrderSummary(state.items, cubit),
+                  SizedBox(height: 24),
+                  Text(context.t.tr('payment_method'),
+                      style: appStyle(18, FontWeight.w600, const Color(0xFF111827))),
+                  SizedBox(height: 12),
+                  _paymentCard(0, Icons.money_rounded, context.t.tr('cash_on_delivery'),
+                      context.t.tr('pay_when_receive'), state.paymentMethod == 0, () => cubit.selectPaymentMethod(0)),
+                  SizedBox(height: 10),
+                  _paymentCard(1, Icons.credit_card_rounded, context.t.tr('pay_with_paymob'),
+                      context.t.tr('pay_online_card'), state.paymentMethod == 1, () => cubit.selectPaymentMethod(1)),
+                  SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity, height: 52,
+                    child: ElevatedButton(
+                      onPressed: (state.selectedAddressId == null || _phoneCtrl.text.trim().isEmpty || state is CheckoutPlacing) ? null : () => _placeOrder(_phoneCtrl.text.trim()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.cta,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
                       ),
+                      child: state is CheckoutPlacing
+                          ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : Text(context.t.tr('place_order'), style: appStyle(16, FontWeight.w600, Colors.white)),
                     ),
-                    SizedBox(height: 40),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: 40),
+                ],
               ),
             ),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildDeliverySection() {
+  Widget _buildDeliverySection(List<Map<String, dynamic>> addresses, String? selectedAddressId, CheckoutCubit cubit) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -336,7 +175,7 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
           ],
         ),
         SizedBox(height: 8),
-        if (_addresses.isEmpty)
+        if (addresses.isEmpty)
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(24),
@@ -355,9 +194,9 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
             ),
           )
         else
-          ...List.generate(_addresses.length, (i) {
-            final addr = _addresses[i];
-            final isSelected = addr['id'] == _selectedAddressId;
+          ...List.generate(addresses.length, (i) {
+            final addr = addresses[i];
+            final isSelected = addr['id'] == selectedAddressId;
             final label = addr['label'] as String? ?? '';
             final city = addr['city'] as String? ?? '';
             final street = addr['street'] as String? ?? '';
@@ -367,7 +206,7 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
               padding: EdgeInsets.only(bottom: 10),
               child: HoverScale(
                 scale: 1.01,
-                onTap: () => setState(() => _selectedAddressId = addr['id'] as String?),
+                onTap: () => cubit.selectAddress(addr['id'] as String?),
                 child: Container(
                   padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -451,7 +290,7 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildOrderSummary() {
+  Widget _buildOrderSummary(List<Map<String, dynamic>> items, CheckoutCubit cubit) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -477,11 +316,11 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
             ],
           ),
           const Divider(height: 24),
-          ...List.generate(_items.length, (i) {
-            final product = _items[i]['products'] as Map<String, dynamic>?;
+          ...List.generate(items.length, (i) {
+            final product = items[i]['products'] as Map<String, dynamic>?;
             final name = product?['name'] as String? ?? '';
             final price = (product?['price'] as num? ?? 0).toDouble();
-            final qty = _items[i]['quantity'] as int? ?? 1;
+            final qty = items[i]['quantity'] as int? ?? 1;
             return TweenAnimationBuilder<double>(
               tween: Tween(begin: 0.0, end: 1.0),
               duration: Duration(milliseconds: 300 + (i * 80)),
@@ -513,7 +352,7 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
             children: [
               Text(context.t.tr('total_colon'),
                   style: appStyle(15, FontWeight.w600, const Color(0xFF111827))),
-              Text('${context.t.tr('egp')} ${_total.toStringAsFixed(0)}',
+              Text('${context.t.tr('egp')} ${cubit.total.toStringAsFixed(0)}',
                   style: appStyle(22, FontWeight.w700, AppColors.cta)),
             ],
           ),
@@ -522,11 +361,10 @@ class _CheckoutWebState extends State<CheckoutWeb> with SingleTickerProviderStat
     );
   }
 
-  Widget _paymentCard(int index, IconData icon, String title, String subtitle) {
-    final isSelected = _selectedMethod == index;
+  Widget _paymentCard(int index, IconData icon, String title, String subtitle, bool isSelected, VoidCallback onTap) {
     return HoverScale(
       scale: 1.01,
-      onTap: () => setState(() => _selectedMethod = index),
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(

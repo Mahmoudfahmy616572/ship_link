@@ -1,0 +1,78 @@
+// To parse this JSON data, do
+//
+//     final confirmCart = confirmCartFromJson(jsonString);
+
+import 'dart:convert';
+
+ConfirmCart confirmCartFromJson(String str) =>
+    ConfirmCart.fromJson(json.decode(str));
+
+String confirmCartToJson(ConfirmCart data) => json.encode(data.toJson());
+
+class ConfirmCart {
+  String? success;
+  Order? order;
+
+  ConfirmCart({
+    this.success,
+    this.order,
+  });
+
+  factory ConfirmCart.fromJson(Map<String, dynamic> json) => ConfirmCart(
+        success: json["success"],
+        order: json["order"] == null ? null : Order.fromJson(json["order"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "success": success,
+        "order": order?.toJson(),
+      };
+}
+
+class Order {
+  int? userId;
+  String? cartId;
+  int? totalPrice;
+  String? orderCode;
+  String? status;
+  DateTime? updatedAt;
+  DateTime? createdAt;
+  int? id;
+
+  Order({
+    this.userId,
+    this.cartId,
+    this.totalPrice,
+    this.orderCode,
+    this.status,
+    this.updatedAt,
+    this.createdAt,
+    this.id,
+  });
+
+  factory Order.fromJson(Map<String, dynamic> json) => Order(
+        userId: json["user_id"] is String ? int.tryParse(json["user_id"]) : (json["user_id"] as num?)?.toInt(),
+        cartId: json["cart_id"]?.toString(),
+        totalPrice: (json["total_price"] as num?)?.toInt(),
+        orderCode: json["order_code"],
+        status: json["status"],
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.tryParse(json["updated_at"]),
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.tryParse(json["created_at"]),
+        id: (json["id"] as num?)?.toInt(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "user_id": userId,
+        "cart_id": cartId,
+        "total_price": totalPrice,
+        "order_code": orderCode,
+        "status": status,
+        "updated_at": updatedAt?.toIso8601String(),
+        "created_at": createdAt?.toIso8601String(),
+        "id": id,
+      };
+}

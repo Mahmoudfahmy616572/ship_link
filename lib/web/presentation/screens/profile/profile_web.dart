@@ -6,13 +6,13 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/providers.dart';
-import 'package:ship_link/web/presentation/services/auth_service_web.dart';
+import 'package:ship_link/web/presentation/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/core/services/profile_image_service.dart';
 import 'package:ship_link/core/services/referral_service.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/screens/addresses/addresses_web.dart';
 import 'package:ship_link/web/presentation/screens/orders/orders_web.dart';
-import 'package:ship_link/web/presentation/screens/login/login_web.dart';
+import 'package:ship_link/web/presentation/screens/welcome/welcome_web.dart';
 import 'package:ship_link/web/presentation/screens/profile/edit_profile_web.dart';
 import 'package:ship_link/web/presentation/screens/settings/settings_web.dart';
 import 'package:ship_link/web/presentation/screens/security/security_web.dart';
@@ -38,9 +38,9 @@ class ProfileWeb extends StatelessWidget {
                 style: appStyle(16, FontWeight.w500, const Color(0xFF9CA3AF))),
             SizedBox(height: 16.h),
             HoverScale(
-              onTap: () => Navigator.pushNamed(context, LoginWeb.routName),
+              onTap: () => Navigator.pushNamed(context, WelcomeWeb.routName),
               child: ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, LoginWeb.routName),
+                onPressed: () => Navigator.pushNamed(context, WelcomeWeb.routName),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -718,7 +718,7 @@ class _LogoutButton extends StatelessWidget {
             ),
           );
           if (confirmed == true && context.mounted) {
-            await context.read<AuthServiceWeb>().signOut();
+            await context.read<AuthCubit>().signOut();
           }
         },
         style: OutlinedButton.styleFrom(
