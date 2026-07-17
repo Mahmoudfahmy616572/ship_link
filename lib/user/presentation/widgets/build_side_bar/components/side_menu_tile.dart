@@ -8,7 +8,6 @@ import 'package:ship_link/user/presentation/screens/MainScreen/main_screen.dart'
 import 'package:ship_link/user/presentation/screens/Profile/profile.dart';
 import 'package:ship_link/user/presentation/screens/favourite/favourite.dart';
 
-import 'package:ship_link/user/presentation/screens/chat/chat_screen.dart';
 import 'package:ship_link/core/widgets/notification_screen.dart';
 import 'package:ship_link/core/widgets/settings_screen.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
@@ -44,8 +43,15 @@ class SideMenuTitle extends StatelessWidget {
               height: 56.h,
               child: Container(
                 decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(10.r)),
+                  color: AppColors.primary.withAlpha(18),
+                  borderRadius: BorderRadius.circular(10.r),
+                  border: Border(
+                    left: BorderSide(
+                      color: AppColors.primary,
+                      width: 3,
+                    ),
+                  ),
+                ),
               ),
             ),
             ListTile(
@@ -56,12 +62,17 @@ class SideMenuTitle extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary.withAlpha(25),
                   borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.18),
+                    width: 1,
+                  ),
                 ),
                 child: menu.controller != null
                     ? RiveWidget(
                         controller: menu.controller!,
                       )
-                    : const SizedBox(),
+                    : Icon(Icons.circle_outlined,
+                        size: 18, color: AppColors.primary.withOpacity(0.5)),
               ),
               title: Text(context.t.tr(menu.title),
                   style: appStyle(18, FontWeight.normal, AppColors.textPrimary)),
