@@ -1,6 +1,11 @@
 class AppConfig {
-  static const String supabaseUrl = 'https://aqxiziqybgtvrdfhmmoc.supabase.co';
+  // Values are injected at build time via `--dart-define-from-file=.env`.
+  // The real values live in `.env` (gitignored) and are NEVER committed.
+  // `.env.example` documents the required keys.
+  static const String supabaseUrl =
+      String.fromEnvironment('SUPABASE_URL', defaultValue: '');
   static const String supabaseAnonKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxeGl6aXF5Ymd0dnJkZmhtbW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjI5MDUsImV4cCI6MjA5NzI5ODkwNX0.vohe0h4gzDZSRttscc6c2RXREIv6Nt7WawxSoavFG6w';
-  static const String googleMapsApiKey = 'AIzaSyDi2u6Qio7v1VaQxwgZDmxAdAsmINY51cs';
+      String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: '');
+  static const String googleMapsApiKey =
+      String.fromEnvironment('GOOGLE_MAPS_API_KEY', defaultValue: '');
 }
