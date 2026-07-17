@@ -24,21 +24,19 @@ class SideMenuTitle extends StatelessWidget {
   final bool isActive;
   @override
   Widget build(BuildContext context) {
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    final titleColor =
+        isActive ? AppColors.primary : AppColors.textPrimary;
+    final titleWeight = isActive ? FontWeight.w600 : FontWeight.normal;
     return Column(
       children: [
-        Padding(
-          padding: EdgeInsets.only(left: 24.w),
-          child: Divider(
-            height: 1,
-            color: AppColors.textPrimary.withOpacity(0.24),
-          ),
-        ),
         Stack(
           children: [
             AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
               width: isActive ? 288.w : 0,
-              left: 0,
+              left: isRtl ? null : 0,
+              right: isRtl ? 0 : null,
               curve: Curves.fastOutSlowIn,
               height: 56.h,
               child: Container(
@@ -46,38 +44,65 @@ class SideMenuTitle extends StatelessWidget {
                   color: AppColors.primary.withAlpha(18),
                   borderRadius: BorderRadius.circular(10.r),
                   border: Border(
-                    left: BorderSide(
-                      color: AppColors.primary,
-                      width: 3,
+                    left: isRtl
+                        ? BorderSide.none
+                        : BorderSide(
+                            color: AppColors.primary,
+                            width: 3,
+                          ),
+                    right: isRtl
+                        ? BorderSide(
+                            color: AppColors.primary,
+                            width: 3,
+                          )
+                        : BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            Material(
+              color: Colors.transparent,
+              child: ListTile(
+                contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
+                onTap: press,
+                leading: Container(
+                  width: 35.w,
+                  height: 35.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withAlpha(25),
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.18),
+                      width: 1,
                     ),
                   ),
+                  child: menu.controller != null
+                      ? RiveWidget(
+                          controller: menu.controller!,
+                        )
+                      : Icon(Icons.circle_outlined,
+                          size: 18, color: AppColors.primary.withOpacity(0.5)),
                 ),
-              ),
-            ),
-            ListTile(
-              onTap: press,
-              leading: Container(
-                width: 35.w,
-                height: 35.h,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withAlpha(25),
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(
-                    color: AppColors.primary.withOpacity(0.18),
-                    width: 1,
-                  ),
+                title: Text(context.t.tr(menu.title),
+                    style: appStyle(16, titleWeight, titleColor)),
+                trailing: Icon(
+                  isRtl ? Icons.chevron_left : Icons.chevron_right,
+                  size: 18,
+                  color: isActive
+                      ? AppColors.primary.withOpacity(0.7)
+                      : AppColors.textSecondary.withOpacity(0.5),
                 ),
-                child: menu.controller != null
-                    ? RiveWidget(
-                        controller: menu.controller!,
-                      )
-                    : Icon(Icons.circle_outlined,
-                        size: 18, color: AppColors.primary.withOpacity(0.5)),
+                visualDensity: VisualDensity.compact,
               ),
-              title: Text(context.t.tr(menu.title),
-                  style: appStyle(18, FontWeight.normal, AppColors.textPrimary)),
             ),
           ],
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 20.w, right: 20.w),
+          child: Divider(
+            height: 1,
+            color: AppColors.textPrimary.withOpacity(0.06),
+          ),
         ),
       ],
     );

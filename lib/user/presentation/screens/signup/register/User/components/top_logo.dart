@@ -14,7 +14,7 @@ class TopLogo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.asset("assets/images/signin Logo.png"),
+        Image.asset("assets/images/signin Logo.webp"),
         Text(
           text,
           style: appStyle(25, FontWeight.bold, Colors.black),

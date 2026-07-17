@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/localization.dart';
+import 'package:ship_link/core/services/cache_service.dart';
+import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/core/utils/validators.dart';
+import 'package:ship_link/core/widgets/auth_field.dart';
 import 'package:ship_link/core/widgets/snackBar/snack_bar.dart';
 import 'package:ship_link/user/presentation/cubits/auth/cubit/auth_cubit.dart';
-import 'package:ship_link/user/presentation/cubits/auth/cubit/auth_stat.dart';
-import 'package:ship_link/core/services/cache_service.dart';
-import 'package:ship_link/user/presentation/screens/location_picker/location_picker.dart';
 import 'package:ship_link/user/presentation/screens/login/login_screen.dart';
-import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/user/presentation/screens/location_picker/location_picker.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -27,6 +28,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _obscurePassword = ValueNotifier<bool>(true);
   final _obscureConfirm = ValueNotifier<bool>(true);
   final _agreeTerms = ValueNotifier<bool>(false);
+  final _nameFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _confirmFocus = FocusNode();
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -34,20 +40,74 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _obscurePassword.dispose();
+    _obscureConfirm.dispose();
+    _agreeTerms.dispose();
+    _nameFocus.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmFocus.dispose();
     super.dispose();
   }
 
   void _register() {
+    if (_submitting) return;
     if (!_formKey.currentState!.validate()) return;
     if (!_agreeTerms.value) {
       CustomSnackBar.info(context.t.tr('please_agree_terms'), context);
       return;
     }
+    setState(() => _submitting = true);
     AuthCubit.get(context).signUp(
       name: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
-      phone: '',
+    );
+  }
+
+  Widget _strengthMeter() {
+    return ListenableBuilder(
+      listenable: _passwordController,
+      builder: (context, _) {
+        final ctrl = _passwordController;
+        final score = Validators.strength(ctrl.text);
+        final color = switch (score) {
+          0 || 1 => AppColors.error,
+          2 || 3 => AppColors.pending,
+          _ => AppColors.success,
+        };
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.h),
+            Row(
+              children: List.generate(4, (i) {
+                return Expanded(
+                  child: Container(
+                    height: 4.h,
+                    margin: EdgeInsets.only(right: i < 3 ? 6.w : 0),
+                    decoration: BoxDecoration(
+                      color: i < score ? color : const Color(0xFFE5E7EB),
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            if (ctrl.text.isNotEmpty) ...[
+              SizedBox(height: 6.h),
+              Text(
+                '${context.t.tr('password_strength')}: ${Validators.strengthLabel(context, score)}',
+                style: GoogleFonts.inter(
+                  fontSize: 12.sp,
+                  color: color,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 
@@ -66,17 +126,20 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is Registersuccess && mounted) {
-            CredentialsService().save(_emailController.text.trim(), password: _passwordController.text.trim());
-            Navigator.pushReplacementNamed(
-                context, LocationPicker.routName);
+            setState(() => _submitting = false);
+            CredentialsService().save(_emailController.text.trim());
+            Navigator.pushReplacementNamed(context, LocationPicker.routName);
           } else if (state is Registerfaild && mounted) {
-            CustomSnackBar.error(state.message.isNotEmpty
-                ? state.message
-                : context.t.tr('registration_failed'), context);
+            setState(() => _submitting = false);
+            CustomSnackBar.error(
+                state.message.isNotEmpty
+                    ? state.message
+                    : context.t.tr('registration_failed'),
+                context);
           }
         },
         builder: (context, state) {
-          final isLoading = state is RegisterLoading;
+          final isLoading = state is RegisterLoading || _submitting;
           return SafeArea(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(24.w),
@@ -105,73 +168,82 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     SizedBox(height: 32.h),
                     _buildRegisterIllustration(),
                     SizedBox(height: 32.h),
-                    _buildField(
+                    AuthField(
                       controller: _nameController,
-                      hint: context.t.tr('full_name'),
-                      leading: Icons.person_outline,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return context.t.tr('name_required');
-                        }
-                        return null;
-                      },
+                      label: context.t.tr('full_name'),
+                      hint: context.t.tr('enter_full_name'),
+                      icon: Icons.person_outline,
+                      focusNode: _nameFocus,
+                      onSubmitted: (_) => _emailFocus.requestFocus(),
+                      validator: (v) => Validators.name(context, v),
                     ),
-                    SizedBox(height: 12.h),
-                    _buildField(
+                    SizedBox(height: 16.h),
+                    AuthField(
                       controller: _emailController,
-                      hint: context.t.tr('email'),
-                      leading: Icons.mail_outline,
+                      label: context.t.tr('email'),
+                      hint: context.t.tr('enter_email'),
+                      icon: Icons.mail_outline,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return context.t.tr('email_required');
-                        if (!RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$')
-                            .hasMatch(v)) {
-                          return context.t.tr('valid_email');
-                        }
-                        return null;
-                      },
+                      maxLength: 254,
+                      focusNode: _emailFocus,
+                      onSubmitted: (_) => _passwordFocus.requestFocus(),
+                      validator: (v) => Validators.email(context, v),
                     ),
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 16.h),
                     ValueListenableBuilder<bool>(
                       valueListenable: _obscurePassword,
                       builder: (context, obscure, _) {
-                        return _buildField(
-                          controller: _passwordController,
-                          hint: context.t.tr('password'),
-                          leading: Icons.lock_outline,
-                          obscure: obscure,
-                          trailing: IconButton(
-                            icon: Icon(
-                              obscure
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              color: const Color(0xFF9CA3AF),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AuthField(
+                              controller: _passwordController,
+                              label: context.t.tr('password'),
+                              hint: context.t.tr('enter_password'),
+                              icon: Icons.lock_outline,
+                              obscure: obscure,
+                              maxLength: 128,
+                              focusNode: _passwordFocus,
+                              onSubmitted: (_) => _confirmFocus.requestFocus(),
+                              suffix: IconButton(
+                                tooltip: obscure
+                                    ? context.t.tr('show_password')
+                                    : context.t.tr('hide_password'),
+                                icon: Icon(
+                                  obscure
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  color: const Color(0xFF9CA3AF),
+                                ),
+                                onPressed: () =>
+                                    _obscurePassword.value = !obscure,
+                              ),
+                              validator: (v) =>
+                                  Validators.password(context, v),
                             ),
-                            onPressed: () =>
-                                _obscurePassword.value = !obscure,
-                          ),
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return context.t.tr('password_required');
-                            }
-                            if (v.length < 6) {
-                              return context.t.tr('password_min_length');
-                            }
-                            return null;
-                          },
+                            _strengthMeter(),
+                          ],
                         );
                       },
                     ),
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 16.h),
                     ValueListenableBuilder<bool>(
                       valueListenable: _obscureConfirm,
                       builder: (context, obscure, _) {
-                        return _buildField(
+                        return AuthField(
                           controller: _confirmPasswordController,
-                          hint: context.t.tr('confirm_password'),
-                          leading: Icons.lock_outline,
+                          label: context.t.tr('confirm_password'),
+                          hint: context.t.tr('enter_confirm_password'),
+                          icon: Icons.lock_outline,
                           obscure: obscure,
-                          trailing: IconButton(
+                          maxLength: 128,
+                          focusNode: _confirmFocus,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => _register(),
+                          suffix: IconButton(
+                            tooltip: obscure
+                                ? context.t.tr('show_password')
+                                : context.t.tr('hide_password'),
                             icon: Icon(
                               obscure
                                   ? Icons.visibility_off_outlined
@@ -181,15 +253,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             onPressed: () =>
                                 _obscureConfirm.value = !obscure,
                           ),
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return context.t.tr('please_confirm_password');
-                            }
-                            if (v != _passwordController.text) {
-                              return context.t.tr('passwords_do_not_match');
-                            }
-                            return null;
-                          },
+                          validator: (v) => Validators.confirmPassword(
+                            context,
+                            v,
+                            _passwordController.text,
+                          ),
                         );
                       },
                     ),
@@ -215,11 +283,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             ),
                             SizedBox(width: 10.w),
                             Expanded(
-                              child: Text(
-                                context.t.tr('i_agree_terms'),
-                                style: GoogleFonts.inter(
-                                  fontSize: 14.sp,
-                                  color: const Color(0xFF6B7280),
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _agreeTerms.value = !agreeTerms,
+                                child: Text(
+                                  context.t.tr('i_agree_terms'),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14.sp,
+                                    color: const Color(0xFF6B7280),
+                                  ),
                                 ),
                               ),
                             ),
@@ -249,7 +321,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             ? SizedBox(
                                 width: 24.w,
                                 height: 24.h,
-                                child: CircularProgressIndicator(
+                                child: const CircularProgressIndicator(
                                   color: Colors.white,
                                   strokeWidth: 2.5,
                                 ),
@@ -305,61 +377,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         Icons.person_outline,
         size: 64,
         color: AppColors.primary,
-      ),
-    );
-  }
-
-  Widget _buildField({
-    required TextEditingController controller,
-    required String hint,
-    required IconData leading,
-    bool obscure = false,
-    Widget? trailing,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return SizedBox(
-      height: 56.h,
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscure,
-        keyboardType: keyboardType,
-        validator: validator,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        style: GoogleFonts.inter(
-          fontSize: 14.sp,
-          color: const Color(0xFF111827),
-        ),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: GoogleFonts.inter(
-            color: const Color(0xFF9CA3AF),
-            fontSize: 14.sp,
-          ),
-          prefixIcon: Icon(leading, color: const Color(0xFF9CA3AF)),
-          suffixIcon: trailing,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.r),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.r),
-            borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.r),
-            borderSide: const BorderSide(color: AppColors.cta),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.r),
-            borderSide: const BorderSide(color: AppColors.error),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16.r),
-            borderSide: const BorderSide(color: AppColors.error),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        ),
       ),
     );
   }
