@@ -28,7 +28,7 @@ class SignUp extends StatelessWidget {
                 const SizedBox(
                   height: 40,
                 ),
-                Image.asset("assets/images/signin Logo.png"),
+                Image.asset("assets/images/signin Logo.webp"),
                 Text(
                   context.t.tr('sign_up'),
                   style: appStyle(25, FontWeight.bold, Colors.black),

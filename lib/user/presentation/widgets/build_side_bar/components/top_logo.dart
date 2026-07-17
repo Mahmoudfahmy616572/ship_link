@@ -18,7 +18,7 @@ class TopLogo extends StatelessWidget {
         height: 96.h,
         alignment: Alignment.center,
         child: Image.asset(
-          "assets/images/signin Logo.png",
+          "assets/images/signin Logo.webp",
           height: 96.h,
           fit: BoxFit.contain,
         ),

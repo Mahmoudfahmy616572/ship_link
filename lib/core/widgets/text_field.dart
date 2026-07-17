@@ -28,7 +28,7 @@ class BuildTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       maxLength: maxLength,
-      maxLines: maxLines,
+      maxLines: obscureText ? 1 : maxLines,
       inputFormatters: inputFormatters,
       validator: validator,
       controller: controller,
