@@ -59,47 +59,78 @@ class _SideBarState extends State<SideBar> {
           body: Container(
             width: 288.w,
             height: double.infinity,
-            child: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    TopLogo(),
-                    SizedBox(height: 16.h),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: 24.w, bottom: 20.h),
-                          child: Text(
-                            context.t.tr('browse'),
-                            style:
-                                appStyle(20, FontWeight.normal, AppColors.textPrimary.withOpacity(0.7)),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 24.w),
-                          child: Divider(
-                            height: 1,
-                            color: AppColors.textPrimary.withOpacity(0.24),
-                          ),
-                        ),
-                        ...sideMenue.map((menu) => SideMenuTitle(
-                              menu: menu,
-                              press: () {
-                                menu.input?.value = true;
-                                Future.delayed(Duration(seconds: 1), () {
-                                  menu.input?.value = false;
-                                  selectedItem(context, menu.index);
-                                });
-                                _selectedMenuIndex.value = sideMenue.indexOf(menu);
-                              },
-                              isActive: sideMenue[selIdx] == menu,
-                            )),
-                      ],
-                    ),
-                  ],
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              border: Border(
+                right: BorderSide(
+                  color: AppColors.textPrimary.withOpacity(0.08),
+                  width: 1,
                 ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 16,
+                  offset: const Offset(4, 0),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          TopLogo(),
+                          Padding(
+                            padding:
+                                EdgeInsets.only(left: 24.w, top: 8.h, bottom: 20.h),
+                            child: Text(
+                              context.t.tr('browse').toUpperCase(),
+                              style: appStyle(12, FontWeight.w600,
+                                  AppColors.textPrimary.withOpacity(0.45)),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 24.w),
+                            child: Divider(
+                              height: 1,
+                              color: AppColors.textPrimary.withOpacity(0.24),
+                            ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ...sideMenue.map((menu) => SideMenuTitle(
+                                    menu: menu,
+                                    press: () {
+                                      menu.input?.value = true;
+                                      Future.delayed(Duration(seconds: 1), () {
+                                        menu.input?.value = false;
+                                        selectedItem(context, menu.index);
+                                      });
+                                      _selectedMenuIndex.value = sideMenue.indexOf(menu);
+                                    },
+                                    isActive: sideMenue[selIdx] == menu,
+                                  )),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                    child: Text(
+                      context.t.tr('developed_by'),
+                      style: appStyle(13, FontWeight.normal,
+                          AppColors.textPrimary.withOpacity(0.4)),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
