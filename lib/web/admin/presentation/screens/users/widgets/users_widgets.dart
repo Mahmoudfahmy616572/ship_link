@@ -26,7 +26,8 @@ class UserRoleBadge extends StatelessWidget {
 // جدول المستخدمين
 class UsersTable extends StatelessWidget {
   final List<Map<String, dynamic>> users;
-  const UsersTable(this.users, {super.key});
+  final void Function(Map<String, dynamic> user)? onOpen;
+  const UsersTable(this.users, {super.key, this.onOpen});
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +46,16 @@ class UsersTable extends StatelessWidget {
           rows: users.map((u) {
             final name = u['name']?.toString() ?? '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}'.trim();
             final joined = u['created_at']?.toString().substring(0, 10) ?? '—';
-            return DataRow(cells: [
-              DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
-              DataCell(Text(u['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-              DataCell(Text(u['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-              DataCell(UserRoleBadge(u['role']?.toString() ?? 'user')),
-              DataCell(Text(joined, style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-            ]);
+            return DataRow(
+              onSelectChanged: (_) => onOpen?.call(u),
+              cells: [
+                DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
+                DataCell(Text(u['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(Text(u['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(UserRoleBadge(u['role']?.toString() ?? 'user')),
+                DataCell(Text(joined, style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+              ],
+            );
           }).toList(),
         ),
       ),
