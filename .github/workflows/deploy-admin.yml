@@ -31,6 +31,14 @@ jobs:
           channel: stable
       - name: Install dependencies
         run: flutter pub get
+      - name: Debug secret presence
+        run: |
+          echo "SUPABASE_URL length: ${#SUPABASE_URL}"
+          echo "SUPABASE_ANON_KEY length: ${#SUPABASE_ANON_KEY}"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
       - name: Build admin web
         run: flutter build web --target lib/web/main_web.dart --release --base-href /ship_link/admin/ --no-wasm-dry-run --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}" --dart-define=GOOGLE_MAPS_API_KEY="${{ secrets.GOOGLE_MAPS_API_KEY }}"
       # نضمن إن كل الـ links تتبع /ship_link/admin/ (نصلح الـ manifest reference)
