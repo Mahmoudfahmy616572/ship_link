@@ -1,0 +1,45 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ship_link/web/admin/domain/repositories/admin_repository.dart';
+import 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_state.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
+
+export 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_state.dart';
+
+class AdminAuthCubit extends Cubit<AdminAuthState> {
+  AdminAuthCubit(this._repository) : super(AdminAuthInitial());
+
+  final AdminRepository _repository;
+
+  static AdminAuthCubit get(context) => BlocProvider.of<AdminAuthCubit>(context);
+
+  Future<void> signIn({required String email, required String password}) async {
+    emit(AdminAuthLoading());
+    final result = await _repository.signIn(email: email, password: password);
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminAuthFailure(failure.errMessage));
+      },
+      (admin) {
+        if (!isClosed) emit(AdminAuthSuccess(admin));
+      },
+    );
+  }
+
+  Future<void> signOut() async {
+    emit(AdminAuthLoading());
+    final result = await _repository.signOut();
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminAuthFailure(failure.errMessage));
+      },
+      (_) {
+        if (!isClosed) emit(AdminSignedOut());
+      },
+    );
+  }
+
+  bool isAdminLoggedIn() {
+    final user = Supabase.instance.client.auth.currentUser;
+    return user != null && state is AdminAuthSuccess;
+  }
+}

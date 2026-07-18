@@ -1,0 +1,49 @@
+name: Deploy Admin Dashboard to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/web/admin/**'
+      - 'lib/web/main_web.dart'
+      - 'lib/web/routs_web.dart'
+      - 'lib/web/data/services_locators.dart'
+      - 'lib/core/**'
+      - '.github/workflows/deploy-admin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-admin
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build admin web
+        run: flutter build web --target lib/web/main_web.dart --release --base-href /ship_link/admin/ --no-wasm-dry-run
+
+      - name: Download existing gh-pages
+        run: |
+          git clone --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-tmp
+          mkdir -p gh-pages-tmp/ship_link/admin
+          rm -rf gh-pages-tmp/ship_link/admin/*
+          cp -r build/web/* gh-pages-tmp/ship_link/admin/
+
+      - name: Commit and push
+        run: |
+          cd gh-pages-tmp
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy admin dashboard" || echo "No changes"
+          git push origin gh-pages

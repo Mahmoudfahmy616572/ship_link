@@ -41,7 +41,9 @@ supabase/.temp/
 
 # Environment files
 .env
+.env.local
 .env.*
+!.env.example
 
 # Local Gradle properties (may contain keys)
 local.properties
@@ -63,3 +65,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Gradle caches (machine-specific, never commit)
+**/.gradle/
+**/buildOutputCleanup/
+patched/**/.gradle/
+
+# Android build reports
+android/build/reports/

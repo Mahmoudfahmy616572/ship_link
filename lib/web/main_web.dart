@@ -1,3 +1,4 @@
+import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,7 +8,6 @@ import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/providers.dart';
 import 'package:ship_link/web/routs_web.dart';
-import 'package:ship_link/web/presentation/layout/web_scaffold.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/data/services_locators.dart';
 import 'package:ship_link/web/presentation/screens/splash/splash_web.dart';
@@ -28,6 +28,12 @@ import 'package:ship_link/web/presentation/cubits/search/search_cubit.dart';
 import 'package:ship_link/web/presentation/cubits/address/address_cubit.dart';
 import 'package:ship_link/web/presentation/cubits/profileEdit/profile_edit_cubit.dart';
 import 'package:ship_link/web/presentation/cubits/checkout/checkout_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/dashboard/admin_dashboard_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
+import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -77,6 +83,11 @@ class WebApp extends StatelessWidget {
           BlocProvider<AddressCubit>(create: (_) => getIt<AddressCubit>()),
           BlocProvider<ProfileEditCubit>(create: (_) => getIt<ProfileEditCubit>()),
           BlocProvider<CheckoutCubit>(create: (_) => getIt<CheckoutCubit>()),
+          BlocProvider<AdminAuthCubit>(create: (_) => getIt<AdminAuthCubit>()),
+          BlocProvider<AdminDashboardCubit>(create: (_) => getIt<AdminDashboardCubit>()),
+          BlocProvider<AdminUsersCubit>(create: (_) => getIt<AdminUsersCubit>()),
+          BlocProvider<AdminDriversCubit>(create: (_) => getIt<AdminDriversCubit>()),
+          BlocProvider<AdminOrdersCubit>(create: (_) => getIt<AdminOrdersCubit>()),
         ],
         child: Consumer<LocaleProvider>(
           builder: (context, localeProvider, _) {
@@ -88,7 +99,10 @@ class WebApp extends StatelessWidget {
                 return child ?? const SizedBox.shrink();
               },
               onGenerateRoute: onGenerateWebRoute,
-              initialRoute: SplashWeb.routName,
+              // لو المسار فيه admin نفتح لوجين الأدمن مباشرة، غير كده السبلاش العادي
+              initialRoute: (html.window.location.pathname ?? '').contains('admin')
+                  ? AdminLoginWeb.routName
+                  : SplashWeb.routName,
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
                 brightness: Brightness.light,
