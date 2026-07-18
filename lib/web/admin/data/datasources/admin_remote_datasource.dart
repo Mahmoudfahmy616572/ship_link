@@ -139,11 +139,16 @@ class AdminRemoteDataSource {
     int limit = 50,
     int offset = 0,
     String? status,
+    String? search,
   }) async {
     final base = _supabase
         .from('orders')
         .select('id, user_id, driver_id, total_price, status, created_at');
-    final filtered = status != null ? base.eq('status', status) : base;
+    var filtered = status != null ? base.eq('status', status) : base;
+    if (search != null && search.isNotEmpty) {
+      // ندور على رقم الأوردر أو الـ user_id
+      filtered = filtered.or('id.eq.$search,user_id.eq.$search');
+    }
     final ordered = filtered.order('created_at', ascending: false).range(offset, offset + limit - 1);
     return await ordered;
   }
