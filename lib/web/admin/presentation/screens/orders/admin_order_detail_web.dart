@@ -10,7 +10,9 @@ import 'package:ship_link/web/admin/presentation/screens/orders/widgets/orders_w
 // شاشة تفاصيل الطلب (المنتجات + تغيير الحالة)
 class AdminOrderDetailWeb extends StatelessWidget {
   final int orderId;
-  const AdminOrderDetailWeb({super.key, required this.orderId});
+  final VoidCallback? onBack;
+  final void Function(int orderId)? onOpenDetail;
+  const AdminOrderDetailWeb({super.key, required this.orderId, this.onBack, this.onOpenDetail});
 
   static const _statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
@@ -45,7 +47,7 @@ class AdminOrderDetailWeb extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => onBack?.call(),
                   ),
                   SizedBox(width: 8.w),
                   Text('${t.tr('order_details')} #$orderId', style: appStyle(20, FontWeight.w700, AppColors.textPrimary)),

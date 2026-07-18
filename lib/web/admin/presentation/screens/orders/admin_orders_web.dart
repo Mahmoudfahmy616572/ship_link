@@ -7,46 +7,78 @@ import 'package:ship_link/web/admin/presentation/screens/orders/widgets/orders_w
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
 
 // شاشة قائمة الطلبات
-class AdminOrdersWeb extends StatelessWidget {
-  const AdminOrdersWeb({super.key});
+class AdminOrdersWeb extends StatefulWidget {
+  final void Function(int orderId)? onOpenDetail;
+  const AdminOrdersWeb({super.key, this.onOpenDetail});
+
+  @override
+  State<AdminOrdersWeb> createState() => _AdminOrdersWebState();
+}
+
+class _AdminOrdersWebState extends State<AdminOrdersWeb> {
+  // بنحتفظ بالـ orders في متغير عشان لما نرجع من تفاصيل الأوردر
+  // منضطرش نعتمد على الـ state اللي ممكن يكون لسه AdminOrderDetailLoaded
+  List<Map<String, dynamic>> _orders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // نتأكد إن الأوردرز متحملين أول ما الشاشة تفتح
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.read<AdminOrdersCubit>().state is! AdminOrdersLoaded) {
+        context.read<AdminOrdersCubit>().loadOrders();
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // لو رجعنا من شاشة تفاصيل الأوردر (الـ state لسه AdminOrderDetailLoaded)
+    // نعيد تحميل القائمة عشان نرجع لـ AdminOrdersLoaded
+    final st = context.read<AdminOrdersCubit>().state;
+    if (st is AdminOrderDetailLoaded && _orders.isEmpty) {
+      context.read<AdminOrdersCubit>().loadOrders();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AdminOrdersCubit, dynamic>(
-      builder: (context, state) {
-        if (state is AdminOrdersInitial) {
-          context.read<AdminOrdersCubit>().loadOrders();
-          return const Center(child: CircularProgressIndicator());
+    return BlocListener<AdminOrdersCubit, dynamic>(
+      listener: (context, state) {
+        if (state is AdminOrdersLoaded) {
+          setState(() => _orders = state.orders);
         }
-        if (state is AdminOrdersLoading) {
-          return const OrdersTableShimmer();
-        }
-        if (state is AdminOrdersError) {
-          return OrdersErrorView(state.message, () => context.read<AdminOrdersCubit>().loadOrders());
-        }
-        // لو جت حالة تفاصيل، هنعرض الشاشة في حالة التحميل أو العرض
-        final orders = (state is AdminOrdersLoaded) ? state.orders : <Map<String, dynamic>>[];
-
-        return SingleChildScrollView(
-          padding: EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AdminSectionTitle('Orders'),
-              SizedBox(height: 16.h),
-              OrdersTable(
-                orders,
-                onOpenDetail: (o) => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => AdminOrderDetailWeb(orderId: o['id'] as int),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
       },
+      child: BlocBuilder<AdminOrdersCubit, dynamic>(
+        builder: (context, state) {
+          if (state is AdminOrdersInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is AdminOrdersLoading && _orders.isEmpty) {
+            return const OrdersTableShimmer();
+          }
+          if (state is AdminOrdersError && _orders.isEmpty) {
+            return OrdersErrorView(state.message, () => context.read<AdminOrdersCubit>().loadOrders());
+          }
+          final orders = _orders;
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const AdminSectionTitle('Orders'),
+                SizedBox(height: 16.h),
+                OrdersTable(
+                  orders,
+                  onOpenDetail: (o) => widget.onOpenDetail?.call(o['id'] as int),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
