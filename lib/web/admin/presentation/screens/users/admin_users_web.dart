@@ -55,7 +55,7 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
                 ),
               ),
               SizedBox(height: 16.h),
-              UsersTable(users, onOpen: widget.onOpen),
+              UsersTable(users, isCompact: MediaQuery.of(context).size.width <= 900, onOpen: widget.onOpen),
             ],
           ),
         );

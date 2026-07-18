@@ -73,6 +73,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
               SizedBox(height: 16.h),
               DriversTable(
                 drivers,
+                isCompact: MediaQuery.of(context).size.width <= 900,
                 onOpen: widget.onOpen,
                 onActivate: (d) async {
                   final confirmed = await AdminConfirmDialog.show(
