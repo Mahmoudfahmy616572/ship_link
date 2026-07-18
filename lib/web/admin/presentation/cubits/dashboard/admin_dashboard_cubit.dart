@@ -11,9 +11,9 @@ class AdminDashboardCubit extends Cubit<AdminDashboardState> {
 
   static AdminDashboardCubit get(context) => BlocProvider.of<AdminDashboardCubit>(context);
 
-  Future<void> loadStats() async {
+  Future<void> loadStats({String period = 'all'}) async {
     if (!isClosed) emit(AdminDashboardLoading());
-    final result = await _repository.getDashboardStats();
+    final result = await _repository.getDashboardStats(period: period);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminDashboardError(failure.errMessage));

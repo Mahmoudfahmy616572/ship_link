@@ -8,7 +8,7 @@ abstract class AdminRepository {
   });
   Future<Either<Failure, void>> signOut();
   Future<Either<Failure, Map<String, dynamic>?>> checkSession();
-  Future<Either<Failure, Map<String, dynamic>>> getDashboardStats();
+  Future<Either<Failure, Map<String, dynamic>>> getDashboardStats({String period = 'all'});
   Future<Either<Failure, List<Map<String, dynamic>>>> getUsers({int limit, int offset});
   Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit, int offset});
   Future<Either<Failure, void>> updateDriver({required String id, Map<String, dynamic> fields});

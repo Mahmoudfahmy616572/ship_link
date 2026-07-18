@@ -42,9 +42,9 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> getDashboardStats() async {
+  Future<Either<Failure, Map<String, dynamic>>> getDashboardStats({String period = 'all'}) async {
     try {
-      final stats = await _dataSource.getDashboardStats();
+      final stats = await _dataSource.getDashboardStats(period: period);
       return right(stats);
     } catch (e) {
       return left(ServerFailure(e.toString()));
