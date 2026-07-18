@@ -32,6 +32,16 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
+  Future<Either<Failure, Map<String, dynamic>?>> checkSession() async {
+    try {
+      final admin = await _dataSource.checkSession();
+      return right(admin);
+    } catch (e) {
+      return left(ServerFailure(e.toString().replaceFirst('Exception: ', '')));
+    }
+  }
+
+  @override
   Future<Either<Failure, Map<String, dynamic>>> getDashboardStats() async {
     try {
       final stats = await _dataSource.getDashboardStats();

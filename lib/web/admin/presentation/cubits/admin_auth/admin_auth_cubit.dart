@@ -38,6 +38,25 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
     );
   }
 
+  // بنتأكد لو فيه أدمن متسجل قبل كده ونرجعه عشان ندخله اللوحة على طول
+  Future<void> checkSession() async {
+    final result = await _repository.checkSession();
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminAuthInitial());
+      },
+      (admin) {
+        if (!isClosed) {
+          if (admin != null) {
+            emit(AdminAuthRestored(admin));
+          } else {
+            emit(AdminAuthInitial());
+          }
+        }
+      },
+    );
+  }
+
   bool isAdminLoggedIn() {
     final user = Supabase.instance.client.auth.currentUser;
     return user != null && state is AdminAuthSuccess;

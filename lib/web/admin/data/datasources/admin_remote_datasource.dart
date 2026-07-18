@@ -31,6 +31,22 @@ class AdminRemoteDataSource {
     await _supabase.auth.signOut();
   }
 
+  // بنتأكد لو فيه أدمن محفوظ في الـ session ونرجع بياناته من غير ما يدخل باسورد تاني
+  Future<Map<String, dynamic>?> checkSession() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return null;
+    final admin = await _supabase
+        .from('admins')
+        .select('id, email, full_name, role, is_active')
+        .eq('id', user.id)
+        .maybeSingle();
+    if (admin == null || admin['is_active'] != true) {
+      await _supabase.auth.signOut();
+      return null;
+    }
+    return admin;
+  }
+
   Future<Map<String, dynamic>> getDashboardStats() async {
     // بنجيب عدد الصفوف لكل جدول (من غير limit عشان نعرف العدد الكلي)
     final r1 = await _supabase.from('profiles').select('id');

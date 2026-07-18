@@ -52,7 +52,9 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
         }
         final admin = (AdminAuthCubit.get(context).state is AdminAuthSuccess)
             ? (AdminAuthCubit.get(context).state as AdminAuthSuccess).admin
-            : <String, dynamic>{};
+            : (AdminAuthCubit.get(context).state is AdminAuthRestored)
+                ? (AdminAuthCubit.get(context).state as AdminAuthRestored).admin
+                : <String, dynamic>{};
         final navItems = _nav.map((e) => NavItem(e.$1, t.tr(e.$2))).toList();
         final titles = [t.tr('dashboard'), t.tr('users'), t.tr('drivers'), t.tr('orders')];
 
