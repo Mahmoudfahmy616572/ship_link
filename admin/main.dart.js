@@ -131977,7 +131977,7 @@ var $async$p8=A.o(function(c,d){if(c===1)return A.p(d,r)
 for(;;)switch(s){case 0:p=$.bU().b
 p===$&&A.b()
 s=3
-return A.l(p.bd("profiles").dD(0,"id, email, name, first_name, last_name, phone_number, role, created_at").kq(0,"created_at",!1).Xz(b,b+a-1),$async$p8)
+return A.l(p.bd("profiles").dD(0,"id, email, name, phone_number, role, created_at").kq(0,"created_at",!1).Xz(b,b+a-1),$async$p8)
 case 3:q=d
 s=1
 break
