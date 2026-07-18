@@ -37618,7 +37618,7 @@ s=q}for(;;)switch(s){case 0:if($.aq==null)A.aYs()
 $.aq.toString
 q=3
 s=6
-return A.l(A.aUx("",""),$async$bi1)
+return A.l(A.aUx("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxeGl6aXF5Ymd0dnJkZmhtbW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjI5MDUsImV4cCI6MjA5NzI5ODkwNX0.vohe0h4gzDZSRttscc6c2RXREIv6Nt7WawxSoavFG6w","https://aqxiziqybgtvrdfhmmoc.supabase.co"),$async$bi1)
 case 6:q=1
 s=5
 break
