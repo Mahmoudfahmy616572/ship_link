@@ -52,9 +52,9 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
-  Future<Either<Failure, List<Map<String, dynamic>>>> getUsers({int limit = 50, int offset = 0}) async {
+  Future<Either<Failure, List<Map<String, dynamic>>>> getUsers({int limit = 50, int offset = 0, String? search}) async {
     try {
-      final data = await _dataSource.getUsers(limit: limit, offset: offset);
+      final data = await _dataSource.getUsers(limit: limit, offset: offset, search: search);
       return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));
@@ -62,9 +62,9 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
-  Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit = 50, int offset = 0}) async {
+  Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit = 50, int offset = 0, String? search}) async {
     try {
-      final data = await _dataSource.getDrivers(limit: limit, offset: offset);
+      final data = await _dataSource.getDrivers(limit: limit, offset: offset, search: search);
       return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));

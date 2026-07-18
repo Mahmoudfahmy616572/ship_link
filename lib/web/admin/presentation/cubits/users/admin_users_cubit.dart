@@ -11,9 +11,9 @@ class AdminUsersCubit extends Cubit<AdminUsersState> {
 
   static AdminUsersCubit get(context) => BlocProvider.of<AdminUsersCubit>(context);
 
-  Future<void> loadUsers({int limit = 50, int offset = 0}) async {
+  Future<void> loadUsers({int limit = 50, int offset = 0, String? search}) async {
     if (!isClosed) emit(AdminUsersLoading());
-    final result = await _repository.getUsers(limit: limit, offset: offset);
+    final result = await _repository.getUsers(limit: limit, offset: offset, search: search);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminUsersError(failure.errMessage));
