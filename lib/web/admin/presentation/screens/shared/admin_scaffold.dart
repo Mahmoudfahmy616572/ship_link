@@ -21,7 +21,9 @@ class AdminScaffoldWeb extends StatefulWidget {
 }
 
 class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
-  int _selected = 0;
+  // بنتتبع تاريخ الشاشات عشان زرار الـ back يرجع للشاشة اللي قبلها جوه الأدمن
+  final List<int> _history = [0];
+  int get _selected => _history.last;
 
   // عناصر التنقل في السايد بار
   static const _nav = [
@@ -39,44 +41,64 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     AdminOrdersWeb(),
   ];
 
+  // لما نختار شاشة من السايد بار، نضيفها فوق التاريخ
+  void _select(int i) {
+    if (_history.last == i) return;
+    setState(() => _history.add(i));
+  }
+
+  // دي بتتعامل مع زرار الـ back بتاع المتصفح
+  Future<bool> _onWillPop() async {
+    // لو لسه فيه شاشات قبل كده، نرجع لـ واحدة قبلها
+    if (_history.length > 1) {
+      setState(() => _history.removeLast());
+      return false; // منعنا الخروج من الأبلكيشن
+    }
+    // لو إحنا في أول شاشة (الـ Home)، منمنع الخروج للوجين/اليوزر أب
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isWide = MediaQuery.of(context).size.width > 900;
     final t = context.t;
 
-    return BlocBuilder<AdminAuthCubit, dynamic>(
-      builder: (context, state) {
-        // لو مش مسجل دخول أدمن، حوله على صفحة اللوجين
-        // (من غير ما نحوّل وهو لسه بيتأكد من الـ session المحفوظ)
-        if (state is AdminAuthFailure || state is AdminSignedOut || state is AdminAuthInitial) {
-          return const _AdminLoginRedirect();
-        }
-        // وهو بيفحص السيشن نسيب اللوحة ظاهرة (أو نحط مؤشر تحميل)
-        if (state is AdminAuthChecking) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
-        final admin = (AdminAuthCubit.get(context).state is AdminAuthSuccess)
-            ? (AdminAuthCubit.get(context).state as AdminAuthSuccess).admin
-            : (AdminAuthCubit.get(context).state is AdminAuthRestored)
-                ? (AdminAuthCubit.get(context).state as AdminAuthRestored).admin
-                : <String, dynamic>{};
-        final navItems = _nav.map((e) => NavItem(e.$1, t.tr(e.$2))).toList();
-        final titles = [t.tr('dashboard'), t.tr('users'), t.tr('drivers'), t.tr('orders')];
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: BlocBuilder<AdminAuthCubit, dynamic>(
+        builder: (context, state) {
+          // لو مش مسجل دخول أدمن، حوله على صفحة اللوجين
+          // (من غير ما نحوّل وهو لسه بيتأكد من الـ session المحفوظ)
+          if (state is AdminAuthFailure || state is AdminSignedOut || state is AdminAuthInitial) {
+            return const _AdminLoginRedirect();
+          }
+          // وهو بيفحص السيشن نسيب اللوحة ظاهرة (أو نحط مؤشر تحميل)
+          if (state is AdminAuthChecking) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          final admin = (AdminAuthCubit.get(context).state is AdminAuthSuccess)
+              ? (AdminAuthCubit.get(context).state as AdminAuthSuccess).admin
+              : (AdminAuthCubit.get(context).state is AdminAuthRestored)
+                  ? (AdminAuthCubit.get(context).state as AdminAuthRestored).admin
+                  : <String, dynamic>{};
+          final navItems = _nav.map((e) => NavItem(e.$1, t.tr(e.$2))).toList();
+          final titles = [t.tr('dashboard'), t.tr('users'), t.tr('drivers'), t.tr('orders')];
 
-        return isWide
-            ? Row(
-                children: [
-                  AdminSideNav(
-                    selectedIndex: _selected,
-                    items: navItems,
-                    onTap: (i) => setState(() => _selected = i),
-                    userName: admin['full_name']?.toString() ?? admin['email']?.toString() ?? '',
-                  ),
-                  Expanded(child: _buildBody(titles)),
-                ],
-              )
-            : _buildNarrow(navItems, titles);
-      },
+          return isWide
+              ? Row(
+                  children: [
+                    AdminSideNav(
+                      selectedIndex: _selected,
+                      items: navItems,
+                      onTap: _select,
+                      userName: admin['full_name']?.toString() ?? admin['email']?.toString() ?? '',
+                    ),
+                    Expanded(child: _buildBody(titles)),
+                  ],
+                )
+              : _buildNarrow(navItems, titles);
+        },
+      ),
     );
   }
 
@@ -103,7 +125,7 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selected,
-        onTap: (i) => setState(() => _selected = i),
+        onTap: _select,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: const Color(0xFF9CA3AF),
         type: BottomNavigationBarType.fixed,
