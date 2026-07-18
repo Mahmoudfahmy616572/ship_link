@@ -12,6 +12,8 @@ on:
       - '.github/workflows/deploy-admin.yml'
   workflow_dispatch:
 
+  # نعيد البناء عشان نقرأ الـ repository secrets (SUPABASE_URL/ANON_KEY/MAPS)
+
 permissions:
   contents: write
 
