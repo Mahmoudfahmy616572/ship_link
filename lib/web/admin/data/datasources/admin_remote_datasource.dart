@@ -109,23 +109,31 @@ class AdminRemoteDataSource {
   Future<List<Map<String, dynamic>>> getUsers({
     int limit = 50,
     int offset = 0,
+    String? search,
   }) async {
-    return await _supabase
+    final base = _supabase
         .from('profiles')
-        .select('id, email, name, phone_number, role, created_at')
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1);
+        .select('id, email, name, phone_number, role, created_at');
+    var filtered = base;
+    if (search != null && search.isNotEmpty) {
+      filtered = filtered.or('email.ilike.%$search%,name.ilike.%$search%,phone_number.ilike.%$search%');
+    }
+    return await filtered.order('created_at', ascending: false).range(offset, offset + limit - 1);
   }
 
   Future<List<Map<String, dynamic>>> getDrivers({
     int limit = 50,
     int offset = 0,
+    String? search,
   }) async {
-    return await _supabase
+    final base = _supabase
         .from('drivers')
-        .select('id, email, name, phone_number, vehicle_type, vehicle_number, state, created_at')
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1);
+        .select('id, email, name, phone_number, vehicle_type, vehicle_number, state, created_at');
+    var filtered = base;
+    if (search != null && search.isNotEmpty) {
+      filtered = filtered.or('email.ilike.%$search%,name.ilike.%$search%,phone_number.ilike.%$search%');
+    }
+    return await filtered.order('created_at', ascending: false).range(offset, offset + limit - 1);
   }
 
   Future<void> updateDriver({

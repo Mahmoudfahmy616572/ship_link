@@ -11,9 +11,9 @@ class AdminDriversCubit extends Cubit<AdminDriversState> {
 
   static AdminDriversCubit get(context) => BlocProvider.of<AdminDriversCubit>(context);
 
-  Future<void> loadDrivers({int limit = 50, int offset = 0}) async {
+  Future<void> loadDrivers({int limit = 50, int offset = 0, String? search}) async {
     if (!isClosed) emit(AdminDriversLoading());
-    final result = await _repository.getDrivers(limit: limit, offset: offset);
+    final result = await _repository.getDrivers(limit: limit, offset: offset, search: search);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminDriversError(failure.errMessage));
