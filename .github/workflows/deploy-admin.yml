@@ -17,10 +17,10 @@ permissions:
 
 concurrency:
   group: pages-admin
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,20 +30,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Build admin web
-        run: flutter build web --target lib/web/main_web.dart --release --base-href /admin/ --no-wasm-dry-run
-
-      - name: Download existing gh-pages
-        run: |
-          git clone --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages-tmp
-          mkdir -p gh-pages-tmp/admin
-          rm -rf gh-pages-tmp/admin/*
-          cp -r build/web/* gh-pages-tmp/admin/
-
-      - name: Commit and push
-        run: |
-          cd gh-pages-tmp
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Deploy admin dashboard" || echo "No changes"
-          git push origin gh-pages
+        run: flutter build web --target lib/web/main_web.dart --release --base-href /ship_link/admin/ --no-wasm-dry-run
+      - name: Deploy to gh-pages under /ship_link/admin
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          destination_dir: ship_link/admin
