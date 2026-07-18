@@ -27,11 +27,50 @@ class UserRoleBadge extends StatelessWidget {
 class UsersTable extends StatelessWidget {
   final List<Map<String, dynamic>> users;
   final void Function(Map<String, dynamic> user)? onOpen;
-  const UsersTable(this.users, {super.key, this.onOpen});
+  final bool isCompact;
+  const UsersTable(this.users, {super.key, this.onOpen, this.isCompact = false});
 
   @override
   Widget build(BuildContext context) {
     final t = context.t;
+    if (isCompact) {
+      return Column(
+        children: users.map((u) {
+          final name = u['name']?.toString() ?? '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}'.trim();
+          final joined = u['created_at']?.toString().substring(0, 10) ?? '—';
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: InkWell(
+              onTap: () => onOpen?.call(u),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: Text(name.isEmpty ? '—' : name, style: appStyle(15, FontWeight.w700, AppColors.textPrimary))),
+                      UserRoleBadge(u['role']?.toString() ?? 'user'),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(u['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  const SizedBox(height: 2),
+                  Text('${t.tr('phone_number')}: ${u['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  const SizedBox(height: 2),
+                  Text('${t.tr('joined')}: $joined', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      );
+    }
     final columns = [t.tr('name'), t.tr('email'), t.tr('phone_number'), t.tr('role'), t.tr('joined')];
     return Container(
       decoration: BoxDecoration(

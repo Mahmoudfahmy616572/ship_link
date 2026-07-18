@@ -35,11 +35,59 @@ class OrderStatusChip extends StatelessWidget {
 class OrdersTable extends StatelessWidget {
   final List<Map<String, dynamic>> orders;
   final void Function(Map<String, dynamic> order) onOpenDetail;
-  const OrdersTable(this.orders, {super.key, required this.onOpenDetail});
+  final bool isCompact;
+  const OrdersTable(this.orders, {super.key, required this.onOpenDetail, this.isCompact = false});
 
   @override
   Widget build(BuildContext context) {
     final t = context.t;
+    if (isCompact) {
+      return Column(
+        children: orders.map((o) {
+          final total = (o['total_price'] is num ? (o['total_price'] as num).toDouble() : 0.0);
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: InkWell(
+              onTap: () => onOpenDetail(o),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('#${o['id']}', style: appStyle(15, FontWeight.w700, AppColors.textPrimary)),
+                      OrderStatusChip(o['status']?.toString() ?? 'unknown'),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text('${t.tr('customer')}: ${o['user_id']?.toString().substring(0, 8) ?? '—'}',
+                      style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('${total.toStringAsFixed(0)} EGP', style: appStyle(14, FontWeight.w600, AppColors.textPrimary)),
+                      TextButton.icon(
+                        onPressed: () => onOpenDetail(o),
+                        icon: const Icon(Icons.visibility_outlined, size: 16),
+                        label: Text(t.tr('details')),
+                        style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      );
+    }
     final columns = [t.tr('order_no'), t.tr('customer'), t.tr('total'), t.tr('status'), t.tr('details')];
     return Container(
       decoration: BoxDecoration(

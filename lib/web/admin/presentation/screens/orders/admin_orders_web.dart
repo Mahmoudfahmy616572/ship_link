@@ -121,6 +121,7 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
                 SizedBox(height: 16.h),
                 OrdersTable(
                   orders,
+                  isCompact: MediaQuery.of(context).size.width <= 900,
                   onOpenDetail: (o) {
                     final id = o['id'];
                     final intId = id is int ? id : (id is String ? int.tryParse(id) : null);

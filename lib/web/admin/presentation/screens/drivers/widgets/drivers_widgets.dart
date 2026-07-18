@@ -28,11 +28,65 @@ class DriversTable extends StatelessWidget {
   final List<Map<String, dynamic>> drivers;
   final void Function(Map<String, dynamic> driver)? onActivate;
   final void Function(Map<String, dynamic> driver)? onOpen;
-  const DriversTable(this.drivers, {super.key, this.onActivate, this.onOpen});
+  final bool isCompact;
+  const DriversTable(this.drivers, {super.key, this.onActivate, this.onOpen, this.isCompact = false});
 
   @override
   Widget build(BuildContext context) {
     final t = context.t;
+    if (isCompact) {
+      return Column(
+        children: drivers.map((d) {
+          final name = d['name']?.toString() ?? '—';
+          final hasVehicle = d['vehicle_number']?.toString().isNotEmpty == true;
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: InkWell(
+              onTap: () => onOpen?.call(d),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: Text(name, style: appStyle(15, FontWeight.w700, AppColors.textPrimary))),
+                      DriverStateBadge(d['state']?.toString()),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(d['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  const SizedBox(height: 2),
+                  Text('${t.tr('phone_number')}: ${d['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  if (hasVehicle) ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => onActivate?.call(d),
+                        icon: const Icon(Icons.check_circle_outline, size: 16),
+                        label: Text(t.tr('activate')),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.success,
+                          side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ),
+                  ] else
+                    Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      );
+    }
     final columns = [t.tr('name'), t.tr('email'), t.tr('phone_number'), t.tr('vehicle_type'), t.tr('state'), t.tr('actions')];
     return Container(
       decoration: BoxDecoration(
