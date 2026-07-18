@@ -113,14 +113,3 @@ class DriversTableShimmer extends StatelessWidget {
     );
   }
 }
-
-// سنackbar نجاح التحديث
-void showDriverUpdateSnackbar(BuildContext context, String name) {
-  final t = context.t;
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('${t.tr('driver_activated')} : $name'),
-      backgroundColor: AppColors.success,
-    ),
-  );
-}

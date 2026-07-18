@@ -13,6 +13,7 @@ import 'package:ship_link/web/admin/presentation/screens/drivers/admin_drivers_w
 import 'package:ship_link/web/admin/presentation/screens/drivers/admin_driver_detail_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_orders_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 
 // ده الـ shell بتاع الأدمن، جواه السايد بار والـ body بيتغير حسب الشاشة المختارة
 class AdminScaffoldWeb extends StatefulWidget {
@@ -272,9 +273,16 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
         IconButton(
           icon: const Icon(Icons.logout),
           tooltip: 'Sign out',
-          onPressed: () {
-            context.read<AdminAuthCubit>().signOut();
-            Navigator.pushReplacementNamed(context, AdminLoginWeb.routName);
+          onPressed: () async {
+            final confirmed = await AdminConfirmDialog.show(
+              context,
+              title: context.t.tr('sign_out_title'),
+              message: context.t.tr('sign_out_confirm'),
+            );
+            if (confirmed) {
+              context.read<AdminAuthCubit>().signOut();
+              Navigator.pushReplacementNamed(context, AdminLoginWeb.routName);
+            }
           },
         ),
       ],

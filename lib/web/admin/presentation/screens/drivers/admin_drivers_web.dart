@@ -5,6 +5,7 @@ import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 import 'package:ship_link/web/admin/presentation/screens/drivers/widgets/drivers_widgets.dart';
 
 // شاشة إدارة السائقين (عرض + تفعيل السائق اللي معاه عربية)
@@ -30,13 +31,11 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
                   .drivers
                   .firstWhere((x) => x['id'] == state.id, orElse: () => <String, dynamic>{})
               : <String, dynamic>{};
-          showDriverUpdateSnackbar(context, d['name']?.toString() ?? '');
+          AdminToast.success(context, '${context.t.tr('driver_activated')} : ${d['name']?.toString() ?? ''}');
           // نعيد تحميل القائمة عشان تتحدث
           context.read<AdminDriversCubit>().loadDrivers(search: _search.isEmpty ? null : _search);
         } else if (state is AdminDriversError && state.message.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: AppColors.error),
-          );
+          AdminToast.error(context, state.message);
         }
       },
       builder: (context, state) {
@@ -75,12 +74,19 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
               DriversTable(
                 drivers,
                 onOpen: widget.onOpen,
-                onActivate: (d) {
-                  // نفعل السائق عن طريق تحديث حالة المركبة
-                  context.read<AdminDriversCubit>().updateDriver(
-                    id: d['id'].toString(),
-                    fields: {'state': d['state']?.toString() ?? 'active'},
+                onActivate: (d) async {
+                  final confirmed = await AdminConfirmDialog.show(
+                    context,
+                    title: context.t.tr('activate_driver_title'),
+                    message: context.t.tr('activate_driver_confirm'),
                   );
+                  if (confirmed) {
+                    // نفعل السائق عن طريق تحديث حالة المركبة
+                    context.read<AdminDriversCubit>().updateDriver(
+                      id: d['id'].toString(),
+                      fields: {'state': d['state']?.toString() ?? 'active'},
+                    );
+                  }
                 },
               ),
             ],
