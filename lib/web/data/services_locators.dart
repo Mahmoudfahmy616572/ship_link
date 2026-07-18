@@ -29,6 +29,14 @@ import 'package:ship_link/web/presentation/cubits/address/address_cubit.dart';
 import 'package:ship_link/web/presentation/cubits/profileEdit/profile_edit_cubit.dart';
 import 'package:ship_link/web/presentation/cubits/checkout/checkout_cubit.dart';
 
+import 'package:ship_link/web/admin/domain/repositories/admin_repository.dart';
+import 'package:ship_link/web/admin/data/repositories/admin_repository_impl.dart';
+import 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/dashboard/admin_dashboard_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
+
 final getIt = GetIt.instance;
 void setupWebServiceLocator() {
   getIt.registerSingleton<HomeRepository>(HomeRepositoryImpl());
@@ -54,4 +62,11 @@ void setupWebServiceLocator() {
   getIt.registerSingleton<AddressCubit>(AddressCubit());
   getIt.registerSingleton<ProfileEditCubit>(ProfileEditCubit());
   getIt.registerSingleton<CheckoutCubit>(CheckoutCubit());
+
+  getIt.registerSingleton<AdminRepository>(AdminRepositoryImpl());
+  getIt.registerSingleton<AdminAuthCubit>(AdminAuthCubit(getIt<AdminRepository>()));
+  getIt.registerFactory<AdminDashboardCubit>(() => AdminDashboardCubit(getIt<AdminRepository>()));
+  getIt.registerFactory<AdminUsersCubit>(() => AdminUsersCubit(getIt<AdminRepository>()));
+  getIt.registerFactory<AdminDriversCubit>(() => AdminDriversCubit(getIt<AdminRepository>()));
+  getIt.registerFactory<AdminOrdersCubit>(() => AdminOrdersCubit(getIt<AdminRepository>()));
 }

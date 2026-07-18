@@ -27,6 +27,8 @@ import 'package:ship_link/web/presentation/screens/chat/chat_list_web.dart';
 import 'package:ship_link/web/presentation/screens/chat/order_chat_web.dart';
 import 'package:ship_link/web/presentation/screens/chat/support_chat_web.dart';
 import 'package:ship_link/web/presentation/screens/tracking/tracking_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_scaffold.dart';
 
 class WebPageRoute extends PageRouteBuilder {
   final Widget page;
@@ -95,5 +97,7 @@ Route<dynamic> onGenerateWebRoute(RouteSettings settings) {
       orderId: args['orderId'] as int?,
     ));
   }
+  if (name == AdminLoginWeb.routName) return WebPageRoute(page: const AdminLoginWeb());
+  if (name == AdminScaffoldWeb.routName) return WebPageRoute(page: const AdminScaffoldWeb());
   return WebPageRoute(page: const NotFoundWeb());
 }
