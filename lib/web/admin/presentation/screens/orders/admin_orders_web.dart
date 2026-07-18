@@ -4,6 +4,7 @@ import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/widgets/orders_widgets.dart';
+import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
 
 // شاشة قائمة الطلبات
 class AdminOrdersWeb extends StatelessWidget {
@@ -35,7 +36,12 @@ class AdminOrdersWeb extends StatelessWidget {
               SizedBox(height: 16.h),
               OrdersTable(
                 orders,
-                onOpenDetail: (o) => context.read<AdminOrdersCubit>().loadOrderItems(o['id'] as int),
+                onOpenDetail: (o) => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AdminOrderDetailWeb(orderId: o['id'] as int),
+                  ),
+                ),
               ),
             ],
           ),

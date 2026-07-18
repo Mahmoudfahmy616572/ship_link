@@ -22,5 +22,6 @@ class AdminOrderUpdateSuccess extends AdminOrdersState {
 class AdminOrderDetailLoaded extends AdminOrdersState {
   final int orderId;
   final List<Map<String, dynamic>> items;
-  AdminOrderDetailLoaded(this.orderId, this.items);
+  final Map<String, dynamic>? order;
+  AdminOrderDetailLoaded(this.orderId, this.items, {this.order});
 }

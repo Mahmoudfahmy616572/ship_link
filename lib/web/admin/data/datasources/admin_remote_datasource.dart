@@ -139,4 +139,13 @@ class AdminRemoteDataSource {
         .select('id, product_id, quantity, products(name, price)')
         .eq('order_id', orderId);
   }
+
+  // بنجيب بيانات الأوردر نفسه (رقم، عميل، مجموع، حالة)
+  Future<Map<String, dynamic>?> getOrderById(int id) async {
+    return await _supabase
+        .from('orders')
+        .select('id, user_id, driver_id, total_price, status, created_at, customer_name, phone_number, delivery_address')
+        .eq('id', id)
+        .maybeSingle();
+  }
 }
