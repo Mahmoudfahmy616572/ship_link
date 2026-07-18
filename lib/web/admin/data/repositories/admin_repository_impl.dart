@@ -110,4 +110,14 @@ class AdminRepositoryImpl extends AdminRepository {
       return left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>?>> getOrderById(int id) async {
+    try {
+      final data = await _dataSource.getOrderById(id);
+      return right(data);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
 }

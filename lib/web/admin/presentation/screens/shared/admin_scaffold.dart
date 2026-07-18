@@ -48,14 +48,12 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
   }
 
   // دي بتتعامل مع زرار الـ back بتاع المتصفح
-  Future<bool> _onWillPop() async {
+  void _onPop() {
     // لو لسه فيه شاشات قبل كده، نرجع لـ واحدة قبلها
     if (_history.length > 1) {
       setState(() => _history.removeLast());
-      return false; // منعنا الخروج من الأبلكيشن
     }
     // لو إحنا في أول شاشة (الـ Home)، منمنع الخروج للوجين/اليوزر أب
-    return false;
   }
 
   @override
@@ -63,8 +61,12 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     final isWide = MediaQuery.of(context).size.width > 900;
     final t = context.t;
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        _onPop();
+      },
       child: BlocBuilder<AdminAuthCubit, dynamic>(
         builder: (context, state) {
           // لو مش مسجل دخول أدمن، حوله على صفحة اللوجين

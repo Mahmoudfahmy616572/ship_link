@@ -74,6 +74,53 @@ class OrdersTable extends StatelessWidget {
   }
 }
 
+// هيدر بيانات الأوردر (رقم، عميل، مجموع، حالة) في شاشة التفاصيل
+class OrderHeader extends StatelessWidget {
+  final Map<String, dynamic> order;
+  const OrderHeader({required this.order});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final total = (order['total_price'] is num ? (order['total_price'] as num).toDouble() : 0.0);
+    final customer = order['customer_name']?.toString() ?? order['user_id']?.toString().substring(0, 8) ?? '—';
+    final status = order['status']?.toString() ?? 'unknown';
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.tr('customer'), style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
+              SizedBox(height: 4.h),
+              Text(customer, style: appStyle(15, FontWeight.w600, AppColors.textPrimary)),
+            ]),
+          ),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.tr('total'), style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
+              SizedBox(height: 4.h),
+              Text('${total.toStringAsFixed(0)} EGP', style: appStyle(15, FontWeight.w600, AppColors.textPrimary)),
+            ]),
+          ),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.tr('status'), style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
+              SizedBox(height: 4.h),
+              OrderStatusChip(status),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // قائمة منتجات الطلب في شاشة التفاصيل
 class OrderItemsList extends StatelessWidget {
   final List<Map<String, dynamic>> items;

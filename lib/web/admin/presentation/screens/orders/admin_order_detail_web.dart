@@ -16,16 +16,16 @@ class AdminOrderDetailWeb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // لما الشاشة تفتح، نتأكد إن تفاصيل الطلب ده متحملين
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.read<AdminOrdersCubit>().state is! AdminOrderDetailLoaded) {
+        context.read<AdminOrdersCubit>().loadOrderItems(orderId);
+      }
+    });
+
     final t = context.t;
     return BlocBuilder<AdminOrdersCubit, dynamic>(
       builder: (context, state) {
-        if (state is AdminOrdersInitial || state is AdminOrdersError || (state is! AdminOrderDetailLoaded)) {
-          // لو لسه ما اتحملش تفاصيل الطلب ده، نحمله
-          if (state is AdminOrdersInitial || state is AdminOrdersError ||
-              (state is AdminOrderDetailLoaded && state.orderId != orderId)) {
-            context.read<AdminOrdersCubit>().loadOrderItems(orderId);
-          }
-        }
         if (state is AdminOrdersLoading) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -45,13 +45,18 @@ class AdminOrderDetailWeb extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => context.read<AdminOrdersCubit>().loadOrders(),
+                    onPressed: () => Navigator.pop(context),
                   ),
                   SizedBox(width: 8.w),
                   Text('${t.tr('order_details')} #$orderId', style: appStyle(20, FontWeight.w700, AppColors.textPrimary)),
                 ],
               ),
               SizedBox(height: 20.h),
+              // بيانات الأوردر الأساسية (رقم، عميل، مجموع، حالة)
+              if (state is AdminOrderDetailLoaded && state.order != null)
+                OrderHeader(order: state.order!),
+              if (state is AdminOrderDetailLoaded && state.order != null)
+                SizedBox(height: 20.h),
               // قائمة المنتجات
               OrderItemsList(items),
               SizedBox(height: 24.h),

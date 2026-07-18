@@ -38,13 +38,19 @@ class AdminOrdersCubit extends Cubit<AdminOrdersState> {
 
   Future<void> loadOrderItems(int orderId) async {
     if (!isClosed) emit(AdminOrdersLoading());
-    final result = await _repository.getOrderItems(orderId);
-    result.fold(
+    final itemsResult = await _repository.getOrderItems(orderId);
+    final orderResult = await _repository.getOrderById(orderId);
+    Map<String, dynamic>? order;
+    orderResult.fold(
+      (_) => order = null,
+      (o) => order = o,
+    );
+    itemsResult.fold(
       (failure) {
         if (!isClosed) emit(AdminOrdersError(failure.errMessage));
       },
       (items) {
-        if (!isClosed) emit(AdminOrderDetailLoaded(orderId, items));
+        if (!isClosed) emit(AdminOrderDetailLoaded(orderId, items, order: order));
       },
     );
   }
