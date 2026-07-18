@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
@@ -49,9 +50,9 @@ class OrdersTable extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
             ),
             child: InkWell(
               onTap: () => onOpenDetail(o),
@@ -61,18 +62,18 @@ class OrdersTable extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('#${o['id']}', style: appStyle(15, FontWeight.w700, AppColors.textPrimary)),
+                      Text('#${o['id']}', style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
                       OrderStatusChip(o['status']?.toString() ?? 'unknown'),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text('${t.tr('customer')}: ${o['user_id']?.toString().substring(0, 8) ?? '—'}',
-                      style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                      style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${total.toStringAsFixed(0)} EGP', style: appStyle(14, FontWeight.w600, AppColors.textPrimary)),
+                      Text('${total.toStringAsFixed(0)} EGP', style: appStyle(14, FontWeight.w600, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
                       TextButton.icon(
                         onPressed: () => onOpenDetail(o),
                         icon: const Icon(Icons.visibility_outlined, size: 16),
@@ -91,20 +92,20 @@ class OrdersTable extends StatelessWidget {
     final columns = [t.tr('order_no'), t.tr('customer'), t.tr('total'), t.tr('status'), t.tr('details')];
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AppColors.textSecondary)))).toList(),
+          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
           rows: orders.map((o) {
             final total = (o['total_price'] is num ? (o['total_price'] as num).toDouble() : 0.0);
             return DataRow(cells: [
-              DataCell(Text('#${o['id']}', style: appStyle(14, FontWeight.w600, AppColors.textPrimary))),
-              DataCell(Text(o['user_id']?.toString().substring(0, 8) ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-              DataCell(Text('${total.toStringAsFixed(0)} EGP', style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
+              DataCell(Text('#${o['id']}', style: appStyle(14, FontWeight.w600, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+              DataCell(Text(o['user_id']?.toString().substring(0, 8) ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
+              DataCell(Text('${total.toStringAsFixed(0)} EGP', style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
               DataCell(OrderStatusChip(o['status']?.toString() ?? 'unknown')),
               DataCell(
                 TextButton.icon(
@@ -136,29 +137,29 @@ class OrderHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
       ),
       child: Row(
         children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(t.tr('customer'), style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
+              Text(t.tr('customer'), style: appStyle(12, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
               SizedBox(height: 4.h),
-              Text(customer, style: appStyle(15, FontWeight.w600, AppColors.textPrimary)),
+              Text(customer, style: appStyle(15, FontWeight.w600, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
             ]),
           ),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(t.tr('total'), style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
+              Text(t.tr('total'), style: appStyle(12, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
               SizedBox(height: 4.h),
-              Text('${total.toStringAsFixed(0)} EGP', style: appStyle(15, FontWeight.w600, AppColors.textPrimary)),
+              Text('${total.toStringAsFixed(0)} EGP', style: appStyle(15, FontWeight.w600, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
             ]),
           ),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(t.tr('status'), style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
+              Text(t.tr('status'), style: appStyle(12, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
               SizedBox(height: 4.h),
               OrderStatusChip(status),
             ]),
@@ -178,13 +179,13 @@ class OrderItemsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.t;
     if (items.isEmpty) {
-      return Text(t.tr('no_results'), style: appStyle(14, FontWeight.w400, AppColors.textSecondary));
+      return Text(t.tr('no_results'), style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)));
     }
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
       ),
       child: Column(
         children: items.map((it) {
@@ -193,9 +194,9 @@ class OrderItemsList extends StatelessWidget {
           final price = (product['price'] is num ? (product['price'] as num).toDouble() : 0.0);
           final qty = it['quantity'] is int ? it['quantity'] as int : 1;
           return ListTile(
-            title: Text(name, style: appStyle(14, FontWeight.w500, AppColors.textPrimary)),
-            subtitle: Text('${price.toStringAsFixed(0)} EGP', style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
-            trailing: Text('x$qty', style: appStyle(14, FontWeight.w600, AppColors.textPrimary)),
+            title: Text(name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
+            subtitle: Text('${price.toStringAsFixed(0)} EGP', style: appStyle(12, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
+            trailing: Text('x$qty', style: appStyle(14, FontWeight.w600, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
           );
         }).toList(),
       ),

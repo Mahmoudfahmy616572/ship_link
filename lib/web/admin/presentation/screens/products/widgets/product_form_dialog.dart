@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
@@ -128,7 +129,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                 const SizedBox(height: 12),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(t.tr('on_offer'), style: appStyle(14, FontWeight.w500, AppColors.textPrimary)),
+                  title: Text(t.tr('on_offer'), style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
                   value: _isOffer,
                   onChanged: (v) => setState(() => _isOffer = v ?? false),
                 ),
@@ -143,7 +144,7 @@ class _ProductFormDialogState extends State<ProductFormDialog> {
                   ),
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(t.tr('top_seller'), style: appStyle(14, FontWeight.w500, AppColors.textPrimary)),
+                  title: Text(t.tr('top_seller'), style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
                   value: _isTopSeller,
                   onChanged: (v) => setState(() => _isTopSeller = v ?? false),
                 ),

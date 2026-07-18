@@ -6,6 +6,7 @@ import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
 import 'package:ship_link/web/admin/presentation/screens/drivers/widgets/drivers_widgets.dart';
 
 // شاشة إدارة السائقين (عرض + تفعيل السائق اللي معاه عربية)
@@ -71,10 +72,13 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
                 ),
               ),
               SizedBox(height: 16.h),
-              DriversTable(
-                drivers,
-                isCompact: MediaQuery.of(context).size.width <= 900,
-                onOpen: widget.onOpen,
+              if (drivers.isEmpty)
+                AdminEmptyState(icon: Icons.local_shipping_outlined, message: t.tr('no_drivers'), onRetry: () => context.read<AdminDriversCubit>().loadDrivers(search: _search.isEmpty ? null : _search))
+              else
+                DriversTable(
+                  drivers,
+                  isCompact: MediaQuery.of(context).size.width <= 900,
+                  onOpen: widget.onOpen,
                 onActivate: (d) async {
                   final confirmed = await AdminConfirmDialog.show(
                     context,

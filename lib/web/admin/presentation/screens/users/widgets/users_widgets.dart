@@ -5,6 +5,7 @@ import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 
 // البادج بتاع نوع المستخدم (user / driver / admin)
 class UserRoleBadge extends StatelessWidget {
@@ -14,7 +15,7 @@ class UserRoleBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isAdmin = role == 'admin' || role == 'driver';
-    final color = role == 'driver' ? AppColors.cta : (isAdmin ? AppColors.primary : AppColors.textSecondary);
+    final color = role == 'driver' ? AppColors.cta : (isAdmin ? AppColors.primary : AdminThemeMode.textSecondary(AdminThemeMode.isDark.value));
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
@@ -42,9 +43,9 @@ class UsersTable extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
             ),
             child: InkWell(
               onTap: () => onOpen?.call(u),
@@ -54,16 +55,16 @@ class UsersTable extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(child: Text(name.isEmpty ? '—' : name, style: appStyle(15, FontWeight.w700, AppColors.textPrimary))),
+                      Expanded(child: Text(name.isEmpty ? '—' : name, style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
                       UserRoleBadge(u['role']?.toString() ?? 'user'),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(u['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  Text(u['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                   const SizedBox(height: 2),
-                  Text('${t.tr('phone_number')}: ${u['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  Text('${t.tr('phone_number')}: ${u['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                   const SizedBox(height: 2),
-                  Text('${t.tr('joined')}: $joined', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  Text('${t.tr('joined')}: $joined', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                 ],
               ),
             ),
@@ -74,25 +75,25 @@ class UsersTable extends StatelessWidget {
     final columns = [t.tr('name'), t.tr('email'), t.tr('phone_number'), t.tr('role'), t.tr('joined')];
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AppColors.textSecondary)))).toList(),
+          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
           rows: users.map((u) {
             final name = u['name']?.toString() ?? '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}'.trim();
             final joined = u['created_at']?.toString().substring(0, 10) ?? '—';
             return DataRow(
               onSelectChanged: (_) => onOpen?.call(u),
               cells: [
-                DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
-                DataCell(Text(u['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-                DataCell(Text(u['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(u['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(u['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(UserRoleBadge(u['role']?.toString() ?? 'user')),
-                DataCell(Text(joined, style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(Text(joined, style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
               ],
             );
           }).toList(),
