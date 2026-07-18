@@ -132010,7 +132010,7 @@ var $async$p6=A.o(function(c,d){if(c===1)return A.p(d,r)
 for(;;)switch(s){case 0:p=$.bU().b
 p===$&&A.b()
 s=3
-return A.l(p.bd("orders").dD(0,"id, user_id, driver_id, total_price, order_code, status, created_at").kq(0,"created_at",!1).Xz(b,b+a-1),$async$p6)
+return A.l(p.bd("orders").dD(0,"id, user_id, driver_id, total_price, status, created_at").kq(0,"created_at",!1).Xz(b,b+a-1),$async$p6)
 case 3:q=d
 s=1
 break
