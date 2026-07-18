@@ -47,33 +47,51 @@ class AdminRemoteDataSource {
     return admin;
   }
 
-  Future<Map<String, dynamic>> getDashboardStats() async {
+  Future<Map<String, dynamic>> getDashboardStats({String period = 'all'}) async {
     // بنجيب عدد الصفوف لكل جدول (من غير limit عشان نعرف العدد الكلي)
     final r1 = await _supabase.from('profiles').select('id');
     final r2 = await _supabase.from('drivers').select('id');
-    final r3 = await _supabase.from('orders').select('id');
     final r4 = await _supabase.from('products').select('id');
     final users = r1.length;
     final drivers = r2.length;
-    final orders = r3.length;
     final products = r4.length;
+
+    // نحسب بداية الفترة حسب المدة المختارة
+    DateTime from = DateTime(2000);
+    if (period == 'daily') {
+      from = DateTime.now().subtract(const Duration(days: 1));
+    } else if (period == 'weekly') {
+      from = DateTime.now().subtract(const Duration(days: 7));
+    } else if (period == 'monthly') {
+      from = DateTime.now().subtract(const Duration(days: 30));
+    }
+    final fromIso = from.toIso8601String();
 
     final ordersData = await _supabase
         .from('orders')
-        .select('total_price, status')
-        .eq('status', 'delivered');
+        .select('id, total_price, status, created_at')
+        .gte('created_at', fromIso);
+    final orders = ordersData.length;
     double revenue = 0;
-    for (final o in ordersData) {
-      revenue += (o['total_price'] is num ? (o['total_price'] as num).toDouble() : 0);
-    }
-
-    final statusData = await _supabase
-        .from('orders')
-        .select('status');
     final Map<String, int> statusCounts = {};
-    for (final o in statusData) {
+    for (final o in ordersData) {
+      if (o['status'] == 'delivered' && o['total_price'] is num) {
+        revenue += (o['total_price'] as num).toDouble();
+      }
       final s = o['status'] as String? ?? 'unknown';
       statusCounts[s] = (statusCounts[s] ?? 0) + 1;
+    }
+
+    // اتجاه الطلبات: عدد الطلبات لكل يوم في آخر 7 أيام
+    final trendData = await _supabase
+        .from('orders')
+        .select('created_at')
+        .gte('created_at', DateTime.now().subtract(const Duration(days: 7)).toIso8601String())
+        .order('created_at', ascending: true);
+    final Map<String, int> trend = {};
+    for (final o in trendData) {
+      final d = (o['created_at']?.toString() ?? '').substring(0, 10);
+      if (d.isNotEmpty) trend[d] = (trend[d] ?? 0) + 1;
     }
 
     return {
@@ -83,6 +101,8 @@ class AdminRemoteDataSource {
       'products': products,
       'revenue': revenue,
       'statusCounts': statusCounts,
+      'trend': trend,
+      'period': period,
     };
   }
 
