@@ -13,6 +13,7 @@ import 'package:ship_link/web/admin/presentation/screens/drivers/admin_drivers_w
 import 'package:ship_link/web/admin/presentation/screens/drivers/admin_driver_detail_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_orders_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/products/admin_products_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 
 // ده الـ shell بتاع الأدمن، جواه السايد بار والـ body بيتغير حسب الشاشة المختارة
@@ -42,6 +43,7 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     (Icons.people_alt_rounded, 'users'),
     (Icons.local_shipping_rounded, 'drivers'),
     (Icons.receipt_long_rounded, 'orders'),
+    (Icons.inventory_2_rounded, 'products'),
   ];
 
   // الشاشات الأربعة بتوع اللوحة
@@ -50,6 +52,7 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     AdminUsersWeb(),
     AdminDriversWeb(),
     AdminOrdersWeb(),
+    AdminProductsWeb(),
   ];
 
   // لما نختار شاشة من السايد بار، نضيفها فوق التاريخ
@@ -146,7 +149,7 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                   ? (AdminAuthCubit.get(context).state as AdminAuthRestored).admin
                   : <String, dynamic>{};
           final navItems = _nav.map((e) => NavItem(e.$1, t.tr(e.$2))).toList();
-          final titles = [t.tr('dashboard'), t.tr('users'), t.tr('drivers'), t.tr('orders')];
+          final titles = [t.tr('dashboard'), t.tr('users'), t.tr('drivers'), t.tr('orders'), t.tr('products')];
 
           return isWide
               ? Row(

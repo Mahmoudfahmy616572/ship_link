@@ -16,4 +16,10 @@ abstract class AdminRepository {
   Future<Either<Failure, void>> updateOrderStatus({required int id, required String status});
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrderItems(int orderId);
   Future<Either<Failure, Map<String, dynamic>?>> getOrderById(int id);
+
+  // المنتجات - CRUD للأدمن
+  Future<Either<Failure, List<Map<String, dynamic>>>> getProducts({int limit, int offset, String? search});
+  Future<Either<Failure, Map<String, dynamic>>> createProduct(Map<String, dynamic> data);
+  Future<Either<Failure, void>> updateProduct({required int id, required Map<String, dynamic> data});
+  Future<Either<Failure, void>> deleteProduct(int id);
 }

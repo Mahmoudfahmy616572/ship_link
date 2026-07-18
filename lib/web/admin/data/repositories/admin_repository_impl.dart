@@ -120,4 +120,44 @@ class AdminRepositoryImpl extends AdminRepository {
       return left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Map<String, dynamic>>>> getProducts({int limit = 50, int offset = 0, String? search}) async {
+    try {
+      final data = await _dataSource.getProducts(limit: limit, offset: offset, search: search);
+      return right(data);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> createProduct(Map<String, dynamic> data) async {
+    try {
+      final created = await _dataSource.createProduct(data);
+      return right(created);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateProduct({required int id, required Map<String, dynamic> data}) async {
+    try {
+      await _dataSource.updateProduct(id: id, data: data);
+      return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteProduct(int id) async {
+    try {
+      await _dataSource.deleteProduct(id);
+      return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
 }
