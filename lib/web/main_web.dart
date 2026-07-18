@@ -43,12 +43,21 @@ void main() async {
     await Supabase.initialize(
       url: AppConfig.supabaseUrl,
       publishableKey: AppConfig.supabaseAnonKey,
+      authOptions: const FlutterAuthClientOptions(
+        persistSession: true,
+      ),
     );
   } catch (e) {
     debugPrint('Supabase init error: $e');
   }
 
   setupWebServiceLocator();
+
+  // لو دخل على مسار الأدمن، نتأكد من الـ session المحفوظ قبل ما الصفحات تفتح
+  final adminCubit = getIt<AdminAuthCubit>();
+  if ((html.window.location.pathname ?? '').contains('admin')) {
+    adminCubit.checkSession();
+  }
 
   runApp(const WebApp());
 }

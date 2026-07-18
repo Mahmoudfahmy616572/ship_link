@@ -1,5 +1,8 @@
 abstract class AdminAuthState {}
 
+// حالة بتدل إننا لسه بنتأكد من الـ session المحفوظ (ممنوع نحوّل للوجين فيها)
+class AdminAuthChecking extends AdminAuthState {}
+
 class AdminAuthInitial extends AdminAuthState {}
 
 class AdminAuthLoading extends AdminAuthState {}

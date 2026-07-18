@@ -14,10 +14,6 @@ class AdminLoginWeb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // أول ما الصفحة تفتح نتأكد لو فيه أدمن متسجل قبل كده (عشان ندخله على طول)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      AdminAuthCubit.get(context).checkSession();
-    });
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();

@@ -47,8 +47,13 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     return BlocBuilder<AdminAuthCubit, dynamic>(
       builder: (context, state) {
         // لو مش مسجل دخول أدمن، حوله على صفحة اللوجين
+        // (من غير ما نحوّل وهو لسه بيتأكد من الـ session المحفوظ)
         if (state is AdminAuthFailure || state is AdminSignedOut || state is AdminAuthInitial) {
           return const _AdminLoginRedirect();
+        }
+        // وهو بيفحص السيشن نسيب اللوحة ظاهرة (أو نحط مؤشر تحميل)
+        if (state is AdminAuthChecking) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         final admin = (AdminAuthCubit.get(context).state is AdminAuthSuccess)
             ? (AdminAuthCubit.get(context).state as AdminAuthSuccess).admin

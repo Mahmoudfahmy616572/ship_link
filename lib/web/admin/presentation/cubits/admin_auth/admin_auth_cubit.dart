@@ -40,6 +40,7 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
 
   // بنتأكد لو فيه أدمن متسجل قبل كده ونرجعه عشان ندخله اللوحة على طول
   Future<void> checkSession() async {
+    emit(AdminAuthChecking());
     final result = await _repository.checkSession();
     result.fold(
       (failure) {
