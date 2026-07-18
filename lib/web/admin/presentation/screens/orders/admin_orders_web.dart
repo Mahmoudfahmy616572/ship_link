@@ -23,6 +23,7 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
   // منضطرش نعتمد على الـ state اللي ممكن يكون لسه AdminOrderDetailLoaded
   List<Map<String, dynamic>> _orders = [];
   String? _activeStatus;
+  String _search = '';
 
   // الـ status المتاحة للفلترة
   static const _statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
@@ -45,13 +46,18 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
     // نعيد تحميل القائمة عشان نرجع لـ AdminOrdersLoaded
     final st = context.read<AdminOrdersCubit>().state;
     if (st is AdminOrderDetailLoaded && _orders.isEmpty) {
-      context.read<AdminOrdersCubit>().loadOrders(status: _activeStatus);
+      context.read<AdminOrdersCubit>().loadOrders(status: _activeStatus, search: _search.isEmpty ? null : _search);
     }
   }
 
   void _filter(String? status) {
     setState(() => _activeStatus = status);
-    context.read<AdminOrdersCubit>().loadOrders(status: status);
+    context.read<AdminOrdersCubit>().loadOrders(status: status, search: _search.isEmpty ? null : _search);
+  }
+
+  void _onSearch(String v) {
+    _search = v;
+    context.read<AdminOrdersCubit>().loadOrders(status: _activeStatus, search: v.isEmpty ? null : v);
   }
 
   @override
@@ -82,6 +88,17 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const AdminSectionTitle('Orders'),
+                SizedBox(height: 16.h),
+                // شريط البحث
+                TextField(
+                  onChanged: _onSearch,
+                  decoration: InputDecoration(
+                    hintText: t.tr('search_orders'),
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                  ),
+                ),
                 SizedBox(height: 16.h),
                 // فلترة حسب الحالة (الـ chips قابلة للضغط)
                 Wrap(
