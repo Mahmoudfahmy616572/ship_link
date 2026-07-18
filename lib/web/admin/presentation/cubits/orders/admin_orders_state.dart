@@ -6,7 +6,8 @@ class AdminOrdersLoading extends AdminOrdersState {}
 
 class AdminOrdersLoaded extends AdminOrdersState {
   final List<Map<String, dynamic>> orders;
-  AdminOrdersLoaded(this.orders);
+  final String? status;
+  AdminOrdersLoaded(this.orders, {this.status});
 }
 
 class AdminOrdersError extends AdminOrdersState {
