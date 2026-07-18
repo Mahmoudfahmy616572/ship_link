@@ -10,6 +10,7 @@ import 'package:ship_link/web/admin/presentation/screens/dashboard/admin_dashboa
 import 'package:ship_link/web/admin/presentation/screens/users/admin_users_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/drivers/admin_drivers_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_orders_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
 
 // ده الـ shell بتاع الأدمن، جواه السايد بار والـ body بيتغير حسب الشاشة المختارة
 class AdminScaffoldWeb extends StatefulWidget {
@@ -24,6 +25,9 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
   // بنتتبع تاريخ الشاشات عشان زرار الـ back يرجع للشاشة اللي قبلها جوه الأدمن
   final List<int> _history = [0];
   int get _selected => _history.last;
+
+  // لو مفتوح تفاصيل أوردر، نخزن الـ id بتاعه (null = مش مفتوح)
+  int? _detailOrderId;
 
   // عناصر التنقل في السايد بار
   static const _nav = [
@@ -43,17 +47,42 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
 
   // لما نختار شاشة من السايد بار، نضيفها فوق التاريخ
   void _select(int i) {
+    if (_detailOrderId != null) {
+      // لو مفتوح تفاصيل، نقفله ونتحرك للشاشة الجديدة
+      setState(() {
+        _detailOrderId = null;
+        if (_history.last != i) _history.add(i);
+      });
+      return;
+    }
     if (_history.last == i) return;
     setState(() => _history.add(i));
   }
 
+  // نفتح تفاصيل أوردر (جوه الـ scaffold مش Navigator.push)
+  void _openOrderDetail(int orderId) {
+    setState(() => _detailOrderId = orderId);
+  }
+
+  // نقفل تفاصيل الأوردر وندجع للـ orders list
+  void _closeOrderDetail() {
+    setState(() => _detailOrderId = null);
+  }
+
   // دي بتتعامل مع زرار الـ back بتاع المتصفح
-  void _onPop() {
+  Future<bool> _onWillPop() async {
+    // لو تفاصيل أوردر مفتوحة، نقفلها ونرجع للـ orders
+    if (_detailOrderId != null) {
+      setState(() => _detailOrderId = null);
+      return false;
+    }
     // لو لسه فيه شاشات قبل كده، نرجع لـ واحدة قبلها
     if (_history.length > 1) {
       setState(() => _history.removeLast());
+      return false; // منعنا الخروج من الأبلكيشن
     }
     // لو إحنا في أول شاشة (الـ Home)، منمنع الخروج للوجين/اليوزر أب
+    return false;
   }
 
   @override
@@ -61,12 +90,8 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     final isWide = MediaQuery.of(context).size.width > 900;
     final t = context.t;
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop) return;
-        _onPop();
-      },
+    return WillPopScope(
+      onWillPop: _onWillPop,
       child: BlocBuilder<AdminAuthCubit, dynamic>(
         builder: (context, state) {
           // لو مش مسجل دخول أدمن، حوله على صفحة اللوجين
@@ -106,35 +131,51 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
 
   // جسم الشاشة للوضع العريض
   Widget _buildBody(List<String> titles) {
+    final child = _detailOrderId != null
+        ? AdminOrderDetailWeb(
+            orderId: _detailOrderId!,
+            onBack: _closeOrderDetail,
+            onOpenDetail: _openOrderDetail,
+          )
+        : _pages[_selected];
     return Scaffold(
-      appBar: _buildAppBar(titles[_selected]),
+      appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected]),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
-        child: KeyedSubtree(key: ValueKey(_selected), child: _pages[_selected]),
+        child: KeyedSubtree(key: ValueKey(_detailOrderId != null ? 'detail' : _selected), child: child),
       ),
     );
   }
 
   // نسخة الموبايل بتبقى بـ bottom nav
   Widget _buildNarrow(List<NavItem> navItems, List<String> titles) {
+    final child = _detailOrderId != null
+        ? AdminOrderDetailWeb(
+            orderId: _detailOrderId!,
+            onBack: _closeOrderDetail,
+            onOpenDetail: _openOrderDetail,
+          )
+        : _pages[_selected];
     return Scaffold(
-      appBar: _buildAppBar(titles[_selected]),
+      appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected]),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
-        child: KeyedSubtree(key: ValueKey(_selected), child: _pages[_selected]),
+        child: KeyedSubtree(key: ValueKey(_detailOrderId != null ? 'detail' : _selected), child: child),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selected,
-        onTap: _select,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: const Color(0xFF9CA3AF),
-        type: BottomNavigationBarType.fixed,
-        items: navItems
-            .map((e) => BottomNavigationBarItem(icon: Icon(e.icon), label: e.label))
-            .toList(),
-      ),
+      bottomNavigationBar: _detailOrderId != null
+          ? null
+          : BottomNavigationBar(
+              currentIndex: _selected,
+              onTap: _select,
+              selectedItemColor: AppColors.primary,
+              unselectedItemColor: const Color(0xFF9CA3AF),
+              type: BottomNavigationBarType.fixed,
+              items: navItems
+                  .map((e) => BottomNavigationBarItem(icon: Icon(e.icon), label: e.label))
+                  .toList(),
+            ),
     );
   }
 
