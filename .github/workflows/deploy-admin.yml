@@ -31,6 +31,12 @@ jobs:
         run: flutter pub get
       - name: Build admin web
         run: flutter build web --target lib/web/main_web.dart --release --base-href /ship_link/admin/ --no-wasm-dry-run
+      # نضمن إن كل الـ links تتبع /ship_link/admin/ (نصلح الـ manifest reference)
+      - name: Patch index.html base href
+        run: |
+          if ! grep -q '<base ' build/web/index.html; then
+            sed -i 's|<head>|<head><base href="/ship_link/admin/">|' build/web/index.html
+          fi
       - name: Deploy to gh-pages under /ship_link/admin
         uses: peaceiris/actions-gh-pages@v4
         with:
