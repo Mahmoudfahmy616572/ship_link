@@ -105,7 +105,7 @@ class AdminRemoteDataSource {
   }) async {
     return await _supabase
         .from('orders')
-        .select('id, user_id, driver_id, total_price, order_code, status, created_at')
+        .select('id, user_id, driver_id, total_price, status, created_at')
         .order('created_at', ascending: false)
         .range(offset, offset + limit - 1);
   }
