@@ -37,9 +37,10 @@ jobs:
           if ! grep -q '<base ' build/web/index.html; then
             sed -i 's|<head>|<head><base href="/ship_link/admin/">|' build/web/index.html
           fi
-      - name: Deploy to gh-pages under /ship_link/admin
+      - name: Deploy to gh-pages under /admin (keep other files)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
-          destination_dir: ship_link/admin
+          destination_dir: admin
+          keep_files: true
