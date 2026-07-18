@@ -27,7 +27,8 @@ class DriverStateBadge extends StatelessWidget {
 class DriversTable extends StatelessWidget {
   final List<Map<String, dynamic>> drivers;
   final void Function(Map<String, dynamic> driver)? onActivate;
-  const DriversTable(this.drivers, {super.key, this.onActivate});
+  final void Function(Map<String, dynamic> driver)? onOpen;
+  const DriversTable(this.drivers, {super.key, this.onActivate, this.onOpen});
 
   @override
   Widget build(BuildContext context) {
@@ -46,27 +47,30 @@ class DriversTable extends StatelessWidget {
           rows: drivers.map((d) {
             final name = d['name']?.toString() ?? '—';
             final hasVehicle = d['vehicle_number']?.toString().isNotEmpty == true;
-            return DataRow(cells: [
-              DataCell(Text(name, style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
-              DataCell(Text(d['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-              DataCell(Text(d['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-              DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-              DataCell(DriverStateBadge(d['state']?.toString())),
-              DataCell(
-                hasVehicle
-                    ? OutlinedButton.icon(
-                        onPressed: () => onActivate?.call(d),
-                        icon: const Icon(Icons.check_circle_outline, size: 16),
-                        label: Text(t.tr('activate')),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.success,
-                          side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                      )
-                    : Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
-              ),
-            ]);
+            return DataRow(
+              onSelectChanged: (_) => onOpen?.call(d),
+              cells: [
+                DataCell(Text(name, style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
+                DataCell(Text(d['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(Text(d['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(DriverStateBadge(d['state']?.toString())),
+                DataCell(
+                  hasVehicle
+                      ? OutlinedButton.icon(
+                          onPressed: () => onActivate?.call(d),
+                          icon: const Icon(Icons.check_circle_outline, size: 16),
+                          label: Text(t.tr('activate')),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.success,
+                            side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        )
+                      : Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
+                ),
+              ],
+            );
           }).toList(),
         ),
       ),

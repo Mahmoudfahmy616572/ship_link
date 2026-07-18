@@ -8,7 +8,8 @@ import 'package:ship_link/web/admin/presentation/screens/drivers/widgets/drivers
 
 // شاشة إدارة السائقين (عرض + تفعيل السائق اللي معاه عربية)
 class AdminDriversWeb extends StatelessWidget {
-  const AdminDriversWeb({super.key});
+  final void Function(Map<String, dynamic> driver)? onOpen;
+  const AdminDriversWeb({super.key, this.onOpen});
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +52,7 @@ class AdminDriversWeb extends StatelessWidget {
               SizedBox(height: 16.h),
               DriversTable(
                 drivers,
+                onOpen: onOpen,
                 onActivate: (d) {
                   // نفعل السائق عن طريق تحديث حالة المركبة
                   context.read<AdminDriversCubit>().updateDriver(
