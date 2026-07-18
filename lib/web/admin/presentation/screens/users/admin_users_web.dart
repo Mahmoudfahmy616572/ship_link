@@ -7,7 +7,8 @@ import 'package:ship_link/web/admin/presentation/screens/users/widgets/users_wid
 
 // شاشة عرض كل المستخدمين في جدول
 class AdminUsersWeb extends StatelessWidget {
-  const AdminUsersWeb({super.key});
+  final void Function(Map<String, dynamic> user)? onOpen;
+  const AdminUsersWeb({super.key, this.onOpen});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class AdminUsersWeb extends StatelessWidget {
             children: [
               const AdminSectionTitle('Users'),
               SizedBox(height: 16.h),
-              UsersTable(users),
+              UsersTable(users, onOpen: onOpen),
             ],
           ),
         );

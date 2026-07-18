@@ -8,6 +8,7 @@ import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.d
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_side_nav.dart';
 import 'package:ship_link/web/admin/presentation/screens/dashboard/admin_dashboard_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/users/admin_users_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/users/admin_user_detail_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/drivers/admin_drivers_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_orders_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
@@ -28,6 +29,8 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
 
   // لو مفتوح تفاصيل أوردر، نخزن الـ id بتاعه (null = مش مفتوح)
   int? _detailOrderId;
+  // لو مفتوح تفاصيل يوزر، نخزن الـ data بتاعته
+  Map<String, dynamic>? _detailUser;
 
   // عناصر التنقل في السايد بار
   static const _nav = [
@@ -69,11 +72,26 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     setState(() => _detailOrderId = null);
   }
 
+  // نفتح تفاصيل يوزر
+  void _openUserDetail(Map<String, dynamic> user) {
+    setState(() => _detailUser = user);
+  }
+
+  // نقفل تفاصيل اليوزر
+  void _closeUserDetail() {
+    setState(() => _detailUser = null);
+  }
+
   // دي بتتعامل مع زرار الـ back بتاع المتصفح
   Future<bool> _onWillPop() async {
     // لو تفاصيل أوردر مفتوحة، نقفلها ونرجع للـ orders
     if (_detailOrderId != null) {
       setState(() => _detailOrderId = null);
+      return false;
+    }
+    // لو تفاصيل يوزر مفتوحة، نقفلها ونرجع للـ users
+    if (_detailUser != null) {
+      setState(() => _detailUser = null);
       return false;
     }
     // لو لسه فيه شاشات قبل كده، نرجع لـ واحدة قبلها
@@ -137,15 +155,31 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
             onBack: _closeOrderDetail,
             onOpenDetail: _openOrderDetail,
           )
-        : _pages[_selected] is AdminOrdersWeb
-            ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
-            : _pages[_selected];
+        : _detailUser != null
+            ? AdminUserDetailWeb(user: _detailUser!, onBack: _closeUserDetail)
+            : _pages[_selected] is AdminOrdersWeb
+                ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
+                : _pages[_selected] is AdminUsersWeb
+                    ? AdminUsersWeb(onOpen: _openUserDetail)
+                    : _pages[_selected];
+    final title = _detailOrderId != null
+        ? titles[3]
+        : _detailUser != null
+            ? titles[1]
+            : titles[_selected];
     return Scaffold(
-      appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected]),
+      appBar: _buildAppBar(title),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
-        child: KeyedSubtree(key: ValueKey(_detailOrderId != null ? 'detail' : _selected), child: child),
+        child: KeyedSubtree(
+          key: ValueKey(_detailOrderId != null
+              ? 'detail'
+              : _detailUser != null
+                  ? 'user'
+                  : _selected),
+          child: child,
+        ),
       ),
     );
   }
@@ -158,9 +192,13 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
             onBack: _closeOrderDetail,
             onOpenDetail: _openOrderDetail,
           )
-        : _pages[_selected] is AdminOrdersWeb
-            ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
-            : _pages[_selected];
+        : _detailUser != null
+            ? AdminUserDetailWeb(user: _detailUser!, onBack: _closeUserDetail)
+            : _pages[_selected] is AdminOrdersWeb
+                ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
+                : _pages[_selected] is AdminUsersWeb
+                    ? AdminUsersWeb(onOpen: _openUserDetail)
+                    : _pages[_selected];
     return Scaffold(
       appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected]),
       body: AnimatedSwitcher(
