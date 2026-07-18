@@ -76,7 +76,7 @@ class AdminRemoteDataSource {
   }) async {
     return await _supabase
         .from('profiles')
-        .select('id, email, name, first_name, last_name, phone_number, role, created_at')
+        .select('id, email, name, phone_number, role, created_at')
         .order('created_at', ascending: false)
         .range(offset, offset + limit - 1);
   }
