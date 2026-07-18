@@ -137,7 +137,9 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
             onBack: _closeOrderDetail,
             onOpenDetail: _openOrderDetail,
           )
-        : _pages[_selected];
+        : _pages[_selected] is AdminOrdersWeb
+            ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
+            : _pages[_selected];
     return Scaffold(
       appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected]),
       body: AnimatedSwitcher(
@@ -156,7 +158,9 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
             onBack: _closeOrderDetail,
             onOpenDetail: _openOrderDetail,
           )
-        : _pages[_selected];
+        : _pages[_selected] is AdminOrdersWeb
+            ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
+            : _pages[_selected];
     return Scaffold(
       appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected]),
       body: AnimatedSwitcher(

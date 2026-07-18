@@ -72,7 +72,11 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
                 SizedBox(height: 16.h),
                 OrdersTable(
                   orders,
-                  onOpenDetail: (o) => widget.onOpenDetail?.call(o['id'] as int),
+                  onOpenDetail: (o) {
+                    final id = o['id'];
+                    final intId = id is int ? id : (id is String ? int.tryParse(id) : null);
+                    if (intId != null) widget.onOpenDetail?.call(intId);
+                  },
                 ),
               ],
             ),
