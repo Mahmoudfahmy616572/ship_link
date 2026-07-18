@@ -14,6 +14,7 @@ import 'package:ship_link/web/admin/presentation/screens/drivers/admin_driver_de
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_orders_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/admin_products_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 
 // ده الـ shell بتاع الأدمن، جواه السايد بار والـ body بيتغير حسب الشاشة المختارة
@@ -132,8 +133,11 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
 
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: BlocBuilder<AdminAuthCubit, dynamic>(
-        builder: (context, state) {
+      child: ValueListenableBuilder<bool>(
+        valueListenable: AdminThemeMode.isDark,
+        builder: (context, isDark, _) {
+          return BlocBuilder<AdminAuthCubit, dynamic>(
+            builder: (context, state) {
           // لو مش مسجل دخول أدمن، حوله على صفحة اللوجين
           // (من غير ما نحوّل وهو لسه بيتأكد من الـ session المحفوظ)
           if (state is AdminAuthFailure || state is AdminSignedOut || state is AdminAuthInitial) {
@@ -159,18 +163,21 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                       items: navItems,
                       onTap: _select,
                       userName: admin['full_name']?.toString() ?? admin['email']?.toString() ?? '',
+                      isDark: isDark,
                     ),
-                    Expanded(child: _buildBody(titles)),
+                    Expanded(child: _buildBody(titles, isDark)),
                   ],
                 )
-              : _buildNarrow(navItems, titles);
+              : _buildNarrow(navItems, titles, isDark);
+            },
+          );
         },
       ),
     );
   }
 
   // جسم الشاشة للوضع العريض
-  Widget _buildBody(List<String> titles) {
+  Widget _buildBody(List<String> titles, bool isDark) {
     final child = _detailOrderId != null
         ? AdminOrderDetailWeb(
             orderId: _detailOrderId!,
@@ -203,7 +210,8 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                 ? titles[2]
                 : titles[_selected];
     return Scaffold(
-      appBar: _buildAppBar(title),
+      backgroundColor: AdminThemeMode.bg(isDark),
+      appBar: _buildAppBar(title, isDark),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
@@ -222,7 +230,7 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
   }
 
   // نسخة الموبايل بتبقى بـ bottom nav
-  Widget _buildNarrow(List<NavItem> navItems, List<String> titles) {
+  Widget _buildNarrow(List<NavItem> navItems, List<String> titles, bool isDark) {
     final child = _detailOrderId != null
         ? AdminOrderDetailWeb(
             orderId: _detailOrderId!,
@@ -244,7 +252,8 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                             ? AdminDriversWeb(onOpen: _openDriverDetail)
                             : _pages[_selected];
     return Scaffold(
-      appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected]),
+      backgroundColor: AdminThemeMode.bg(isDark),
+      appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected], isDark),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
         transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
@@ -266,13 +275,23 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
   }
 
   // البار العلوي فيه زر تسجيل الخروج
-  PreferredSizeWidget _buildAppBar(String title) {
+  PreferredSizeWidget _buildAppBar(String title, bool isDark) {
     return AppBar(
-      backgroundColor: Colors.white,
-      foregroundColor: AppColors.textPrimary,
+      backgroundColor: AdminThemeMode.surface(isDark),
+      foregroundColor: AdminThemeMode.textPrimary(isDark),
       elevation: 0.5,
-      title: Text(title, style: appStyle(18, FontWeight.w600, AppColors.textPrimary)),
+      title: Text(title, style: appStyle(18, FontWeight.w600, AdminThemeMode.textPrimary(isDark))),
       actions: [
+        ValueListenableBuilder<bool>(
+          valueListenable: AdminThemeMode.isDark,
+          builder: (context, dark, _) {
+            return IconButton(
+              icon: Icon(dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+              tooltip: dark ? 'Light mode' : 'Dark mode',
+              onPressed: () => AdminThemeMode.isDark.value = !AdminThemeMode.isDark.value,
+            );
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.logout),
           tooltip: 'Sign out',

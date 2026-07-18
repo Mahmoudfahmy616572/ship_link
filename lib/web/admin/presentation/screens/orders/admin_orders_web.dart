@@ -6,6 +6,7 @@ import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/widgets/orders_widgets.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
 
@@ -119,15 +120,22 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
                   ],
                 ),
                 SizedBox(height: 16.h),
-                OrdersTable(
-                  orders,
-                  isCompact: MediaQuery.of(context).size.width <= 900,
-                  onOpenDetail: (o) {
-                    final id = o['id'];
-                    final intId = id is int ? id : (id is String ? int.tryParse(id) : null);
-                    if (intId != null) widget.onOpenDetail?.call(intId);
-                  },
-                ),
+                if (orders.isEmpty)
+                  AdminEmptyState(
+                    icon: Icons.receipt_long_outlined,
+                    message: t.tr('no_orders'),
+                    onRetry: () => context.read<AdminOrdersCubit>().loadOrders(status: _activeStatus, search: _search.isEmpty ? null : _search),
+                  )
+                else
+                  OrdersTable(
+                    orders,
+                    isCompact: MediaQuery.of(context).size.width <= 900,
+                    onOpenDetail: (o) {
+                      final id = o['id'];
+                      final intId = id is int ? id : (id is String ? int.tryParse(id) : null);
+                      if (intId != null) widget.onOpenDetail?.call(intId);
+                    },
+                  ),
               ],
             ),
           );

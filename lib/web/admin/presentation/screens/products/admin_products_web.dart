@@ -9,6 +9,7 @@ import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/widgets/product_form_dialog.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/widgets/products_widgets.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 
 // شاشة المنتجات - عرض + بحث + إضافة/تعديل/حذف
@@ -83,7 +84,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                 ),
                 SizedBox(height: 16.h),
                 if (products.isEmpty)
-                  Center(child: Padding(padding: const EdgeInsets.all(40), child: Text(t.tr('no_products'), style: appStyle(15, FontWeight.w500, AppColors.textSecondary))))
+                  AdminEmptyState(icon: Icons.inventory_2_outlined, message: t.tr('no_products'), onRetry: () => context.read<AdminProductsCubit>().loadProducts(search: _search.isEmpty ? null : _search))
                 else
                   ProductsTable(
                     products,

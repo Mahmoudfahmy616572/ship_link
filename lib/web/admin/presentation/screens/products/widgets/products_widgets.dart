@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
@@ -35,9 +36,9 @@ class ProductsTable extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
             ),
             child: Row(
               children: [
@@ -45,21 +46,21 @@ class ProductsTable extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(img, width: 56, height: 56, fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(width: 56, height: 56, color: AppColors.background)),
+                        errorBuilder: (_, __, ___) => Container(width: 56, height: 56, color: AdminThemeMode.bg(AdminThemeMode.isDark.value))),
                   )
                 else
-                  Container(width: 56, height: 56, decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(8))),
+                  Container(width: 56, height: 56, decoration: BoxDecoration(color: AdminThemeMode.bg(AdminThemeMode.isDark.value), borderRadius: BorderRadius.circular(8))),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(p['name']?.toString() ?? '—', style: appStyle(15, FontWeight.w700, AppColors.textPrimary)),
+                      Text(p['name']?.toString() ?? '—', style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
                       const SizedBox(height: 4),
                       Text(_priceText(p), style: appStyle(13, FontWeight.w600, AppColors.primary)),
                       const SizedBox(height: 2),
                       Text('${t.tr('category')}: ${p['category']?.toString() ?? '—'} • ${t.tr('qty')}: ${p['qty'] ?? 0}',
-                          style: appStyle(12, FontWeight.w400, AppColors.textSecondary)),
+                          style: appStyle(12, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                     ],
                   ),
                 ),
@@ -78,14 +79,14 @@ class ProductsTable extends StatelessWidget {
     final columns = [t.tr('image'), t.tr('name'), t.tr('category'), t.tr('price'), t.tr('qty'), t.tr('status'), t.tr('actions')];
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AppColors.textSecondary)))).toList(),
+          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
           rows: products.map((p) {
             final img = p['image']?.toString();
             final status = p['status'] is int ? p['status'] as int : 1;
@@ -95,20 +96,20 @@ class ProductsTable extends StatelessWidget {
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(6),
                       child: Image.network(img, width: 40, height: 40, fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(width: 40, height: 40, color: AppColors.background)),
+                          errorBuilder: (_, __, ___) => Container(width: 40, height: 40, color: AdminThemeMode.bg(AdminThemeMode.isDark.value))),
                     )
-                  : Container(width: 40, height: 40, decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(6)))),
-              DataCell(Text(p['name']?.toString() ?? '—', style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
-              DataCell(Text(p['category']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                  : Container(width: 40, height: 40, decoration: BoxDecoration(color: AdminThemeMode.bg(AdminThemeMode.isDark.value), borderRadius: BorderRadius.circular(6)))),
+              DataCell(Text(p['name']?.toString() ?? '—', style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+              DataCell(Text(p['category']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
               DataCell(Text(_priceText(p), style: appStyle(14, FontWeight.w600, AppColors.primary))),
-              DataCell(Text('${p['qty'] ?? 0}', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+              DataCell(Text('${p['qty'] ?? 0}', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
               DataCell(Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: status == 1 ? AppColors.success.withValues(alpha: 0.12) : AppColors.textDisabled.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(statusText, style: appStyle(12, FontWeight.w600, status == 1 ? AppColors.success : AppColors.textSecondary)),
+                child: Text(statusText, style: appStyle(12, FontWeight.w600, status == 1 ? AppColors.success : AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
               )),
               DataCell(Row(
                 mainAxisSize: MainAxisSize.min,
@@ -132,9 +133,9 @@ class ProductsTableShimmer extends StatelessWidget {
     return Container(
       height: 320,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
       ),
     );
   }
@@ -152,7 +153,7 @@ class ProductsErrorView extends StatelessWidget {
         children: [
           const Icon(Icons.error_outline, size: 48, color: AppColors.error),
           const SizedBox(height: 12),
-          Text(message, style: appStyle(14, FontWeight.w500, AppColors.textSecondary)),
+          Text(message, style: appStyle(14, FontWeight.w500, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
           const SizedBox(height: 12),
           ElevatedButton(onPressed: () => context.read<AdminProductsCubit>().loadProducts(), child: Text(t.tr('retry'))),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
@@ -43,9 +44,9 @@ class DriversTable extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
             ),
             child: InkWell(
               onTap: () => onOpen?.call(d),
@@ -55,14 +56,14 @@ class DriversTable extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(child: Text(name, style: appStyle(15, FontWeight.w700, AppColors.textPrimary))),
+                      Expanded(child: Text(name, style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
                       DriverStateBadge(d['state']?.toString()),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(d['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  Text(d['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                   const SizedBox(height: 2),
-                  Text('${t.tr('phone_number')}: ${d['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AppColors.textSecondary)),
+                  Text('${t.tr('phone_number')}: ${d['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                   if (hasVehicle) ...[
                     const SizedBox(height: 10),
                     SizedBox(
@@ -90,24 +91,24 @@ class DriversTable extends StatelessWidget {
     final columns = [t.tr('name'), t.tr('email'), t.tr('phone_number'), t.tr('vehicle_type'), t.tr('state'), t.tr('actions')];
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AppColors.textSecondary)))).toList(),
+          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
           rows: drivers.map((d) {
             final name = d['name']?.toString() ?? '—';
             final hasVehicle = d['vehicle_number']?.toString().isNotEmpty == true;
             return DataRow(
               onSelectChanged: (_) => onOpen?.call(d),
               cells: [
-                DataCell(Text(name, style: appStyle(14, FontWeight.w500, AppColors.textPrimary))),
-                DataCell(Text(d['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-                DataCell(Text(d['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
-                DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+                DataCell(Text(name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(d['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(d['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(DriverStateBadge(d['state']?.toString())),
                 DataCell(
                   hasVehicle

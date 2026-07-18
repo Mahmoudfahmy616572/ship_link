@@ -4,6 +4,7 @@ import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
 import 'package:ship_link/web/admin/presentation/screens/users/widgets/users_widgets.dart';
 
 // شاشة عرض كل المستخدمين في جدول
@@ -55,7 +56,10 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
                 ),
               ),
               SizedBox(height: 16.h),
-              UsersTable(users, isCompact: MediaQuery.of(context).size.width <= 900, onOpen: widget.onOpen),
+              if (users.isEmpty)
+                AdminEmptyState(icon: Icons.people_alt_outlined, message: t.tr('no_users'), onRetry: () => context.read<AdminUsersCubit>().loadUsers(search: _search.isEmpty ? null : _search))
+              else
+                UsersTable(users, isCompact: MediaQuery.of(context).size.width <= 900, onOpen: widget.onOpen),
             ],
           ),
         );
