@@ -183,4 +183,48 @@ class AdminRemoteDataSource {
         .eq('id', id)
         .maybeSingle();
   }
+
+  // جلب كل المنتجات مع البحث
+  Future<List<Map<String, dynamic>>> getProducts({
+    int limit = 50,
+    int offset = 0,
+    String? search,
+  }) async {
+    final base = _supabase.from('products').select(
+        'id, name, description, image, images, price, is_offer, new_price, qty, status, popular, is_top_seller, category, created_at');
+    var filtered = base;
+    if (search != null && search.isNotEmpty) {
+      filtered = filtered.or('name.ilike.%$search%,category.ilike.%$search%,description.ilike.%$search%');
+    }
+    return await filtered.order('created_at', ascending: false).range(offset, offset + limit - 1);
+  }
+
+  // إنشاء منتج جديد
+  Future<Map<String, dynamic>> createProduct(Map<String, dynamic> data) async {
+    final row = <String, dynamic>{
+      'name': data['name'],
+      'description': data['description'],
+      'image': data['image'],
+      'images': data['images'] ?? [],
+      'price': data['price'],
+      'is_offer': data['is_offer'] ?? false,
+      'new_price': data['new_price'],
+      'qty': data['qty'] ?? 0,
+      'status': data['status'] ?? 1,
+      'popular': data['popular'] ?? 0,
+      'is_top_seller': data['is_top_seller'] ?? false,
+      'category': data['category'],
+    };
+    return await _supabase.from('products').insert(row).select().single();
+  }
+
+  // تعديل منتج
+  Future<void> updateProduct({required int id, required Map<String, dynamic> data}) async {
+    await _supabase.from('products').update(data).eq('id', id);
+  }
+
+  // حذف منتج
+  Future<void> deleteProduct(int id) async {
+    await _supabase.from('products').delete().eq('id', id);
+  }
 }

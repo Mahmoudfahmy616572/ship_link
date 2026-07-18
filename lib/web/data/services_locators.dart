@@ -36,6 +36,7 @@ import 'package:ship_link/web/admin/presentation/cubits/dashboard/admin_dashboar
 import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
 import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
 import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
 
 final getIt = GetIt.instance;
 void setupWebServiceLocator() {
@@ -69,4 +70,5 @@ void setupWebServiceLocator() {
   getIt.registerFactory<AdminUsersCubit>(() => AdminUsersCubit(getIt<AdminRepository>()));
   getIt.registerFactory<AdminDriversCubit>(() => AdminDriversCubit(getIt<AdminRepository>()));
   getIt.registerFactory<AdminOrdersCubit>(() => AdminOrdersCubit(getIt<AdminRepository>()));
+  getIt.registerFactory<AdminProductsCubit>(() => AdminProductsCubit(getIt<AdminRepository>()));
 }
