@@ -118,12 +118,14 @@ class AdminRemoteDataSource {
   Future<List<Map<String, dynamic>>> getOrders({
     int limit = 50,
     int offset = 0,
+    String? status,
   }) async {
-    return await _supabase
+    final base = _supabase
         .from('orders')
-        .select('id, user_id, driver_id, total_price, status, created_at')
-        .order('created_at', ascending: false)
-        .range(offset, offset + limit - 1);
+        .select('id, user_id, driver_id, total_price, status, created_at');
+    final filtered = status != null ? base.eq('status', status) : base;
+    final ordered = filtered.order('created_at', ascending: false).range(offset, offset + limit - 1);
+    return await ordered;
   }
 
   Future<void> updateOrderStatus({

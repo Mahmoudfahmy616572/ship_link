@@ -11,15 +11,15 @@ class AdminOrdersCubit extends Cubit<AdminOrdersState> {
 
   static AdminOrdersCubit get(context) => BlocProvider.of<AdminOrdersCubit>(context);
 
-  Future<void> loadOrders({int limit = 50, int offset = 0}) async {
+  Future<void> loadOrders({int limit = 50, int offset = 0, String? status}) async {
     if (!isClosed) emit(AdminOrdersLoading());
-    final result = await _repository.getOrders(limit: limit, offset: offset);
+    final result = await _repository.getOrders(limit: limit, offset: offset, status: status);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminOrdersError(failure.errMessage));
       },
       (orders) {
-        if (!isClosed) emit(AdminOrdersLoaded(orders));
+        if (!isClosed) emit(AdminOrdersLoaded(orders, status: status));
       },
     );
   }

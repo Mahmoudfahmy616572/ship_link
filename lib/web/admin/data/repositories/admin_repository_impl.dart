@@ -82,9 +82,9 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
-  Future<Either<Failure, List<Map<String, dynamic>>>> getOrders({int limit = 50, int offset = 0}) async {
+  Future<Either<Failure, List<Map<String, dynamic>>>> getOrders({int limit = 50, int offset = 0, String? status}) async {
     try {
-      final data = await _dataSource.getOrders(limit: limit, offset: offset);
+      final data = await _dataSource.getOrders(limit: limit, offset: offset, status: status);
       return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));
