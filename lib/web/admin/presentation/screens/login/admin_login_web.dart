@@ -14,6 +14,10 @@ class AdminLoginWeb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // أول ما الصفحة تفتح نتأكد لو فيه أدمن متسجل قبل كده (عشان ندخله على طول)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AdminAuthCubit.get(context).checkSession();
+    });
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
@@ -39,7 +43,7 @@ class AdminLoginWeb extends StatelessWidget {
               key: formKey,
               child: BlocConsumer<AdminAuthCubit, dynamic>(
                 listener: (context, state) {
-                  if (state is AdminAuthSuccess) {
+                  if (state is AdminAuthSuccess || state is AdminAuthRestored) {
                     Navigator.pushReplacementNamed(context, AdminScaffoldWeb.routName);
                   } else if (state is AdminAuthFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(

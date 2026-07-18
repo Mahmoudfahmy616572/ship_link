@@ -15,3 +15,9 @@ class AdminAuthFailure extends AdminAuthState {
 }
 
 class AdminSignedOut extends AdminAuthState {}
+
+// حالة استرجاع السيشن المحفوظ (refresh من غير ما يدخل باسورد تاني)
+class AdminAuthRestored extends AdminAuthState {
+  final Map<String, dynamic> admin;
+  AdminAuthRestored(this.admin);
+}
