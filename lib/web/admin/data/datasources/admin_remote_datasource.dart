@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AdminRemoteDataSource {
@@ -226,5 +227,12 @@ class AdminRemoteDataSource {
   // حذف منتج
   Future<void> deleteProduct(int id) async {
     await _supabase.from('products').delete().eq('id', id);
+  }
+
+  // رفع صورة المنتج على الـ storage ويرجّع الرابط العام
+  Future<String> uploadProductImage(Uint8List bytes, String fileName) async {
+    final path = 'products/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+    await _supabase.storage.from('product-images').uploadBinary(path, bytes, fileOptions: const FileOptions(upsert: true));
+    return _supabase.storage.from('product-images').getPublicUrl(path);
   }
 }

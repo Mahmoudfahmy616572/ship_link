@@ -1,5 +1,7 @@
+import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
 import 'package:ship_link/core/constants/Errors/failures.dart';
+import 'package:ship_link/web/admin/domain/models/admin_models.dart';
 
 abstract class AdminRepository {
   Future<Either<Failure, Map<String, dynamic>>> signIn({
@@ -17,9 +19,10 @@ abstract class AdminRepository {
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrderItems(int orderId);
   Future<Either<Failure, Map<String, dynamic>?>> getOrderById(int id);
 
-  // المنتجات - CRUD للأدمن
-  Future<Either<Failure, List<Map<String, dynamic>>>> getProducts({int limit, int offset, String? search});
-  Future<Either<Failure, Map<String, dynamic>>> createProduct(Map<String, dynamic> data);
+  // المنتجات - CRUD للأدمن (باستخدام AdminProduct model)
+  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit, int offset, String? search});
+  Future<Either<Failure, AdminProduct>> createProduct(Map<String, dynamic> data);
   Future<Either<Failure, void>> updateProduct({required int id, required Map<String, dynamic> data});
   Future<Either<Failure, void>> deleteProduct(int id);
+  Future<Either<Failure, String>> uploadProductImage(Uint8List bytes, String fileName);
 }
