@@ -95,14 +95,12 @@ class AdminRemoteDataSource {
       if (d.isNotEmpty) trend[d] = (trend[d] ?? 0) + 1;
     }
 
-    // إحصائيات المنتجات: النشط/غير النشط + المخزون المنخفض + التوزيع حسب الفئة
-    final productsData = await _supabase.from('products').select('status, qty, category');
+    // إحصائيات المنتجات: التوزيع حسب الفئة (الأعمدة status/qty لسه متضافش في الـ schema)
+    final productsData = await _supabase.from('products').select('category');
     int activeProducts = 0;
     int lowStock = 0;
     final Map<String, int> byCategory = {};
     for (final p in productsData) {
-      if (p['status'] == 1) activeProducts++;
-      if (p['qty'] is int && (p['qty'] as int) <= 5) lowStock++;
       final c = p['category']?.toString();
       if (c != null && c.isNotEmpty) byCategory[c] = (byCategory[c] ?? 0) + 1;
     }
@@ -214,7 +212,7 @@ class AdminRemoteDataSource {
     bool ascending = false,
   }) async {
     final base = _supabase.from('products').select(
-        'id, name, description, image, images, price, is_offer, new_price, qty, status, popular, is_top_seller, category, created_at');
+        'id, name, description, image, images, price, is_top_seller, category, created_at');
     dynamic filtered = base;
     if (search != null && search.isNotEmpty) {
       filtered = filtered.or('name.ilike.%$search%,category.ilike.%$search%,description.ilike.%$search%');
@@ -255,20 +253,24 @@ class AdminRemoteDataSource {
       'image': data['image'],
       'images': data['images'] ?? [],
       'price': data['price'],
-      'is_offer': data['is_offer'] ?? false,
-      'new_price': data['new_price'],
-      'qty': data['qty'] ?? 0,
-      'status': data['status'] ?? 1,
-      'popular': data['popular'] ?? 0,
       'is_top_seller': data['is_top_seller'] ?? false,
       'category': data['category'],
     };
     return await _supabase.from('products').insert(row).select().single();
   }
 
-  // تعديل منتج
+  // تعديل منتج (نصفّي الأعمدة الموجودة في الـ schema عشان منعملش 400)
   Future<void> updateProduct({required int id, required Map<String, dynamic> data}) async {
-    await _supabase.from('products').update(data).eq('id', id);
+    final allowed = <String, dynamic>{
+      if (data.containsKey('name')) 'name': data['name'],
+      if (data.containsKey('description')) 'description': data['description'],
+      if (data.containsKey('image')) 'image': data['image'],
+      if (data.containsKey('images')) 'images': data['images'],
+      if (data.containsKey('price')) 'price': data['price'],
+      if (data.containsKey('is_top_seller')) 'is_top_seller': data['is_top_seller'],
+      if (data.containsKey('category')) 'category': data['category'],
+    };
+    await _supabase.from('products').update(allowed).eq('id', id);
   }
 
   // حذف منتج
