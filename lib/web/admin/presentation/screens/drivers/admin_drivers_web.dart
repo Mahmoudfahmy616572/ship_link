@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/utils/sizer.dart';
@@ -20,6 +21,19 @@ class AdminDriversWeb extends StatefulWidget {
 
 class _AdminDriversWebState extends State<AdminDriversWeb> {
   String _search = '';
+  Timer? _searchTimer;
+
+  @override
+  void dispose() {
+    _searchTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String v) {
+    _search = v;
+    _searchTimer?.cancel();
+    _searchTimer = Timer(const Duration(milliseconds: 300), () => context.read<AdminDriversCubit>().loadDrivers(search: v.isEmpty ? null : v));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +75,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
               const AdminSectionTitle('Drivers'),
               SizedBox(height: 16.h),
               TextField(
-                onChanged: (v) {
-                  _search = v;
-                  context.read<AdminDriversCubit>().loadDrivers(search: v.isEmpty ? null : v);
-                },
+                onChanged: _onSearchChanged,
                 decoration: InputDecoration(
                   hintText: t.tr('search_drivers'),
                   prefixIcon: const Icon(Icons.search),

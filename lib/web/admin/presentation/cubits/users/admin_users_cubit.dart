@@ -30,6 +30,19 @@ class AdminUsersCubit extends Cubit<AdminUsersState> {
     );
   }
 
+  Future<void> deleteUser(String id) async {
+    if (!isClosed) emit(AdminUsersLoading());
+    final result = await _repository.deleteUser(id);
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminUsersError(failure.errMessage));
+      },
+      (_) {
+        if (!isClosed) emit(AdminUserDeleteSuccess(id));
+      },
+    );
+  }
+
   Future<void> loadMoreUsers({String? search}) async {
     if (state is! AdminUsersLoaded) return;
     final loaded = state as AdminUsersLoaded;

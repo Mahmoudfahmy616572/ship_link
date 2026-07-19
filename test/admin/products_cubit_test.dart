@@ -17,7 +17,7 @@ class FakeAdminRepository implements AdminRepository {
   int? updatedId;
 
   @override
-  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit = 20, int offset = 0, String? search}) async {
+  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit = 20, int offset = 0, String? search, String? category, String sortBy = 'created_at', bool ascending = false}) async {
     lastSearch = search;
     if (failGet) return left(ServerFailure('boom'));
     return right(productsToReturn);

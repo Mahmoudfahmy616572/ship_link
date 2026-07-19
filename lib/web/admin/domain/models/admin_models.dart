@@ -119,6 +119,39 @@ class AdminProduct {
         'is_top_seller': isTopSeller,
         'category': category,
       };
+
+  AdminProduct copyWith({
+    int? id,
+    String? name,
+    String? description,
+    String? image,
+    List<dynamic>? images,
+    num? price,
+    bool? isOffer,
+    num? newPrice,
+    int? qty,
+    int? status,
+    int? popular,
+    bool? isTopSeller,
+    String? category,
+    String? createdAt,
+  }) =>
+      AdminProduct(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        description: description ?? this.description,
+        image: image ?? this.image,
+        images: images ?? this.images,
+        price: price ?? this.price,
+        isOffer: isOffer ?? this.isOffer,
+        newPrice: newPrice ?? this.newPrice,
+        qty: qty ?? this.qty,
+        status: status ?? this.status,
+        popular: popular ?? this.popular,
+        isTopSeller: isTopSeller ?? this.isTopSeller,
+        category: category ?? this.category,
+        createdAt: createdAt ?? this.createdAt,
+      );
 }
 
 class AdminOrder {

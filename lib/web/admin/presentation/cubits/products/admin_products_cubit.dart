@@ -15,11 +15,11 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
 
   static AdminProductsCubit get(context) => BlocProvider.of<AdminProductsCubit>(context);
 
-  Future<void> loadProducts({int limit = 20, int offset = 0, String? search, bool append = false}) async {
+  Future<void> loadProducts({int limit = 20, int offset = 0, String? search, String? category, String sortBy = 'created_at', bool ascending = false, bool append = false}) async {
     if (!append) {
       if (!isClosed) emit(AdminProductsLoading());
     }
-    final result = await _repository.getProducts(limit: limit, offset: offset, search: search);
+    final result = await _repository.getProducts(limit: limit, offset: offset, search: search, category: category, sortBy: sortBy, ascending: ascending);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminProductsError(failure.errMessage));
@@ -28,17 +28,30 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
         if (!isClosed) {
           final current = append && state is AdminProductsLoaded ? (state as AdminProductsLoaded).products : <AdminProduct>[];
           final merged = [...current, ...products];
-          emit(AdminProductsLoaded(merged, search: search, hasMore: products.length >= limit));
+          emit(AdminProductsLoaded(merged, search: search, category: category, sortBy: sortBy, ascending: ascending, hasMore: products.length >= limit));
         }
       },
     );
   }
 
-  Future<void> loadMoreProducts({String? search}) async {
+  Future<void> loadMoreProducts({String? search, String? category, String sortBy = 'created_at', bool ascending = false}) async {
     if (state is! AdminProductsLoaded) return;
     final loaded = state as AdminProductsLoaded;
     if (!loaded.hasMore) return;
-    await loadProducts(offset: loaded.products.length, search: search, append: true);
+    await loadProducts(offset: loaded.products.length, search: search, category: category, sortBy: sortBy, ascending: ascending, append: true);
+  }
+
+  List<String> _categories = const [];
+  List<String> get categories => _categories;
+
+  Future<void> loadCategories() async {
+    final result = await _repository.getProductCategories();
+    result.fold(
+      (failure) {},
+      (cats) {
+        if (!isClosed) _categories = cats;
+      },
+    );
   }
 
   Future<void> createProduct(Map<String, dynamic> data) async {
@@ -82,5 +95,36 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
 
   Future<Either<Failure, String>> uploadProductImage(Uint8List bytes, String fileName) async {
     return _repository.uploadProductImage(bytes, fileName);
+  }
+
+  Future<void> deleteProductsBulk(List<int> ids) async {
+    if (!isClosed) emit(AdminProductsLoading());
+    final result = await _repository.deleteProductsBulk(ids);
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminProductsError(failure.errMessage));
+      },
+      (_) {
+        if (!isClosed) emit(AdminProductsBulkDeleteSuccess(ids.length));
+      },
+    );
+  }
+
+  Future<void> toggleStatus(int id, int currentStatus) async {
+    final newStatus = currentStatus == 1 ? 0 : 1;
+    final result = await _repository.toggleProductStatus(id, newStatus);
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminProductsError(failure.errMessage));
+      },
+      (_) {
+        // نحدث المنتج محلياً من غير ما نعمل reload كامل
+        if (state is AdminProductsLoaded && !isClosed) {
+          final loaded = state as AdminProductsLoaded;
+          final updated = loaded.products.map((p) => p.id == id ? p.copyWith(status: newStatus) : p).toList();
+          emit(AdminProductsLoaded(updated, search: loaded.search, category: loaded.category, sortBy: loaded.sortBy, ascending: loaded.ascending, hasMore: loaded.hasMore));
+        }
+      },
+    );
   }
 }

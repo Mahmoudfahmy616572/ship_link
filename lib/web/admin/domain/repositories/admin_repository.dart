@@ -12,6 +12,7 @@ abstract class AdminRepository {
   Future<Either<Failure, Map<String, dynamic>?>> checkSession();
   Future<Either<Failure, Map<String, dynamic>>> getDashboardStats({String period = 'all'});
   Future<Either<Failure, List<Map<String, dynamic>>>> getUsers({int limit, int offset, String? search});
+  Future<Either<Failure, void>> deleteUser(String id);
   Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit, int offset, String? search});
   Future<Either<Failure, void>> updateDriver({required String id, Map<String, dynamic> fields});
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrders({int limit, int offset, String? status, String? search});
@@ -20,9 +21,12 @@ abstract class AdminRepository {
   Future<Either<Failure, Map<String, dynamic>?>> getOrderById(int id);
 
   // المنتجات - CRUD للأدمن (باستخدام AdminProduct model)
-  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit, int offset, String? search});
+  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit, int offset, String? search, String? category, String sortBy = 'created_at', bool ascending = false});
+  Future<Either<Failure, List<String>>> getProductCategories();
   Future<Either<Failure, AdminProduct>> createProduct(Map<String, dynamic> data);
   Future<Either<Failure, void>> updateProduct({required int id, required Map<String, dynamic> data});
   Future<Either<Failure, void>> deleteProduct(int id);
+  Future<Either<Failure, void>> toggleProductStatus(int id, int status);
+  Future<Either<Failure, void>> deleteProductsBulk(List<int> ids);
   Future<Either<Failure, String>> uploadProductImage(Uint8List bytes, String fileName);
 }

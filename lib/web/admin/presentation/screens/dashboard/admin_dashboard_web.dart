@@ -6,6 +6,7 @@ import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/dashboard/admin_dashboard_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/dashboard/widgets/dashboard_widgets.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 
 // شاشة نظرة عامة على اللوحة (إحصائيات + توزيع حالات الطلبات)
 class AdminDashboardWeb extends StatefulWidget {
@@ -88,6 +89,10 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
               Text(t.tr('order_status_distribution'), style: appStyle(18, FontWeight.w600, AppColors.textPrimary)),
               SizedBox(height: 12.h),
               DashboardStatusChips(statusCounts),
+              SizedBox(height: 28.h),
+              Text(t.tr('products_by_category'), style: appStyle(18, FontWeight.w600, AppColors.textPrimary)),
+              SizedBox(height: 12.h),
+              ProductCategoryList(Map<String, dynamic>.from(s['productByCategory'] ?? {})),
             ],
           ),
         );

@@ -24,3 +24,18 @@ class AdminAuthRestored extends AdminAuthState {
   final Map<String, dynamic> admin;
   AdminAuthRestored(this.admin);
 }
+
+// ناخد الـ role من حالة الأدمن عشان نعرف صلاحياته
+extension AdminAuthRole on AdminAuthState {
+  Map<String, dynamic>? get adminData {
+    if (this is AdminAuthSuccess) return (this as AdminAuthSuccess).admin;
+    if (this is AdminAuthRestored) return (this as AdminAuthRestored).admin;
+    return null;
+  }
+
+  String get adminRole => adminData?['role']?.toString() ?? '';
+
+  // الصلاحيات: super_admin بس اللي يقدر يضيف/يعدل/يحذف
+  bool get isSuperAdmin => adminRole == 'super_admin';
+  bool get canManage => isSuperAdmin;
+}
