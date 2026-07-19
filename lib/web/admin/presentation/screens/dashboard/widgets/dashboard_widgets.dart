@@ -5,6 +5,7 @@ import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 
 // شبكة الكروت الإحصائية فوق الداشبورد
 class DashboardStatGrid extends StatelessWidget {
@@ -26,7 +27,7 @@ class DashboardStatGrid extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cols = constraints.maxWidth > 900 ? 4 : (constraints.maxWidth > 600 ? 2 : 1);
+        final cols = constraints.maxWidth > 1100 ? 6 : (constraints.maxWidth > 800 ? 3 : (constraints.maxWidth > 500 ? 2 : 1));
         return GridView.count(
           crossAxisCount: cols,
           shrinkWrap: true,
@@ -38,12 +39,9 @@ class DashboardStatGrid extends StatelessWidget {
             AdminStatCard(title: t.tr('users'), value: '${stats['users']}', icon: Icons.people_alt_rounded, color: AppColors.primary),
             AdminStatCard(title: t.tr('drivers'), value: '${stats['drivers']}', icon: Icons.local_shipping_rounded, color: AppColors.cta),
             AdminStatCard(title: t.tr('orders'), value: '${stats['orders']}', icon: Icons.receipt_long_rounded, color: AppColors.info),
-            AdminStatCard(
-              title: '${t.tr('revenue')} ($periodLabel)',
-              value: '${revenue.toStringAsFixed(0)} EGP',
-              icon: Icons.payments_outlined,
-              color: AppColors.success,
-            ),
+            AdminStatCard(title: t.tr('products'), value: '${stats['products']}', icon: Icons.inventory_2_rounded, color: AppColors.warning),
+            AdminStatCard(title: t.tr('active_products'), value: '${stats['activeProducts'] ?? 0}', icon: Icons.check_circle_outline, color: AppColors.success),
+            AdminStatCard(title: t.tr('low_stock'), value: '${stats['lowStock'] ?? 0}', icon: Icons.warning_amber_outlined, color: AppColors.error),
           ],
         );
       },
@@ -195,6 +193,54 @@ class DashboardStatusChips extends StatelessWidget {
               Text(e.key.toUpperCase(), style: appStyle(12, FontWeight.w600, color)),
               SizedBox(height: 4.h),
               Text('${e.value}', style: appStyle(20, FontWeight.w700, AppColors.textPrimary)),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+// قائمة توزيع المنتجات حسب الفئة (شريط نسبي)
+class ProductCategoryList extends StatelessWidget {
+  final Map<String, dynamic> byCategory;
+  const ProductCategoryList(this.byCategory, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    if (byCategory.isEmpty) {
+      return Text('—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary));
+    }
+    final entries = byCategory.entries.toList()..sort((a, b) => (b.value as int).compareTo(a.value as int));
+    final max = entries.map((e) => e.value as int).reduce((a, b) => a > b ? a : b).toDouble();
+    final palette = [AppColors.primary, AppColors.cta, AppColors.info, AppColors.success, AppColors.warning, AppColors.error];
+    return Column(
+      children: entries.asMap().entries.map((e) {
+        final i = e.key;
+        final entry = e.value;
+        final color = palette[i % palette.length];
+        final pct = max > 0 ? (entry.value as int) / max : 0.0;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            children: [
+              SizedBox(width: 120, child: Text(entry.key, style: appStyle(14, FontWeight.w500, AppColors.textPrimary), overflow: TextOverflow.ellipsis)),
+              Expanded(
+                child: Container(
+                  height: 22,
+                  decoration: BoxDecoration(color: AdminThemeMode.bg(AdminThemeMode.isDark.value), borderRadius: BorderRadius.circular(6)),
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: pct,
+                    child: Container(
+                      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6)),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Text('${entry.value}', style: appStyle(14, FontWeight.w700, AppColors.textPrimary)),
             ],
           ),
         );

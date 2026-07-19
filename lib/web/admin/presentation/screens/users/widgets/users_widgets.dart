@@ -30,7 +30,18 @@ class UsersTable extends StatelessWidget {
   final List<Map<String, dynamic>> users;
   final void Function(Map<String, dynamic> user)? onOpen;
   final bool isCompact;
-  const UsersTable(this.users, {super.key, this.onOpen, this.isCompact = false});
+  final bool isSelectionMode;
+  final Set<String> selectedIds;
+  final void Function(String id)? onToggleSelect;
+  const UsersTable(
+    this.users, {
+    super.key,
+    this.onOpen,
+    this.isCompact = false,
+    this.isSelectionMode = false,
+    this.selectedIds = const {},
+    this.onToggleSelect,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +49,7 @@ class UsersTable extends StatelessWidget {
     if (isCompact) {
       return Column(
         children: users.map((u) {
+          final id = u['id']?.toString() ?? '';
           final name = u['name']?.toString() ?? '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}'.trim();
           final joined = u['created_at']?.toString().substring(0, 10) ?? '—';
           return Container(
@@ -49,7 +61,13 @@ class UsersTable extends StatelessWidget {
               border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
             ),
             child: InkWell(
-              onTap: () => onOpen?.call(u),
+              onTap: () {
+                if (isSelectionMode) {
+                  onToggleSelect?.call(id);
+                } else {
+                  onOpen?.call(u);
+                }
+              },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -57,7 +75,10 @@ class UsersTable extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(child: Text(name.isEmpty ? '—' : name, style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
-                      UserRoleBadge(u['role']?.toString() ?? 'user'),
+                      if (isSelectionMode)
+                        Checkbox(value: selectedIds.contains(id), onChanged: (_) => onToggleSelect?.call(id))
+                      else
+                        UserRoleBadge(u['role']?.toString() ?? 'user'),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -73,7 +94,7 @@ class UsersTable extends StatelessWidget {
         }).toList(),
       );
     }
-    final columns = [t.tr('name'), t.tr('email'), t.tr('phone_number'), t.tr('role'), t.tr('joined')];
+    final columns = [if (isSelectionMode) '', t.tr('name'), t.tr('email'), t.tr('phone_number'), t.tr('role'), t.tr('joined')];
     return Container(
       decoration: BoxDecoration(
         color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
@@ -85,11 +106,13 @@ class UsersTable extends StatelessWidget {
         child: DataTable(
           columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
           rows: users.map((u) {
+            final id = u['id']?.toString() ?? '';
             final name = u['name']?.toString() ?? '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}'.trim();
             final joined = AdminDateFormatter.formatDate(u['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode);
             return DataRow(
-              onSelectChanged: (_) => onOpen?.call(u),
+              onSelectChanged: isSelectionMode ? (_) => onToggleSelect?.call(id) : (_) => onOpen?.call(u),
               cells: [
+                if (isSelectionMode) DataCell(Checkbox(value: selectedIds.contains(id), onChanged: (_) => onToggleSelect?.call(id))),
                 DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
                 DataCell(Text(u['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(Text(u['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),

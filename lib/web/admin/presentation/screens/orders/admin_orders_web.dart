@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
@@ -26,6 +27,7 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
   bool _hasMore = false;
   String? _activeStatus;
   String _search = '';
+  Timer? _searchTimer;
 
   // الـ status المتاحة للفلترة
   static const _statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
@@ -39,6 +41,12 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
         context.read<AdminOrdersCubit>().loadOrders();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _searchTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -59,7 +67,8 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
 
   void _onSearch(String v) {
     _search = v;
-    context.read<AdminOrdersCubit>().loadOrders(status: _activeStatus, search: v.isEmpty ? null : v);
+    _searchTimer?.cancel();
+    _searchTimer = Timer(const Duration(milliseconds: 300), () => context.read<AdminOrdersCubit>().loadOrders(status: _activeStatus, search: v.isEmpty ? null : v));
   }
 
   @override

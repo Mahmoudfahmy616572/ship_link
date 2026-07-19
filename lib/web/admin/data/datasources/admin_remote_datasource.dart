@@ -95,11 +95,26 @@ class AdminRemoteDataSource {
       if (d.isNotEmpty) trend[d] = (trend[d] ?? 0) + 1;
     }
 
+    // إحصائيات المنتجات: النشط/غير النشط + المخزون المنخفض + التوزيع حسب الفئة
+    final productsData = await _supabase.from('products').select('status, qty, category');
+    int activeProducts = 0;
+    int lowStock = 0;
+    final Map<String, int> byCategory = {};
+    for (final p in productsData) {
+      if (p['status'] == 1) activeProducts++;
+      if (p['qty'] is int && (p['qty'] as int) <= 5) lowStock++;
+      final c = p['category']?.toString();
+      if (c != null && c.isNotEmpty) byCategory[c] = (byCategory[c] ?? 0) + 1;
+    }
+
     return {
       'users': users,
       'drivers': drivers,
       'orders': orders,
       'products': products,
+      'activeProducts': activeProducts,
+      'lowStock': lowStock,
+      'productByCategory': byCategory,
       'revenue': revenue,
       'statusCounts': statusCounts,
       'trend': trend,
@@ -120,6 +135,10 @@ class AdminRemoteDataSource {
       filtered = filtered.or('email.ilike.%$search%,name.ilike.%$search%,phone_number.ilike.%$search%');
     }
     return await filtered.order('created_at', ascending: false).range(offset, offset + limit - 1);
+  }
+
+  Future<void> deleteUser(String id) async {
+    await _supabase.from('profiles').delete().eq('id', id);
   }
 
   Future<List<Map<String, dynamic>>> getDrivers({
@@ -190,14 +209,42 @@ class AdminRemoteDataSource {
     int limit = 50,
     int offset = 0,
     String? search,
+    String? category,
+    String sortBy = 'created_at',
+    bool ascending = false,
   }) async {
     final base = _supabase.from('products').select(
         'id, name, description, image, images, price, is_offer, new_price, qty, status, popular, is_top_seller, category, created_at');
-    var filtered = base;
+    dynamic filtered = base;
     if (search != null && search.isNotEmpty) {
       filtered = filtered.or('name.ilike.%$search%,category.ilike.%$search%,description.ilike.%$search%');
     }
-    return await filtered.order('created_at', ascending: false).range(offset, offset + limit - 1);
+    if (category != null && category.isNotEmpty) {
+      filtered = filtered.eq('category', category);
+    }
+    if (sortBy == 'price') {
+      filtered = filtered.order('price', ascending: ascending);
+    } else if (sortBy == 'name') {
+      filtered = filtered.order('name', ascending: ascending);
+    } else {
+      filtered = filtered.order('created_at', ascending: ascending);
+    }
+    return await filtered.range(offset, offset + limit - 1);
+  }
+
+  Future<List<String>> getProductCategories() async {
+    final data = await _supabase.from('products').select('category').not('category', 'is', null);
+    final set = <String>{};
+    for (final row in data) {
+      final c = row['category']?.toString();
+      if (c != null && c.isNotEmpty) set.add(c);
+    }
+    return set.toList()..sort();
+  }
+
+  // تبديل حالة المنتج (نشط/غير نشط) من الجدول مباشرة
+  Future<void> toggleProductStatus(int id, int status) async {
+    await _supabase.from('products').update({'status': status}).eq('id', id);
   }
 
   // إنشاء منتج جديد
@@ -227,6 +274,11 @@ class AdminRemoteDataSource {
   // حذف منتج
   Future<void> deleteProduct(int id) async {
     await _supabase.from('products').delete().eq('id', id);
+  }
+
+  // حذف مجموعة منتجات
+  Future<void> deleteProductsBulk(List<int> ids) async {
+    await _supabase.from('products').delete().inFilter('id', ids);
   }
 
   // رفع صورة المنتج على الـ storage ويرجّع الرابط العام

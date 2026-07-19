@@ -71,6 +71,16 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
+  @override
+  Future<Either<Failure, void>> deleteUser(String id) async {
+    try {
+      await _dataSource.deleteUser(id);
+      return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
   Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit = 50, int offset = 0, String? search}) async {
     try {
       final cacheKey = 'drivers';
@@ -143,18 +153,28 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
-  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit = 50, int offset = 0, String? search}) async {
+  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit = 50, int offset = 0, String? search, String? category, String sortBy = 'created_at', bool ascending = false}) async {
     try {
-      // كاش للتحميل الأولي بدون بحث/صفحات
+      // كاش للتحميل الأولي بدون بحث/صفحات/فلتر
       final cacheKey = 'products';
-      if (search == null && offset == 0) {
+      if (search == null && offset == 0 && category == null && sortBy == 'created_at' && !ascending) {
         final cached = AdminListCache.get(cacheKey);
         if (cached != null) return right(cached.cast<AdminProduct>());
       }
-      final data = await _dataSource.getProducts(limit: limit, offset: offset, search: search);
+      final data = await _dataSource.getProducts(limit: limit, offset: offset, search: search, category: category, sortBy: sortBy, ascending: ascending);
       final models = data.map((m) => AdminProduct.fromMap(m)).toList();
-      if (search == null && offset == 0) AdminListCache.set(cacheKey, data);
+      if (search == null && offset == 0 && category == null && sortBy == 'created_at' && !ascending) AdminListCache.set(cacheKey, data);
       return right(models);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<String>>> getProductCategories() async {
+    try {
+      final data = await _dataSource.getProductCategories();
+      return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));
     }
@@ -184,6 +204,26 @@ class AdminRepositoryImpl extends AdminRepository {
   Future<Either<Failure, void>> deleteProduct(int id) async {
     try {
       await _dataSource.deleteProduct(id);
+      return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteProductsBulk(List<int> ids) async {
+    try {
+      await _dataSource.deleteProductsBulk(ids);
+      return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> toggleProductStatus(int id, int status) async {
+    try {
+      await _dataSource.toggleProductStatus(id, status);
       return right(null);
     } catch (e) {
       return left(ServerFailure(e.toString()));

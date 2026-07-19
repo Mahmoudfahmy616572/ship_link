@@ -60,6 +60,10 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
 
   bool isAdminLoggedIn() {
     final user = Supabase.instance.client.auth.currentUser;
-    return user != null && state is AdminAuthSuccess;
+    return user != null && (state is AdminAuthSuccess || state is AdminAuthRestored);
   }
+
+  // الصلاحيات الحالية للأدمن المسجل
+  bool get isSuperAdmin => state.isSuperAdmin;
+  bool get canManage => state.canManage;
 }

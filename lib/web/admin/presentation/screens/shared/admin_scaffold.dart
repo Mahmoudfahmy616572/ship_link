@@ -14,6 +14,8 @@ import 'package:ship_link/web/admin/presentation/screens/drivers/admin_driver_de
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_orders_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/admin_products_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/products/admin_product_detail_web.dart';
+import 'package:ship_link/web/admin/domain/models/admin_models.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 
@@ -37,6 +39,8 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
   Map<String, dynamic>? _detailUser;
   // لو مفتوح تفاصيل درايفر
   Map<String, dynamic>? _detailDriver;
+  // لو مفتوح تفاصيل منتج
+  AdminProduct? _detailProduct;
 
   // عناصر التنقل في السايد بار
   static const _nav = [
@@ -100,6 +104,16 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     setState(() => _detailDriver = null);
   }
 
+  // نفتح تفاصيل منتج
+  void _openProductDetail(AdminProduct product) {
+    setState(() => _detailProduct = product);
+  }
+
+  // نقفل تفاصيل المنتج
+  void _closeProductDetail() {
+    setState(() => _detailProduct = null);
+  }
+
   // دي بتتعامل مع زرار الـ back بتاع المتصفح
   Future<bool> _onWillPop() async {
     // لو تفاصيل أوردر مفتوحة، نقفلها ونرجع للـ orders
@@ -115,6 +129,11 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
     // لو تفاصيل درايفر مفتوحة، نقفلها ونرجع للـ drivers
     if (_detailDriver != null) {
       setState(() => _detailDriver = null);
+      return false;
+    }
+    // لو تفاصيل منتج مفتوحة، نقفلها ونرجع للـ products
+    if (_detailProduct != null) {
+      setState(() => _detailProduct = null);
       return false;
     }
     // لو لسه فيه شاشات قبل كده، نرجع لـ واحدة قبلها
@@ -186,29 +205,44 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
           )
         : _detailUser != null
             ? AdminUserDetailWeb(user: _detailUser!, onBack: _closeUserDetail)
-            : _detailDriver != null
-                ? AdminDriverDetailWeb(
-                    driver: _detailDriver!,
-                    onBack: _closeDriverDetail,
-                    onActivate: (d) {
-                      // تفعيل الدرايفر
-                      // (نستخدم الكيوبت عن طريق الـ context تحت)
-                    },
-                  )
-                : _pages[_selected] is AdminOrdersWeb
-                    ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
-                    : _pages[_selected] is AdminUsersWeb
-                        ? AdminUsersWeb(onOpen: _openUserDetail)
-                        : _pages[_selected] is AdminDriversWeb
-                            ? AdminDriversWeb(onOpen: _openDriverDetail)
-                            : _pages[_selected];
+                : _detailDriver != null
+                    ? AdminDriverDetailWeb(
+                        driver: _detailDriver!,
+                        onBack: _closeDriverDetail,
+                        onActivate: (d) {
+                          // تفعيل الدرايفر
+                          // (نستخدم الكيوبت عن طريق الـ context تحت)
+                        },
+                      )
+                    : _detailProduct != null
+                        ? AdminProductDetailWeb(
+                            product: _detailProduct!,
+                            onBack: _closeProductDetail,
+                            onEdit: AdminAuthCubit.get(context).isSuperAdmin
+                                ? (p) {
+                                    _closeProductDetail();
+                                    // نفتح فورم التعديل من شاشة المنتجات
+                                  }
+                                : null,
+                          )
+                        : _pages[_selected] is AdminOrdersWeb
+                            ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
+                            : _pages[_selected] is AdminUsersWeb
+                                ? AdminUsersWeb(onOpen: _openUserDetail)
+                                : _pages[_selected] is AdminDriversWeb
+                                    ? AdminDriversWeb(onOpen: _openDriverDetail)
+                                    : _pages[_selected] is AdminProductsWeb
+                                        ? AdminProductsWeb(onOpen: _openProductDetail)
+                                        : _pages[_selected];
     final title = _detailOrderId != null
         ? titles[3]
         : _detailUser != null
             ? titles[1]
             : _detailDriver != null
                 ? titles[2]
-                : titles[_selected];
+                : _detailProduct != null
+                    ? titles[4]
+                    : titles[_selected];
     return Scaffold(
       backgroundColor: AdminThemeMode.bg(isDark),
       appBar: _buildAppBar(title, isDark),
@@ -244,13 +278,21 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                 driver: _detailDriver!,
                 onBack: _closeDriverDetail,
               )
-            : _pages[_selected] is AdminOrdersWeb
-                    ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
-                    : _pages[_selected] is AdminUsersWeb
-                        ? AdminUsersWeb(onOpen: _openUserDetail)
-                        : _pages[_selected] is AdminDriversWeb
-                            ? AdminDriversWeb(onOpen: _openDriverDetail)
-                            : _pages[_selected];
+            : _detailProduct != null
+                ? AdminProductDetailWeb(
+                    product: _detailProduct!,
+                    onBack: _closeProductDetail,
+                    onEdit: AdminAuthCubit.get(context).isSuperAdmin ? (p) => _closeProductDetail() : null,
+                  )
+                : _pages[_selected] is AdminOrdersWeb
+                        ? AdminOrdersWeb(onOpenDetail: _openOrderDetail)
+                        : _pages[_selected] is AdminUsersWeb
+                            ? AdminUsersWeb(onOpen: _openUserDetail)
+                            : _pages[_selected] is AdminDriversWeb
+                                ? AdminDriversWeb(onOpen: _openDriverDetail)
+                                : _pages[_selected] is AdminProductsWeb
+                                    ? AdminProductsWeb(onOpen: _openProductDetail)
+                                    : _pages[_selected];
     return Scaffold(
       backgroundColor: AdminThemeMode.bg(isDark),
       appBar: _buildAppBar(_detailOrderId != null ? titles[3] : titles[_selected], isDark),
