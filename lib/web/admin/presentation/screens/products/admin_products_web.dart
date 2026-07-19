@@ -139,7 +139,10 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                     ),
                     if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
                       ElevatedButton.icon(
-                        onPressed: () => _openForm(context, null),
+                        onPressed: () {
+                          if (!_guard(context)) return;
+                          _openForm(context, null);
+                        },
                         icon: const Icon(Icons.add, size: 18),
                         label: Text(t.tr('add_product')),
                         style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
@@ -196,6 +199,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                     onOpen: widget.onOpen,
                     onToggleStatus: AdminAuthCubit.get(context).isSuperAdmin
                         ? (p) async {
+                            if (!_guard(context)) return;
                             await getIt<AdminProductsCubit>().toggleStatus(p.id!, p.status);
                             AdminToast.show(context, t.tr('status_updated'), type: AdminToastType.success);
                           }
@@ -237,7 +241,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
   }
 
   Future<void> _openForm(BuildContext context, AdminProduct? product) async {
-    final t = context.t;
+    if (!_guard(context)) return;
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (_) => ProductFormDialog(product: product),
@@ -259,6 +263,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
       message: '${t.tr('delete_selected_confirm')} (${_selectedIds.length})؟',
     );
     if (confirmed != true || !mounted) return;
+    if (!_guard(context)) return;
     context.read<AdminProductsCubit>().deleteProductsBulk(_selectedIds.toList());
   }
 
@@ -270,8 +275,18 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
       message: '${t.tr('delete_product_confirm')} "${p.name ?? ''}"؟',
     );
     if (confirmed != true || !mounted) return;
+    if (!_guard(context)) return;
     final id = p.id;
     if (id is int) context.read<AdminProductsCubit>().deleteProduct(id);
+  }
+
+  // نحمي الـ viewer: أي محاولة كتابة تطلع توست وتمنع
+  bool _guard(BuildContext context) {
+    if (AdminAuthCubit.get(context).canViewOnly) {
+      AdminToast.show(context, context.t.tr('no_access'));
+      return false;
+    }
+    return true;
   }
 }
 

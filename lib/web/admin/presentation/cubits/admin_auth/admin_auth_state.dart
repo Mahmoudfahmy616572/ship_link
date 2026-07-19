@@ -38,4 +38,7 @@ extension AdminAuthRole on AdminAuthState {
   // الصلاحيات: super_admin بس اللي يقدر يضيف/يعدل/يحذف
   bool get isSuperAdmin => adminRole == 'super_admin';
   bool get canManage => isSuperAdmin;
+  // المشاهد يشوف بس من غير أي صلاحية كتابة
+  bool get isViewer => adminRole == 'viewer';
+  bool get canViewOnly => isViewer && !isSuperAdmin;
 }
