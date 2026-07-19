@@ -66,4 +66,6 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
   // الصلاحيات الحالية للأدمن المسجل
   bool get isSuperAdmin => state.isSuperAdmin;
   bool get canManage => state.canManage;
+  bool get isViewer => state.isViewer;
+  bool get canViewOnly => state.canViewOnly;
 }

@@ -104,6 +104,23 @@ class AdminLoginWeb extends StatelessWidget {
                                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                             : Text(t.tr('sign_in'), style: appStyle(15, FontWeight.w600, Colors.white)),
                       ),
+                      SizedBox(height: 12.h),
+                      // زرار دخول سريع للمشاهد (بييعبي الإيميل والباسورد أوتوماتيك)
+                      OutlinedButton.icon(
+                        onPressed: loading ? null : () {
+                          emailCtrl.text = 'viewer@unipath.com';
+                          passCtrl.text = 'Mm0100400@';
+                          _submit(formKey, context, emailCtrl, passCtrl);
+                        },
+                        icon: const Icon(Icons.visibility_outlined),
+                        label: Text(t.tr('viewer_login'), style: appStyle(14, FontWeight.w600, AppColors.primary)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: BorderSide(color: AppColors.primary),
+                          padding: EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
                     ],
                   );
                 },

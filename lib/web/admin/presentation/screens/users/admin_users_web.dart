@@ -60,6 +60,10 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
       message: '${t.tr('delete_selected_confirm')} (${_selectedIds.length})؟',
     );
     if (confirmed != true || !mounted) return;
+    if (AdminAuthCubit.get(context).canViewOnly) {
+      AdminToast.show(context, context.t.tr('no_access'));
+      return;
+    }
     final cubit = context.read<AdminUsersCubit>();
     for (final id in _selectedIds.toList()) {
       await cubit.deleteUser(id);
