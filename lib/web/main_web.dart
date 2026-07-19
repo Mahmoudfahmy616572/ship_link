@@ -33,6 +33,7 @@ import 'package:ship_link/web/admin/presentation/cubits/dashboard/admin_dashboar
 import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
 import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
 import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -94,6 +95,7 @@ class WebApp extends StatelessWidget {
           BlocProvider<AdminUsersCubit>(create: (_) => getIt<AdminUsersCubit>()),
           BlocProvider<AdminDriversCubit>(create: (_) => getIt<AdminDriversCubit>()),
           BlocProvider<AdminOrdersCubit>(create: (_) => getIt<AdminOrdersCubit>()),
+          BlocProvider<AdminProductsCubit>(create: (_) => getIt<AdminProductsCubit>()),
         ],
         child: Consumer<LocaleProvider>(
           builder: (context, localeProvider, _) {
