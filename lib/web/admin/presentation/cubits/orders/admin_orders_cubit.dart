@@ -11,17 +11,30 @@ class AdminOrdersCubit extends Cubit<AdminOrdersState> {
 
   static AdminOrdersCubit get(context) => BlocProvider.of<AdminOrdersCubit>(context);
 
-  Future<void> loadOrders({int limit = 50, int offset = 0, String? status, String? search}) async {
-    if (!isClosed) emit(AdminOrdersLoading());
+  Future<void> loadOrders({int limit = 20, int offset = 0, String? status, String? search, bool append = false}) async {
+    if (!append) {
+      if (!isClosed) emit(AdminOrdersLoading());
+    }
     final result = await _repository.getOrders(limit: limit, offset: offset, status: status, search: search);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminOrdersError(failure.errMessage));
       },
       (orders) {
-        if (!isClosed) emit(AdminOrdersLoaded(orders, status: status, search: search));
+        if (!isClosed) {
+          final current = append && state is AdminOrdersLoaded ? (state as AdminOrdersLoaded).orders : <Map<String, dynamic>>[];
+          final merged = [...current, ...orders];
+          emit(AdminOrdersLoaded(merged, status: status, search: search, hasMore: orders.length >= limit));
+        }
       },
     );
+  }
+
+  Future<void> loadMoreOrders({String? status, String? search}) async {
+    if (state is! AdminOrdersLoaded) return;
+    final loaded = state as AdminOrdersLoaded;
+    if (!loaded.hasMore) return;
+    await loadOrders(offset: loaded.orders.length, status: status, search: search, append: true);
   }
 
   Future<void> updateStatus({required int id, required String status}) async {

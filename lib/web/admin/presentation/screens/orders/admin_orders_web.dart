@@ -23,6 +23,7 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
   // بنحتفظ بالـ orders في متغير عشان لما نرجع من تفاصيل الأوردر
   // منضطرش نعتمد على الـ state اللي ممكن يكون لسه AdminOrderDetailLoaded
   List<Map<String, dynamic>> _orders = [];
+  bool _hasMore = false;
   String? _activeStatus;
   String _search = '';
 
@@ -67,7 +68,10 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
     return BlocListener<AdminOrdersCubit, dynamic>(
       listener: (context, state) {
         if (state is AdminOrdersLoaded) {
-          setState(() => _orders = state.orders);
+          setState(() {
+            _orders = state.orders;
+            _hasMore = state.hasMore;
+          });
         }
       },
       child: BlocBuilder<AdminOrdersCubit, dynamic>(
@@ -135,6 +139,17 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
                       final intId = id is int ? id : (id is String ? int.tryParse(id) : null);
                       if (intId != null) widget.onOpenDetail?.call(intId);
                     },
+                  ),
+                if (_hasMore)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Center(
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.read<AdminOrdersCubit>().loadMoreOrders(status: _activeStatus, search: _search.isEmpty ? null : _search),
+                        icon: const Icon(Icons.expand_more, size: 18),
+                        label: Text(t.tr('load_more')),
+                      ),
+                    ),
                   ),
               ],
             ),

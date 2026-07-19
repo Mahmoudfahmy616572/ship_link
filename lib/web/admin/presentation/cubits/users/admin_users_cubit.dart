@@ -11,16 +11,29 @@ class AdminUsersCubit extends Cubit<AdminUsersState> {
 
   static AdminUsersCubit get(context) => BlocProvider.of<AdminUsersCubit>(context);
 
-  Future<void> loadUsers({int limit = 50, int offset = 0, String? search}) async {
-    if (!isClosed) emit(AdminUsersLoading());
+  Future<void> loadUsers({int limit = 20, int offset = 0, String? search, bool append = false}) async {
+    if (!append) {
+      if (!isClosed) emit(AdminUsersLoading());
+    }
     final result = await _repository.getUsers(limit: limit, offset: offset, search: search);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminUsersError(failure.errMessage));
       },
       (users) {
-        if (!isClosed) emit(AdminUsersLoaded(users));
+        if (!isClosed) {
+          final current = append && state is AdminUsersLoaded ? (state as AdminUsersLoaded).users : <Map<String, dynamic>>[];
+          final merged = [...current, ...users];
+          emit(AdminUsersLoaded(merged, hasMore: users.length >= limit));
+        }
       },
     );
+  }
+
+  Future<void> loadMoreUsers({String? search}) async {
+    if (state is! AdminUsersLoaded) return;
+    final loaded = state as AdminUsersLoaded;
+    if (!loaded.hasMore) return;
+    await loadUsers(offset: loaded.users.length, search: search, append: true);
   }
 }

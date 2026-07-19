@@ -11,17 +11,30 @@ class AdminDriversCubit extends Cubit<AdminDriversState> {
 
   static AdminDriversCubit get(context) => BlocProvider.of<AdminDriversCubit>(context);
 
-  Future<void> loadDrivers({int limit = 50, int offset = 0, String? search}) async {
-    if (!isClosed) emit(AdminDriversLoading());
+  Future<void> loadDrivers({int limit = 20, int offset = 0, String? search, bool append = false}) async {
+    if (!append) {
+      if (!isClosed) emit(AdminDriversLoading());
+    }
     final result = await _repository.getDrivers(limit: limit, offset: offset, search: search);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminDriversError(failure.errMessage));
       },
       (drivers) {
-        if (!isClosed) emit(AdminDriversLoaded(drivers));
+        if (!isClosed) {
+          final current = append && state is AdminDriversLoaded ? (state as AdminDriversLoaded).drivers : <Map<String, dynamic>>[];
+          final merged = [...current, ...drivers];
+          emit(AdminDriversLoaded(merged, hasMore: drivers.length >= limit));
+        }
       },
     );
+  }
+
+  Future<void> loadMoreDrivers({String? search}) async {
+    if (state is! AdminDriversLoaded) return;
+    final loaded = state as AdminDriversLoaded;
+    if (!loaded.hasMore) return;
+    await loadDrivers(offset: loaded.drivers.length, search: search, append: true);
   }
 
   Future<void> updateDriver({required String id, required Map<String, dynamic> fields}) async {

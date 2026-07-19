@@ -11,17 +11,30 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
 
   static AdminProductsCubit get(context) => BlocProvider.of<AdminProductsCubit>(context);
 
-  Future<void> loadProducts({int limit = 50, int offset = 0, String? search}) async {
-    if (!isClosed) emit(AdminProductsLoading());
+  Future<void> loadProducts({int limit = 20, int offset = 0, String? search, bool append = false}) async {
+    if (!append) {
+      if (!isClosed) emit(AdminProductsLoading());
+    }
     final result = await _repository.getProducts(limit: limit, offset: offset, search: search);
     result.fold(
       (failure) {
         if (!isClosed) emit(AdminProductsError(failure.errMessage));
       },
       (products) {
-        if (!isClosed) emit(AdminProductsLoaded(products, search: search));
+        if (!isClosed) {
+          final current = append && state is AdminProductsLoaded ? (state as AdminProductsLoaded).products : <Map<String, dynamic>>[];
+          final merged = [...current, ...products];
+          emit(AdminProductsLoaded(merged, search: search, hasMore: products.length >= limit));
+        }
       },
     );
+  }
+
+  Future<void> loadMoreProducts({String? search}) async {
+    if (state is! AdminProductsLoaded) return;
+    final loaded = state as AdminProductsLoaded;
+    if (!loaded.hasMore) return;
+    await loadProducts(offset: loaded.products.length, search: search, append: true);
   }
 
   Future<void> createProduct(Map<String, dynamic> data) async {
