@@ -7,6 +7,7 @@ import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
 import 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 import 'package:ship_link/web/admin/presentation/screens/users/widgets/users_widgets.dart';
@@ -104,7 +105,7 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const AdminSectionTitle('Users'),
+                    AdminSectionTitle('Users', isDark: AdminThemeMode.isDark.value),
                     if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
                       TextButton.icon(
                         onPressed: () => setState(() => _selectionMode = true),
@@ -142,7 +143,7 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
                 ),
                 SizedBox(height: 16.h),
                 if (users.isEmpty)
-                  AdminEmptyState(icon: Icons.people_alt_outlined, message: t.tr('no_users'), onRetry: () => context.read<AdminUsersCubit>().loadUsers(search: _search.isEmpty ? null : _search))
+                  AdminEmptyState(icon: Icons.people_alt_outlined, message: t.tr('no_users'), onRetry: () => context.read<AdminUsersCubit>().loadUsers(search: _search.isEmpty ? null : _search), isDark: AdminThemeMode.isDark.value)
                 else ...[
                   UsersTable(
                     users,

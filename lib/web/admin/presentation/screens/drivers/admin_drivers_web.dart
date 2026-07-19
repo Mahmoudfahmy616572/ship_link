@@ -9,6 +9,7 @@ import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
 import 'package:ship_link/web/admin/presentation/screens/drivers/widgets/drivers_widgets.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 
 // شاشة إدارة السائقين (عرض + تفعيل السائق اللي معاه عربية)
 class AdminDriversWeb extends StatefulWidget {
@@ -72,7 +73,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AdminSectionTitle('Drivers'),
+              AdminSectionTitle('Drivers', isDark: AdminThemeMode.isDark.value),
               SizedBox(height: 16.h),
               TextField(
                 onChanged: _onSearchChanged,
@@ -85,7 +86,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
               ),
               SizedBox(height: 16.h),
               if (drivers.isEmpty)
-                AdminEmptyState(icon: Icons.local_shipping_outlined, message: t.tr('no_drivers'), onRetry: () => context.read<AdminDriversCubit>().loadDrivers(search: _search.isEmpty ? null : _search))
+                AdminEmptyState(icon: Icons.local_shipping_outlined, message: t.tr('no_drivers'), onRetry: () => context.read<AdminDriversCubit>().loadDrivers(search: _search.isEmpty ? null : _search), isDark: AdminThemeMode.isDark.value)
               else ...[
                 DriversTable(
                   drivers,

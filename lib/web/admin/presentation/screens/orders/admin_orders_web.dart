@@ -8,6 +8,7 @@ import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/widgets/orders_widgets.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_order_detail_web.dart';
 
@@ -101,7 +102,7 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const AdminSectionTitle('Orders'),
+                AdminSectionTitle('Orders', isDark: AdminThemeMode.isDark.value),
                 SizedBox(height: 16.h),
                 // شريط البحث
                 TextField(
@@ -138,6 +139,7 @@ class _AdminOrdersWebState extends State<AdminOrdersWeb> {
                     icon: Icons.receipt_long_outlined,
                     message: t.tr('no_orders'),
                     onRetry: () => context.read<AdminOrdersCubit>().loadOrders(status: _activeStatus, search: _search.isEmpty ? null : _search),
+                    isDark: AdminThemeMode.isDark.value,
                   )
                 else
                   OrdersTable(

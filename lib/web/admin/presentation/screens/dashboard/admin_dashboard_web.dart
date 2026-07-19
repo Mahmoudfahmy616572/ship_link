@@ -22,6 +22,8 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
   @override
   Widget build(BuildContext context) {
     final t = context.t;
+    final isDark = AdminThemeMode.isDark.value;
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
     return BlocBuilder<AdminDashboardCubit, dynamic>(
       builder: (context, state) {
         if (state is AdminDashboardInitial) {
@@ -34,7 +36,7 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(t.tr('dashboard_overview'), style: appStyle(22, FontWeight.w700, AppColors.textPrimary)),
+                Text(t.tr('dashboard_overview'), style: appStyle(22, FontWeight.w700, textPrimary)),
                 SizedBox(height: 20.h),
                 const DashboardStatGridShimmer(),
               ],
@@ -66,7 +68,7 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.tr('dashboard_overview'), style: appStyle(22, FontWeight.w700, AppColors.textPrimary)),
+              Text(t.tr('dashboard_overview'), style: appStyle(22, FontWeight.w700, textPrimary)),
               SizedBox(height: 16.h),
               // فلتر المدة
               Wrap(
@@ -80,19 +82,19 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
                 ],
               ),
               SizedBox(height: 20.h),
-              DashboardStatGrid(s),
+              DashboardStatGrid(s, isDark: isDark),
               SizedBox(height: 28.h),
-              Text(t.tr('orders_trend'), style: appStyle(18, FontWeight.w600, AppColors.textPrimary)),
+              Text(t.tr('orders_trend'), style: appStyle(18, FontWeight.w600, textPrimary)),
               SizedBox(height: 12.h),
-              OrderTrendChart(trend),
+              OrderTrendChart(trend, isDark: isDark),
               SizedBox(height: 28.h),
-              Text(t.tr('order_status_distribution'), style: appStyle(18, FontWeight.w600, AppColors.textPrimary)),
+              Text(t.tr('order_status_distribution'), style: appStyle(18, FontWeight.w600, textPrimary)),
               SizedBox(height: 12.h),
-              DashboardStatusChips(statusCounts),
+              DashboardStatusChips(statusCounts, isDark: isDark),
               SizedBox(height: 28.h),
-              Text(t.tr('products_by_category'), style: appStyle(18, FontWeight.w600, AppColors.textPrimary)),
+              Text(t.tr('products_by_category'), style: appStyle(18, FontWeight.w600, textPrimary)),
               SizedBox(height: 12.h),
-              ProductCategoryList(Map<String, dynamic>.from(s['productByCategory'] ?? {})),
+              ProductCategoryList(Map<String, dynamic>.from(s['productByCategory'] ?? {}), isDark: isDark),
             ],
           ),
         );
@@ -115,16 +117,19 @@ class _PeriodChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AdminThemeMode.isDark.value;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withValues(alpha: 0.12) : Colors.white,
+          color: selected ? AppColors.primary.withValues(alpha: 0.12) : surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selected ? AppColors.primary : AppColors.border),
+          border: Border.all(color: selected ? AppColors.primary : border),
         ),
-        child: Text(label, style: appStyle(13, FontWeight.w600, selected ? AppColors.primary : AppColors.textSecondary)),
+        child: Text(label, style: appStyle(13, FontWeight.w600, selected ? AppColors.primary : AdminThemeMode.textSecondary(isDark))),
       ),
     );
   }

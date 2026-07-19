@@ -110,7 +110,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                   children: [
                     Row(
                       children: [
-                        Text(t.tr('products'), style: appStyle(22, FontWeight.w700, AppColors.textPrimary)),
+                        Text(t.tr('products'), style: appStyle(22, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
                         const SizedBox(width: 12),
                     if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
                       TextButton.icon(
@@ -186,7 +186,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                 ),
                 SizedBox(height: 16.h),
                 if (products.isEmpty)
-                  AdminEmptyState(icon: Icons.inventory_2_outlined, message: t.tr('no_products'), onRetry: () => _reload())
+                  AdminEmptyState(icon: Icons.inventory_2_outlined, message: t.tr('no_products'), onRetry: () => _reload(), isDark: AdminThemeMode.isDark.value)
                 else ...[
                   ProductsTable(
                     products,

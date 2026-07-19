@@ -5,6 +5,7 @@ import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 
 // شاشة تفاصيل السائق (بياناته الأساسية)
 class AdminDriverDetailWeb extends StatelessWidget {
@@ -16,6 +17,11 @@ class AdminDriverDetailWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.t;
+    final isDark = AdminThemeMode.isDark.value;
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
     final name = driver['name']?.toString() ?? '—';
     final email = driver['email']?.toString() ?? '—';
     final phone = driver['phone_number']?.toString() ?? '—';
@@ -31,28 +37,28 @@ class AdminDriverDetailWeb extends StatelessWidget {
         children: [
           Row(
             children: [
-              IconButton(icon: const Icon(Icons.arrow_back), onPressed: onBack),
+              IconButton(icon: const Icon(Icons.arrow_back), onPressed: onBack, color: textPrimary),
               SizedBox(width: 8.w),
               Text('${t.tr('driver_details')} #$id',
-                  style: appStyle(20, FontWeight.w700, AppColors.textPrimary)),
+                  style: appStyle(20, FontWeight.w700, textPrimary)),
             ],
           ),
           SizedBox(height: 20.h),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: border),
             ),
             child: Column(
               children: [
-                _Row(t.tr('name'), name),
-                _Row(t.tr('email'), email),
-                _Row(t.tr('phone_number'), phone),
-                _Row(t.tr('vehicle_type'), vehicleType),
-                _Row(t.tr('vehicle_number'), vehicleNumber),
-                _Row(t.tr('state'), state),
+                _Row(t.tr('name'), name, textPrimary, textSecondary),
+                _Row(t.tr('email'), email, textPrimary, textSecondary),
+                _Row(t.tr('phone_number'), phone, textPrimary, textSecondary),
+                _Row(t.tr('vehicle_type'), vehicleType, textPrimary, textSecondary),
+                _Row(t.tr('vehicle_number'), vehicleNumber, textPrimary, textSecondary),
+                _Row(t.tr('state'), state, textPrimary, textSecondary),
               ],
             ),
           ),
@@ -83,13 +89,13 @@ class AdminDriverDetailWeb extends StatelessWidget {
     );
   }
 
-  Widget _Row(String label, String value) {
+  Widget _Row(String label, String value, Color textPrimary, Color textSecondary) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Expanded(flex: 2, child: Text(label, style: appStyle(13, FontWeight.w400, AppColors.textSecondary))),
-          Expanded(flex: 3, child: Text(value, style: appStyle(15, FontWeight.w600, AppColors.textPrimary))),
+          Expanded(flex: 2, child: Text(label, style: appStyle(13, FontWeight.w400, textSecondary))),
+          Expanded(flex: 3, child: Text(value, style: appStyle(15, FontWeight.w600, textPrimary))),
         ],
       ),
     );
