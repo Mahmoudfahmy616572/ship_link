@@ -10,7 +10,8 @@ import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode
 // شبكة الكروت الإحصائية فوق الداشبورد
 class DashboardStatGrid extends StatelessWidget {
   final Map<String, dynamic> stats;
-  const DashboardStatGrid(this.stats, {super.key});
+  final bool isDark;
+  const DashboardStatGrid(this.stats, {super.key, this.isDark = false});
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +37,12 @@ class DashboardStatGrid extends StatelessWidget {
           mainAxisSpacing: 16,
           childAspectRatio: 1.6,
           children: [
-            AdminStatCard(title: t.tr('users'), value: '${stats['users']}', icon: Icons.people_alt_rounded, color: AppColors.primary),
-            AdminStatCard(title: t.tr('drivers'), value: '${stats['drivers']}', icon: Icons.local_shipping_rounded, color: AppColors.cta),
-            AdminStatCard(title: t.tr('orders'), value: '${stats['orders']}', icon: Icons.receipt_long_rounded, color: AppColors.info),
-            AdminStatCard(title: t.tr('products'), value: '${stats['products']}', icon: Icons.inventory_2_rounded, color: AppColors.warning),
-            AdminStatCard(title: t.tr('active_products'), value: '${stats['activeProducts'] ?? 0}', icon: Icons.check_circle_outline, color: AppColors.success),
-            AdminStatCard(title: t.tr('low_stock'), value: '${stats['lowStock'] ?? 0}', icon: Icons.warning_amber_outlined, color: AppColors.error),
+            AdminStatCard(title: t.tr('users'), value: '${stats['users']}', icon: Icons.people_alt_rounded, color: AppColors.primary, isDark: isDark),
+            AdminStatCard(title: t.tr('drivers'), value: '${stats['drivers']}', icon: Icons.local_shipping_rounded, color: AppColors.cta, isDark: isDark),
+            AdminStatCard(title: t.tr('orders'), value: '${stats['orders']}', icon: Icons.receipt_long_rounded, color: AppColors.info, isDark: isDark),
+            AdminStatCard(title: t.tr('products'), value: '${stats['products']}', icon: Icons.inventory_2_rounded, color: AppColors.warning, isDark: isDark),
+            AdminStatCard(title: t.tr('active_products'), value: '${stats['activeProducts'] ?? 0}', icon: Icons.check_circle_outline, color: AppColors.success, isDark: isDark),
+            AdminStatCard(title: t.tr('low_stock'), value: '${stats['lowStock'] ?? 0}', icon: Icons.warning_amber_outlined, color: AppColors.error, isDark: isDark),
           ],
         );
       },
@@ -52,20 +53,25 @@ class DashboardStatGrid extends StatelessWidget {
 // شارت اتجاه الطلبات (آخر 7 أيام)
 class OrderTrendChart extends StatelessWidget {
   final Map<String, dynamic> trend;
-  const OrderTrendChart(this.trend, {super.key});
+  final bool isDark;
+  const OrderTrendChart(this.trend, {super.key, this.isDark = false});
 
   @override
   Widget build(BuildContext context) {
     final t = context.t;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
     if (trend.isEmpty) {
       return Container(
         height: 220,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: border),
         ),
-        child: Center(child: Text(t.tr('no_results'), style: appStyle(14, FontWeight.w400, AppColors.textSecondary))),
+        child: Center(child: Text(t.tr('no_results'), style: appStyle(14, FontWeight.w400, textSecondary))),
       );
     }
 
@@ -87,21 +93,21 @@ class OrderTrendChart extends StatelessWidget {
       height: 240,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(t.tr('orders_trend'), style: appStyle(15, FontWeight.w600, AppColors.textPrimary)),
+          Text(t.tr('orders_trend'), style: appStyle(15, FontWeight.w600, textPrimary)),
           const SizedBox(height: 12),
           Expanded(
             child: LineChart(
               LineChartData(
                 minY: 0,
                 maxY: roundedMax,
-                gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 1),
+                gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 1, getDrawingHorizontalLine: (v) => FlLine(color: border, strokeWidth: 1)),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -109,12 +115,12 @@ class OrderTrendChart extends StatelessWidget {
                       getTitlesWidget: (v, _) {
                         final idx = v.toInt();
                         if (idx < 0 || idx >= labels.length) return const Text('');
-                        return Text(labels[idx], style: appStyle(10, FontWeight.w400, AppColors.textSecondary));
+                        return Text(labels[idx], style: appStyle(10, FontWeight.w400, textSecondary));
                       },
                     ),
                   ),
                   leftTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: true, interval: 1, getTitlesWidget: (v, _) => Text(v.toInt().toString(), style: appStyle(10, FontWeight.w400, AppColors.textSecondary))),
+                    sideTitles: SideTitles(showTitles: true, interval: 1, getTitlesWidget: (v, _) => Text(v.toInt().toString(), style: appStyle(10, FontWeight.w400, textSecondary))),
                   ),
                   topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -127,7 +133,7 @@ class OrderTrendChart extends StatelessWidget {
                     color: AppColors.primary,
                     barWidth: 3,
                     dotData: FlDotData(show: true),
-                    belowBarData: BarAreaData(show: true, color: AppColors.primary.withValues(alpha: 0.1)),
+                    belowBarData: BarAreaData(show: true, color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.1)),
                   ),
                 ],
               ),
@@ -161,10 +167,13 @@ class DashboardStatGridShimmer extends StatelessWidget {
 // شيتس بتوزيع حالات الطلبات
 class DashboardStatusChips extends StatelessWidget {
   final Map<String, dynamic> statusCounts;
-  const DashboardStatusChips(this.statusCounts, {super.key});
+  final bool isDark;
+  const DashboardStatusChips(this.statusCounts, {super.key, this.isDark = false});
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
     final colors = {
       'pending': AppColors.pending,
       'confirmed': AppColors.primary,
@@ -190,9 +199,9 @@ class DashboardStatusChips extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(e.key.toUpperCase(), style: appStyle(12, FontWeight.w600, color)),
+              Text(t.tr(e.key), style: appStyle(12, FontWeight.w600, color)),
               SizedBox(height: 4.h),
-              Text('${e.value}', style: appStyle(20, FontWeight.w700, AppColors.textPrimary)),
+              Text('${e.value}', style: appStyle(20, FontWeight.w700, textPrimary)),
             ],
           ),
         );
@@ -204,13 +213,16 @@ class DashboardStatusChips extends StatelessWidget {
 // قائمة توزيع المنتجات حسب الفئة (شريط نسبي)
 class ProductCategoryList extends StatelessWidget {
   final Map<String, dynamic> byCategory;
-  const ProductCategoryList(this.byCategory, {super.key});
+  final bool isDark;
+  const ProductCategoryList(this.byCategory, {super.key, this.isDark = false});
 
   @override
   Widget build(BuildContext context) {
-    final t = context.t;
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    final barBg = AdminThemeMode.bg(isDark);
     if (byCategory.isEmpty) {
-      return Text('—', style: appStyle(14, FontWeight.w400, AppColors.textSecondary));
+      return Text('—', style: appStyle(14, FontWeight.w400, textSecondary));
     }
     final entries = byCategory.entries.toList()..sort((a, b) => (b.value as int).compareTo(a.value as int));
     final max = entries.map((e) => e.value as int).reduce((a, b) => a > b ? a : b).toDouble();
@@ -225,11 +237,11 @@ class ProductCategoryList extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 10),
           child: Row(
             children: [
-              SizedBox(width: 120, child: Text(entry.key, style: appStyle(14, FontWeight.w500, AppColors.textPrimary), overflow: TextOverflow.ellipsis)),
+              SizedBox(width: 120, child: Text(entry.key, style: appStyle(14, FontWeight.w500, textPrimary), overflow: TextOverflow.ellipsis)),
               Expanded(
                 child: Container(
                   height: 22,
-                  decoration: BoxDecoration(color: AdminThemeMode.bg(AdminThemeMode.isDark.value), borderRadius: BorderRadius.circular(6)),
+                  decoration: BoxDecoration(color: barBg, borderRadius: BorderRadius.circular(6)),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
                     widthFactor: pct,
@@ -240,7 +252,7 @@ class ProductCategoryList extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 10.w),
-              Text('${entry.value}', style: appStyle(14, FontWeight.w700, AppColors.textPrimary)),
+              Text('${entry.value}', style: appStyle(14, FontWeight.w700, textPrimary)),
             ],
           ),
         );

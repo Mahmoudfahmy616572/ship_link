@@ -7,6 +7,7 @@ import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/widgets/orders_widgets.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 
 // شاشة تفاصيل الطلب (المنتجات + تغيير الحالة)
 class AdminOrderDetailWeb extends StatelessWidget {
@@ -27,6 +28,8 @@ class AdminOrderDetailWeb extends StatelessWidget {
     });
 
     final t = context.t;
+    final isDark = AdminThemeMode.isDark.value;
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
     return BlocBuilder<AdminOrdersCubit, dynamic>(
       builder: (context, state) {
         if (state is AdminOrdersLoading) {
@@ -49,9 +52,10 @@ class AdminOrderDetailWeb extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () => onBack?.call(),
+                    color: textPrimary,
                   ),
                   SizedBox(width: 8.w),
-                  Text('${t.tr('order_details')} #$orderId', style: appStyle(20, FontWeight.w700, AppColors.textPrimary)),
+                  Text('${t.tr('order_details')} #$orderId', style: appStyle(20, FontWeight.w700, textPrimary)),
                 ],
               ),
               SizedBox(height: 20.h),
@@ -64,7 +68,7 @@ class AdminOrderDetailWeb extends StatelessWidget {
               OrderItemsList(items),
               SizedBox(height: 24.h),
               // تغيير الحالة
-              Text(t.tr('order_status'), style: appStyle(16, FontWeight.w600, AppColors.textPrimary)),
+              Text(t.tr('order_status'), style: appStyle(16, FontWeight.w600, textPrimary)),
               SizedBox(height: 12.h),
               Wrap(
                 spacing: 8,
