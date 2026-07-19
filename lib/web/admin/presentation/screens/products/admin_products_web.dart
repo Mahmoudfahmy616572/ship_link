@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
 import 'package:ship_link/web/admin/domain/models/admin_models.dart';
+import 'package:ship_link/web/data/services_locators.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/widgets/product_form_dialog.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/widgets/products_widgets.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
@@ -27,7 +26,10 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
   @override
   Widget build(BuildContext context) {
     final t = context.t;
-    return BlocListener<AdminProductsCubit, dynamic>(
+    final cubit = getIt<AdminProductsCubit>();
+    return BlocProvider.value(
+      value: cubit,
+      child: BlocListener<AdminProductsCubit, dynamic>(
       listener: (context, state) {
         if (state is AdminProductSaveSuccess) {
           AdminToast.show(context, t.tr('product_saved'), type: AdminToastType.success);
@@ -109,6 +111,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
             ),
           );
         },
+      ),
       ),
     );
   }
