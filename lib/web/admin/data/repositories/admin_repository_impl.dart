@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:ship_link/core/constants/Errors/failures.dart';
 import 'package:ship_link/web/admin/data/datasources/admin_remote_datasource.dart';
 import 'package:ship_link/web/admin/domain/repositories/admin_repository.dart';
+import 'package:ship_link/web/admin/presentation/utils/admin_list_cache.dart';
 
 class AdminRepositoryImpl extends AdminRepository {
   AdminRepositoryImpl();
@@ -54,7 +55,13 @@ class AdminRepositoryImpl extends AdminRepository {
   @override
   Future<Either<Failure, List<Map<String, dynamic>>>> getUsers({int limit = 50, int offset = 0, String? search}) async {
     try {
+      final cacheKey = 'users';
+      if (search == null && offset == 0) {
+        final cached = AdminListCache.get(cacheKey);
+        if (cached != null) return right(cached);
+      }
       final data = await _dataSource.getUsers(limit: limit, offset: offset, search: search);
+      if (search == null && offset == 0) AdminListCache.set(cacheKey, data);
       return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));
@@ -64,7 +71,13 @@ class AdminRepositoryImpl extends AdminRepository {
   @override
   Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit = 50, int offset = 0, String? search}) async {
     try {
+      final cacheKey = 'drivers';
+      if (search == null && offset == 0) {
+        final cached = AdminListCache.get(cacheKey);
+        if (cached != null) return right(cached);
+      }
       final data = await _dataSource.getDrivers(limit: limit, offset: offset, search: search);
+      if (search == null && offset == 0) AdminListCache.set(cacheKey, data);
       return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));
@@ -84,7 +97,13 @@ class AdminRepositoryImpl extends AdminRepository {
   @override
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrders({int limit = 50, int offset = 0, String? status, String? search}) async {
     try {
+      final cacheKey = 'orders_$status';
+      if (search == null && offset == 0) {
+        final cached = AdminListCache.get(cacheKey);
+        if (cached != null) return right(cached);
+      }
       final data = await _dataSource.getOrders(limit: limit, offset: offset, status: status, search: search);
+      if (search == null && offset == 0) AdminListCache.set(cacheKey, data);
       return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));
@@ -124,7 +143,14 @@ class AdminRepositoryImpl extends AdminRepository {
   @override
   Future<Either<Failure, List<Map<String, dynamic>>>> getProducts({int limit = 50, int offset = 0, String? search}) async {
     try {
+      // كاش للتحميل الأولي بدون بحث/صفحات
+      final cacheKey = 'products';
+      if (search == null && offset == 0) {
+        final cached = AdminListCache.get(cacheKey);
+        if (cached != null) return right(cached);
+      }
       final data = await _dataSource.getProducts(limit: limit, offset: offset, search: search);
+      if (search == null && offset == 0) AdminListCache.set(cacheKey, data);
       return right(data);
     } catch (e) {
       return left(ServerFailure(e.toString()));

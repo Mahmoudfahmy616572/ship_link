@@ -6,6 +6,7 @@ import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
+import 'package:ship_link/web/admin/presentation/utils/admin_date_formatter.dart';
 
 // البادج بتاع نوع المستخدم (user / driver / admin)
 class UserRoleBadge extends StatelessWidget {
@@ -85,7 +86,7 @@ class UsersTable extends StatelessWidget {
           columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
           rows: users.map((u) {
             final name = u['name']?.toString() ?? '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}'.trim();
-            final joined = u['created_at']?.toString().substring(0, 10) ?? '—';
+            final joined = AdminDateFormatter.formatDate(u['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode);
             return DataRow(
               onSelectChanged: (_) => onOpen?.call(u),
               cells: [

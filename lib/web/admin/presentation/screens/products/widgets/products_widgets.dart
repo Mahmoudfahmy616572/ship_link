@@ -5,6 +5,7 @@ import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
+import 'package:ship_link/web/admin/presentation/utils/admin_date_formatter.dart';
 
 String _priceText(Map<String, dynamic> p) {
   final price = (p['price'] is num ? (p['price'] as num).toDouble() : 0.0);
@@ -61,6 +62,9 @@ class ProductsTable extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text('${t.tr('category')}: ${p['category']?.toString() ?? '—'} • ${t.tr('qty')}: ${p['qty'] ?? 0}',
                           style: appStyle(12, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
+                      const SizedBox(height: 2),
+                      Text(AdminDateFormatter.formatDate(p['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode),
+                          style: appStyle(11, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                     ],
                   ),
                 ),
