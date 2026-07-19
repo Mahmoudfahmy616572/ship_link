@@ -85,13 +85,25 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                 SizedBox(height: 16.h),
                 if (products.isEmpty)
                   AdminEmptyState(icon: Icons.inventory_2_outlined, message: t.tr('no_products'), onRetry: () => context.read<AdminProductsCubit>().loadProducts(search: _search.isEmpty ? null : _search))
-                else
+                else ...[
                   ProductsTable(
                     products,
                     isCompact: MediaQuery.of(context).size.width <= 900,
                     onEdit: (p) => _openForm(context, p),
                     onDelete: (p) => _confirmDelete(context, p),
                   ),
+                  if (state is AdminProductsLoaded && state.hasMore)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Center(
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.read<AdminProductsCubit>().loadMoreProducts(search: _search.isEmpty ? null : _search),
+                          icon: const Icon(Icons.expand_more, size: 18),
+                          label: Text(t.tr('load_more')),
+                        ),
+                      ),
+                    ),
+                ],
               ],
             ),
           );

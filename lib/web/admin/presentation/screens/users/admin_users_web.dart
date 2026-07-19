@@ -35,6 +35,7 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
           return UsersErrorView(state.message);
         }
         final users = (state is AdminUsersLoaded) ? state.users : <Map<String, dynamic>>[];
+        final hasMore = (state is AdminUsersLoaded) ? state.hasMore : false;
 
         return SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -58,8 +59,20 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
               SizedBox(height: 16.h),
               if (users.isEmpty)
                 AdminEmptyState(icon: Icons.people_alt_outlined, message: t.tr('no_users'), onRetry: () => context.read<AdminUsersCubit>().loadUsers(search: _search.isEmpty ? null : _search))
-              else
+              else ...[
                 UsersTable(users, isCompact: MediaQuery.of(context).size.width <= 900, onOpen: widget.onOpen),
+                if (hasMore)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Center(
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.read<AdminUsersCubit>().loadMoreUsers(search: _search.isEmpty ? null : _search),
+                        icon: const Icon(Icons.expand_more, size: 18),
+                        label: Text(t.tr('load_more')),
+                      ),
+                    ),
+                  ),
+              ],
             ],
           ),
         );

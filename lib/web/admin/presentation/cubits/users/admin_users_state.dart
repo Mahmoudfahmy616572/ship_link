@@ -6,7 +6,8 @@ class AdminUsersLoading extends AdminUsersState {}
 
 class AdminUsersLoaded extends AdminUsersState {
   final List<Map<String, dynamic>> users;
-  AdminUsersLoaded(this.users);
+  final bool hasMore;
+  AdminUsersLoaded(this.users, {this.hasMore = false});
 }
 
 class AdminUsersError extends AdminUsersState {

@@ -8,7 +8,8 @@ class AdminOrdersLoaded extends AdminOrdersState {
   final List<Map<String, dynamic>> orders;
   final String? status;
   final String? search;
-  AdminOrdersLoaded(this.orders, {this.status, this.search});
+  final bool hasMore;
+  AdminOrdersLoaded(this.orders, {this.status, this.search, this.hasMore = false});
 }
 
 class AdminOrdersError extends AdminOrdersState {

@@ -6,7 +6,8 @@ class AdminDriversLoading extends AdminDriversState {}
 
 class AdminDriversLoaded extends AdminDriversState {
   final List<Map<String, dynamic>> drivers;
-  AdminDriversLoaded(this.drivers);
+  final bool hasMore;
+  AdminDriversLoaded(this.drivers, {this.hasMore = false});
 }
 
 class AdminDriversError extends AdminDriversState {

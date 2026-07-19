@@ -51,6 +51,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
           return DriversErrorView(state.message, () => context.read<AdminDriversCubit>().loadDrivers());
         }
         final drivers = (state is AdminDriversLoaded) ? state.drivers : <Map<String, dynamic>>[];
+        final hasMore = (state is AdminDriversLoaded) ? state.hasMore : false;
 
         return SingleChildScrollView(
           padding: EdgeInsets.all(24),
@@ -74,7 +75,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
               SizedBox(height: 16.h),
               if (drivers.isEmpty)
                 AdminEmptyState(icon: Icons.local_shipping_outlined, message: t.tr('no_drivers'), onRetry: () => context.read<AdminDriversCubit>().loadDrivers(search: _search.isEmpty ? null : _search))
-              else
+              else ...[
                 DriversTable(
                   drivers,
                   isCompact: MediaQuery.of(context).size.width <= 900,
@@ -94,6 +95,18 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
                   }
                 },
               ),
+                if (hasMore)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Center(
+                      child: OutlinedButton.icon(
+                        onPressed: () => context.read<AdminDriversCubit>().loadMoreDrivers(search: _search.isEmpty ? null : _search),
+                        icon: const Icon(Icons.expand_more, size: 18),
+                        label: Text(t.tr('load_more')),
+                      ),
+                    ),
+                  ),
+              ],
             ],
           ),
         );
