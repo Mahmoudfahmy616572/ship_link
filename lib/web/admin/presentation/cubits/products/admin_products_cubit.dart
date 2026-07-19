@@ -1,4 +1,8 @@
+import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dartz/dartz.dart';
+import 'package:ship_link/core/constants/Errors/failures.dart';
+import 'package:ship_link/web/admin/domain/models/admin_models.dart';
 import 'package:ship_link/web/admin/domain/repositories/admin_repository.dart';
 import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_state.dart';
 
@@ -22,7 +26,7 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
       },
       (products) {
         if (!isClosed) {
-          final current = append && state is AdminProductsLoaded ? (state as AdminProductsLoaded).products : <Map<String, dynamic>>[];
+          final current = append && state is AdminProductsLoaded ? (state as AdminProductsLoaded).products : <AdminProduct>[];
           final merged = [...current, ...products];
           emit(AdminProductsLoaded(merged, search: search, hasMore: products.length >= limit));
         }
@@ -45,7 +49,7 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
         if (!isClosed) emit(AdminProductsError(failure.errMessage));
       },
       (created) {
-        if (!isClosed) emit(AdminProductSaveSuccess(id: created['id'] is int ? created['id'] : null));
+        if (!isClosed) emit(AdminProductSaveSuccess(id: created.id));
       },
     );
   }
@@ -74,5 +78,9 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
         if (!isClosed) emit(AdminProductDeleteSuccess(id));
       },
     );
+  }
+
+  Future<Either<Failure, String>> uploadProductImage(Uint8List bytes, String fileName) async {
+    return _repository.uploadProductImage(bytes, fileName);
   }
 }

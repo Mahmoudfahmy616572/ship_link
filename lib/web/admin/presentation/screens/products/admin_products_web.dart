@@ -7,6 +7,7 @@ import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
+import 'package:ship_link/web/admin/domain/models/admin_models.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/widgets/product_form_dialog.dart';
 import 'package:ship_link/web/admin/presentation/screens/products/widgets/products_widgets.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
@@ -50,7 +51,7 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
           if (state is AdminProductsError) {
             return ProductsErrorView(state.message);
           }
-          final products = (state is AdminProductsLoaded) ? state.products : <Map<String, dynamic>>[];
+          final products = (state is AdminProductsLoaded) ? state.products : <AdminProduct>[];
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -112,14 +113,14 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
     );
   }
 
-  Future<void> _openForm(BuildContext context, Map<String, dynamic>? product) async {
+  Future<void> _openForm(BuildContext context, AdminProduct? product) async {
     final t = context.t;
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (_) => ProductFormDialog(product: product),
     );
     if (result == null || !mounted) return;
-    final id = product?['id'];
+    final id = product?.id;
     if (id is int) {
       context.read<AdminProductsCubit>().updateProduct(id: id, data: result);
     } else {
@@ -127,15 +128,15 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
     }
   }
 
-  Future<void> _confirmDelete(BuildContext context, Map<String, dynamic> p) async {
+  Future<void> _confirmDelete(BuildContext context, AdminProduct p) async {
     final t = context.t;
     final confirmed = await AdminConfirmDialog.show(
       context,
       title: t.tr('delete_product'),
-      message: '${t.tr('delete_product_confirm')} "${p['name']?.toString() ?? ''}"؟',
+      message: '${t.tr('delete_product_confirm')} "${p.name ?? ''}"؟',
     );
     if (confirmed != true || !mounted) return;
-    final id = p['id'];
+    final id = p.id;
     if (id is int) context.read<AdminProductsCubit>().deleteProduct(id);
   }
 }

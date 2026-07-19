@@ -102,3 +102,15 @@ CREATE POLICY "Admins can manage reviews" ON reviews
 --      VALUES ('<USER_UUID>', 'admin@shiplink.app', 'Site Admin', 'super_admin', true)
 --      ON CONFLICT (id) DO UPDATE SET is_active = true, role = 'super_admin';
 -- =============================================================
+
+-- =============================================================
+-- STORAGE BUCKET FOR PRODUCT IMAGES
+-- Create the bucket (run once in SQL Editor or via Dashboard):
+--   insert into storage.buckets (id, name, public) values ('product-images', 'product-images', true);
+-- Then allow authenticated admins to upload (RLS on storage.objects):
+--   create policy "Admins can upload product images"
+--     on storage.objects for insert to authenticated
+--     with check (bucket_id = 'product-images' and auth.uid() in (select id from admins where is_active = true));
+--   create policy "Public can read product images"
+--     on storage.objects for select using (bucket_id = 'product-images');
+-- =============================================================

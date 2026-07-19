@@ -1,8 +1,10 @@
+import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
 import 'package:ship_link/core/constants/Errors/failures.dart';
 import 'package:ship_link/web/admin/data/datasources/admin_remote_datasource.dart';
 import 'package:ship_link/web/admin/domain/repositories/admin_repository.dart';
 import 'package:ship_link/web/admin/presentation/utils/admin_list_cache.dart';
+import 'package:ship_link/web/admin/domain/models/admin_models.dart';
 
 class AdminRepositoryImpl extends AdminRepository {
   AdminRepositoryImpl();
@@ -141,27 +143,28 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
-  Future<Either<Failure, List<Map<String, dynamic>>>> getProducts({int limit = 50, int offset = 0, String? search}) async {
+  Future<Either<Failure, List<AdminProduct>>> getProducts({int limit = 50, int offset = 0, String? search}) async {
     try {
       // كاش للتحميل الأولي بدون بحث/صفحات
       final cacheKey = 'products';
       if (search == null && offset == 0) {
         final cached = AdminListCache.get(cacheKey);
-        if (cached != null) return right(cached);
+        if (cached != null) return right(cached.cast<AdminProduct>());
       }
       final data = await _dataSource.getProducts(limit: limit, offset: offset, search: search);
+      final models = data.map((m) => AdminProduct.fromMap(m)).toList();
       if (search == null && offset == 0) AdminListCache.set(cacheKey, data);
-      return right(data);
+      return right(models);
     } catch (e) {
       return left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> createProduct(Map<String, dynamic> data) async {
+  Future<Either<Failure, AdminProduct>> createProduct(Map<String, dynamic> data) async {
     try {
       final created = await _dataSource.createProduct(data);
-      return right(created);
+      return right(AdminProduct.fromMap(created));
     } catch (e) {
       return left(ServerFailure(e.toString()));
     }
@@ -182,6 +185,16 @@ class AdminRepositoryImpl extends AdminRepository {
     try {
       await _dataSource.deleteProduct(id);
       return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadProductImage(Uint8List bytes, String fileName) async {
+    try {
+      final url = await _dataSource.uploadProductImage(bytes, fileName);
+      return right(url);
     } catch (e) {
       return left(ServerFailure(e.toString()));
     }

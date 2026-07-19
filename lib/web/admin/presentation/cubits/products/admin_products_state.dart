@@ -1,3 +1,5 @@
+import 'package:ship_link/web/admin/domain/models/admin_models.dart';
+
 abstract class AdminProductsState {}
 
 class AdminProductsInitial extends AdminProductsState {}
@@ -5,7 +7,7 @@ class AdminProductsInitial extends AdminProductsState {}
 class AdminProductsLoading extends AdminProductsState {}
 
 class AdminProductsLoaded extends AdminProductsState {
-  final List<Map<String, dynamic>> products;
+  final List<AdminProduct> products;
   final String? search;
   final bool hasMore;
   AdminProductsLoaded(this.products, {this.search, this.hasMore = false});
