@@ -4,6 +4,7 @@ import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/web/admin/presentation/utils/admin_date_formatter.dart';
 
 // بادج حالة الطلب ملون حسب الحالة
 class OrderStatusChip extends StatelessWidget {
@@ -69,6 +70,9 @@ class OrdersTable extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text('${t.tr('customer')}: ${o['user_id']?.toString().substring(0, 8) ?? '—'}',
                       style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
+                  const SizedBox(height: 2),
+                  Text(AdminDateFormatter.formatDate(o['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode),
+                      style: appStyle(12, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,7 +93,7 @@ class OrdersTable extends StatelessWidget {
         }).toList(),
       );
     }
-    final columns = [t.tr('order_no'), t.tr('customer'), t.tr('total'), t.tr('status'), t.tr('details')];
+    final columns = [t.tr('order_no'), t.tr('customer'), t.tr('date'), t.tr('total'), t.tr('status'), t.tr('details')];
     return Container(
       decoration: BoxDecoration(
         color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
@@ -105,6 +109,7 @@ class OrdersTable extends StatelessWidget {
             return DataRow(cells: [
               DataCell(Text('#${o['id']}', style: appStyle(14, FontWeight.w600, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
               DataCell(Text(o['user_id']?.toString().substring(0, 8) ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
+              DataCell(Text(AdminDateFormatter.formatDate(o['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode), style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
               DataCell(Text('${total.toStringAsFixed(0)} EGP', style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
               DataCell(OrderStatusChip(o['status']?.toString() ?? 'unknown')),
               DataCell(
