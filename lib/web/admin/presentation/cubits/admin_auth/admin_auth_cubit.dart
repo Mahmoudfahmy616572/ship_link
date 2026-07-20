@@ -17,6 +17,8 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
     final result = await _repository.signIn(email: email, password: password);
     result.fold(
       (failure) {
+        // ignore: avoid_print
+        print('DEBUG AUTH FAILURE = ${failure.errMessage}');
         if (!isClosed) emit(AdminAuthFailure(failure.errMessage));
       },
       (admin) {
