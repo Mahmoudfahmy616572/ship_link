@@ -142,7 +142,10 @@ class ProductsTable extends StatelessWidget {
             final img = p.image;
             final statusText = p.status == 1 ? t.tr('active') : t.tr('inactive');
             return DataRow(
-              onSelectChanged: isSelectionMode ? (_) => onToggleSelect(p.id ?? -1) : (_) => onOpen?.call(p),
+              // في وضع التحديد الصف كله يعمل تبديل، ومن غيره مفيش تفاعل (عشان الـ checkbox يتحكم)
+              onSelectChanged: isSelectionMode
+                  ? (_) => onToggleSelect(p.id ?? -1)
+                  : null,
               cells: [
               if (isSelectionMode)
                 DataCell(Checkbox(value: selectedIds.contains(p.id), onChanged: (_) => onToggleSelect(p.id ?? -1))),
