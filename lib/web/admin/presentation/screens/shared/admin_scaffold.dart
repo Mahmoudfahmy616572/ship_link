@@ -5,11 +5,13 @@ import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_cubit.dart';
 import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/users/admin_users_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_side_nav.dart';
 import 'package:ship_link/web/admin/presentation/screens/dashboard/admin_dashboard_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/users/admin_users_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/users/admin_user_detail_web.dart';
+import 'package:ship_link/web/admin/presentation/screens/users/widgets/user_form_dialog.dart';
 import 'package:ship_link/web/admin/presentation/screens/drivers/admin_drivers_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/drivers/admin_driver_detail_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/orders/admin_orders_web.dart';
@@ -63,10 +65,14 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
 
   // لما نختار شاشة من السايد بار، نضيفها فوق التاريخ
   void _select(int i) {
-    if (_detailOrderId != null) {
-      // لو مفتوح تفاصيل، نقفله ونتحرك للشاشة الجديدة
+    // لو مفتوح أي تفاصيل، نقفلهم كلهم ونروح للشاشة المختارة
+    final anyDetailOpen = _detailOrderId != null || _detailUser != null || _detailDriver != null || _detailProduct != null;
+    if (anyDetailOpen) {
       setState(() {
         _detailOrderId = null;
+        _detailUser = null;
+        _detailDriver = null;
+        _detailProduct = null;
         if (_history.last != i) _history.add(i);
       });
       return;
@@ -209,8 +215,15 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                 user: _detailUser!,
                 onBack: _closeUserDetail,
                 onEdit: AdminAuthCubit.get(context).isSuperAdmin
-                    ? (u) {
+                    ? (u) async {
                         _closeUserDetail();
+                        final result = await showDialog<Map<String, dynamic>>(
+                          context: context,
+                          builder: (_) => UserCreateEditDialog(user: u),
+                        );
+                        if (result != null && context.mounted) {
+                          context.read<AdminUsersCubit>().updateUser(id: u['id'].toString(), data: result);
+                        }
                       }
                     : null,
               )

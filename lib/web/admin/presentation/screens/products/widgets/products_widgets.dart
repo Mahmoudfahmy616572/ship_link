@@ -127,7 +127,7 @@ class ProductsTable extends StatelessWidget {
         }).toList(),
       );
     }
-    final columns = [if (isSelectionMode) '', t.tr('image'), t.tr('name'), t.tr('category'), t.tr('price'), t.tr('qty'), t.tr('status'), t.tr('actions')];
+    final columns = [t.tr('image'), t.tr('name'), t.tr('category'), t.tr('price'), t.tr('qty'), t.tr('status'), t.tr('actions')];
     return Container(
       decoration: BoxDecoration(
         color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
@@ -142,13 +142,12 @@ class ProductsTable extends StatelessWidget {
             final img = p.image;
             final statusText = p.status == 1 ? t.tr('active') : t.tr('inactive');
             return DataRow(
-              // في وضع التحديد الصف كله يعمل تبديل، ومن غيره مفيش تفاعل (عشان الـ checkbox يتحكم)
+              // الصف كله يعمل تبديل للاختيار (Flutter بيرسم الـ checkmark تلقائياً)
               onSelectChanged: isSelectionMode
                   ? (_) => onToggleSelect(p.id ?? -1)
                   : null,
+              selected: isSelectionMode && selectedIds.contains(p.id ?? -1),
               cells: [
-              if (isSelectionMode)
-                DataCell(Checkbox(value: selectedIds.contains(p.id), onChanged: (_) => onToggleSelect(p.id ?? -1))),
               DataCell(img != null && img.isNotEmpty
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(6),
