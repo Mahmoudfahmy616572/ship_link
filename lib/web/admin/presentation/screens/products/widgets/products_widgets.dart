@@ -154,8 +154,10 @@ class ProductsTable extends StatelessWidget {
                       child: Image.network(img, width: 40, height: 40, fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => Container(width: 40, height: 40, color: AdminThemeMode.bg(AdminThemeMode.isDark.value))),
                     )
-                  : Container(width: 40, height: 40, decoration: BoxDecoration(color: AdminThemeMode.bg(AdminThemeMode.isDark.value), borderRadius: BorderRadius.circular(6)))),
-              DataCell(Text(p.name?.isNotEmpty == true ? p.name! : '—', style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+                  : Container(width: 40, height: 40, decoration: BoxDecoration(color: AdminThemeMode.bg(AdminThemeMode.isDark.value), borderRadius: BorderRadius.circular(6))),
+                  onTap: isSelectionMode ? null : () => onOpen?.call(p)),
+              DataCell(Text(p.name?.isNotEmpty == true ? p.name! : '—', style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
+                  onTap: isSelectionMode ? null : () => onOpen?.call(p)),
               DataCell(Text(p.category ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
               DataCell(Text(_priceText(p), style: appStyle(14, FontWeight.w600, AppColors.primary))),
               DataCell(Text('${p.qty}', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
