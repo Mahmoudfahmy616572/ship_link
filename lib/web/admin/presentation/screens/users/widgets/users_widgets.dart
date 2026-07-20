@@ -110,7 +110,7 @@ class UsersTable extends StatelessWidget {
             final name = u['name']?.toString() ?? '${u['first_name'] ?? ''} ${u['last_name'] ?? ''}'.trim();
             final joined = AdminDateFormatter.formatDate(u['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode);
             return DataRow(
-              onSelectChanged: isSelectionMode ? (_) => onToggleSelect?.call(id) : (_) => onOpen?.call(u),
+              onSelectChanged: isSelectionMode ? (_) => onToggleSelect?.call(id) : null,
               cells: [
                 if (isSelectionMode) DataCell(Checkbox(value: selectedIds.contains(id), onChanged: (_) => onToggleSelect?.call(id))),
                 DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
