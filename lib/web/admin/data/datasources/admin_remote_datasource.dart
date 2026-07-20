@@ -248,6 +248,10 @@ class AdminRemoteDataSource {
     await _supabase.from('drivers').update(fields).eq('id', id);
   }
 
+  Future<void> deleteDriversBulk(List<String> ids) async {
+    await _supabase.from('drivers').delete().filter('id', 'in', '(${ids.join(',')})');
+  }
+
   Future<List<Map<String, dynamic>>> getOrders({
     int limit = 50,
     int offset = 0,

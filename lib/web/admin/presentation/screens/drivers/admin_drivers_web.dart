@@ -24,6 +24,8 @@ class AdminDriversWeb extends StatefulWidget {
 class _AdminDriversWebState extends State<AdminDriversWeb> {
   String _search = '';
   Timer? _searchTimer;
+  final Set<String> _selectedIds = {};
+  bool _selectionMode = false;
 
   @override
   void dispose() {
@@ -35,6 +37,27 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
     _search = v;
     _searchTimer?.cancel();
     _searchTimer = Timer(const Duration(milliseconds: 300), () => context.read<AdminDriversCubit>().loadDrivers(search: v.isEmpty ? null : v));
+  }
+
+  // نحمي الـ viewer: أي محاولة كتابة تطلع توست وتمنع
+  bool _guard(BuildContext context) {
+    if (AdminAuthCubit.get(context).canViewOnly) {
+      AdminToast.show(context, context.t.tr('no_access'));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _confirmBulkDelete() async {
+    final t = context.t;
+    final confirmed = await AdminConfirmDialog.show(
+      context,
+      title: t.tr('delete_selected'),
+      message: '${t.tr('delete_selected_confirm')} (${_selectedIds.length})؟',
+    );
+    if (confirmed != true || !mounted) return;
+    if (!_guard(context)) return;
+    context.read<AdminDriversCubit>().deleteDriversBulk(_selectedIds.toList());
   }
 
   @override
@@ -50,6 +73,13 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
               : <String, dynamic>{};
           AdminToast.success(context, '${context.t.tr('driver_activated')} : ${d['name']?.toString() ?? ''}');
           // نعيد تحميل القائمة عشان تتحدث
+          context.read<AdminDriversCubit>().loadDrivers(search: _search.isEmpty ? null : _search);
+        } else if (state is AdminDriversBulkDeleteSuccess) {
+          AdminToast.success(context, '${t.tr('drivers_deleted')} (${state.count})');
+          setState(() {
+            _selectedIds.clear();
+            _selectionMode = false;
+          });
           context.read<AdminDriversCubit>().loadDrivers(search: _search.isEmpty ? null : _search);
         } else if (state is AdminDriversError && state.message.isNotEmpty) {
           AdminToast.error(context, state.message);
@@ -74,7 +104,35 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AdminSectionTitle('Drivers', isDark: AdminThemeMode.isDark.value),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AdminSectionTitle('Drivers', isDark: AdminThemeMode.isDark.value),
+                  if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
+                    TextButton.icon(
+                      onPressed: () => setState(() => _selectionMode = true),
+                      icon: const Icon(Icons.checklist, size: 18),
+                      label: Text(t.tr('select')),
+                    )
+                  else if (_selectionMode) ...[
+                    TextButton.icon(
+                      onPressed: () => setState(() {
+                        _selectedIds.clear();
+                        _selectionMode = false;
+                      }),
+                      icon: const Icon(Icons.close, size: 18),
+                      label: Text(t.tr('cancel')),
+                    ),
+                    if (_selectedIds.isNotEmpty)
+                      ElevatedButton.icon(
+                        onPressed: _confirmBulkDelete,
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: Text('${t.tr('delete_selected')} (${_selectedIds.length})'),
+                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: Colors.white),
+                      ),
+                  ],
+                ],
+              ),
               SizedBox(height: 16.h),
               TextField(
                 onChanged: _onSearchChanged,
@@ -93,6 +151,18 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
                   drivers,
                   isCompact: MediaQuery.of(context).size.width <= 900,
                   onOpen: widget.onOpen,
+                  isSelectionMode: _selectionMode,
+                  selectedIds: _selectedIds,
+                  onToggleSelect: (id) {
+                    if (id.isEmpty) return;
+                    setState(() {
+                      if (_selectedIds.contains(id)) {
+                        _selectedIds.remove(id);
+                      } else {
+                        _selectedIds.add(id);
+                      }
+                    });
+                  },
                 onActivate: AdminAuthCubit.get(context).isSuperAdmin
                     ? (d) async {
                         final confirmed = await AdminConfirmDialog.show(

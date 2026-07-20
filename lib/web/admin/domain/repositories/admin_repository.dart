@@ -17,6 +17,7 @@ abstract class AdminRepository {
   Future<Either<Failure, void>> updateUser({required String id, required Map<String, dynamic> data});
   Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit, int offset, String? search});
   Future<Either<Failure, void>> updateDriver({required String id, Map<String, dynamic> fields});
+  Future<Either<Failure, void>> deleteDriversBulk(List<String> ids);
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrders({int limit, int offset, String? status, String? search});
   Future<Either<Failure, void>> updateOrderStatus({required int id, required String status});
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrderItems(int orderId);
