@@ -16,6 +16,8 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
   static AdminProductsCubit get(context) => BlocProvider.of<AdminProductsCubit>(context);
 
   Future<void> loadProducts({int limit = 20, int offset = 0, String? search, String? category, String sortBy = 'created_at', bool ascending = false, bool append = false}) async {
+    // ignore: avoid_print
+    print('DEBUG loadProducts called, append=$append, currentState=${state.runtimeType}');
     if (!append) {
       if (!isClosed) emit(AdminProductsLoading());
     }
@@ -111,6 +113,8 @@ class AdminProductsCubit extends Cubit<AdminProductsState> {
   }
 
   Future<void> toggleStatus(int id, int currentStatus) async {
+    // ignore: avoid_print
+    print('DEBUG toggleStatus id=$id current=$currentStatus');
     final newStatus = currentStatus == 1 ? 0 : 1;
     final result = await _repository.toggleProductStatus(id, newStatus);
     result.fold(

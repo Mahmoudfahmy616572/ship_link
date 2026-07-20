@@ -208,6 +208,8 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                     isSelectionMode: _selectionMode,
                     selectedIds: _selectedIds,
                     onToggleSelect: (id) {
+                      // ignore: avoid_print
+                      print('DEBUG onToggleSelect id=$id, mode=$_selectionMode, selectedBefore=${_selectedIds.length}');
                       if (id < 0) return;
                       setState(() {
                         if (_selectedIds.contains(id)) {
