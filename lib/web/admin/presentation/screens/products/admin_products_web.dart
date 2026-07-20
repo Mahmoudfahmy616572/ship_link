@@ -212,7 +212,6 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                       setState(() {
                         if (_selectedIds.contains(id)) {
                           _selectedIds.remove(id);
-                          if (_selectedIds.isEmpty) _selectionMode = false;
                         } else {
                           _selectedIds.add(id);
                         }
