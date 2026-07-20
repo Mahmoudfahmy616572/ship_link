@@ -132,40 +132,45 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     AdminSectionTitle('Users', isDark: AdminThemeMode.isDark.value),
-                    if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
-                      Row(
-                        children: [
-                          TextButton.icon(
-                            onPressed: () => setState(() => _selectionMode = true),
-                            icon: const Icon(Icons.checklist, size: 18),
-                            label: Text(t.tr('select')),
-                          ),
-                          const SizedBox(width: 8),
-                          ElevatedButton.icon(
-                            onPressed: () => _openForm(context, null),
-                            icon: const Icon(Icons.person_add, size: 18),
-                            label: Text(t.tr('add_user')),
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
-                          ),
-                        ],
-                      )
-                    else if (_selectionMode) ...[
-                      TextButton.icon(
-                        onPressed: () => setState(() {
-                          _selectedIds.clear();
-                          _selectionMode = false;
-                        }),
-                        icon: const Icon(Icons.close, size: 18),
-                        label: Text(t.tr('cancel')),
-                      ),
-                      if (_selectedIds.isNotEmpty)
-                        ElevatedButton.icon(
-                          onPressed: _confirmBulkDelete,
-                          icon: const Icon(Icons.delete_outline, size: 18),
-                          label: Text('${t.tr('delete_selected')} (${_selectedIds.length})'),
-                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: Colors.white),
-                        ),
-                    ],
+                    if (AdminAuthCubit.get(context).isSuperAdmin)
+                      _selectionMode
+                          ? Row(
+                              children: [
+                                TextButton.icon(
+                                  key: const Key('cancel_sel'),
+                                  onPressed: () => setState(() {
+                                    _selectedIds.clear();
+                                    _selectionMode = false;
+                                  }),
+                                  icon: const Icon(Icons.close, size: 18),
+                                  label: Text(t.tr('cancel')),
+                                ),
+                                if (_selectedIds.isNotEmpty)
+                                  ElevatedButton.icon(
+                                    onPressed: _confirmBulkDelete,
+                                    icon: const Icon(Icons.delete_outline, size: 18),
+                                    label: Text('${t.tr('delete_selected')} (${_selectedIds.length})'),
+                                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: Colors.white),
+                                  ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                TextButton.icon(
+                                  key: const Key('select_btn'),
+                                  onPressed: () => setState(() => _selectionMode = true),
+                                  icon: const Icon(Icons.checklist, size: 18),
+                                  label: Text(t.tr('select')),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton.icon(
+                                  onPressed: () => _openForm(context, null),
+                                  icon: const Icon(Icons.person_add, size: 18),
+                                  label: Text(t.tr('add_user')),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                                ),
+                              ],
+                            ),
                   ],
                 ),
                 SizedBox(height: 16.h),
