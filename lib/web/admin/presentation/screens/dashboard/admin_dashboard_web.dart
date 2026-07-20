@@ -1,3 +1,5 @@
+import 'dart:html' as html;
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
@@ -7,6 +9,7 @@ import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/dashboard/admin_dashboard_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/dashboard/widgets/dashboard_widgets.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
+import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 
 // شاشة نظرة عامة على اللوحة (إحصائيات + توزيع حالات الطلبات)
 class AdminDashboardWeb extends StatefulWidget {
@@ -62,13 +65,38 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
         final s = state.stats;
         final statusCounts = Map<String, dynamic>.from(s['statusCounts'] ?? {});
         final trend = Map<String, dynamic>.from(s['trend'] ?? {});
+        final period = s['period']?.toString() ?? 'all';
+        final periodLabel = period == 'daily'
+            ? t.tr('today')
+            : period == 'weekly'
+                ? t.tr('this_week')
+                : period == 'monthly'
+                    ? t.tr('this_month')
+                    : t.tr('total');
+        final revenue = (s['revenue'] is num ? (s['revenue'] as num).toDouble() : 0.0);
+        final growth = (s['growth'] is num ? (s['growth'] as num).toDouble() : 0.0);
+        final recentOrders = (s['recentOrders'] is List) ? List<dynamic>.from(s['recentOrders']) : <dynamic>[];
+        final recentUsers = (s['recentUsers'] is List) ? List<dynamic>.from(s['recentUsers']) : <dynamic>[];
+        final topProducts = (s['topProducts'] is List) ? List<dynamic>.from(s['topProducts']) : <dynamic>[];
+        final alerts = (s['alerts'] is List) ? List<dynamic>.from(s['alerts']) : <dynamic>[];
 
         return SingleChildScrollView(
           padding: EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.tr('dashboard_overview'), style: appStyle(22, FontWeight.w700, textPrimary)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(t.tr('dashboard_overview'), style: appStyle(22, FontWeight.w700, textPrimary)),
+                  ElevatedButton.icon(
+                    onPressed: () => _exportCsv(context, s),
+                    icon: const Icon(Icons.download_outlined, size: 18),
+                    label: Text(t.tr('export_csv')),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                  ),
+                ],
+              ),
               SizedBox(height: 16.h),
               // فلتر المدة
               Wrap(
@@ -82,15 +110,92 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
                 ],
               ),
               SizedBox(height: 20.h),
-              DashboardStatGrid(s, isDark: isDark),
+              // الصف الأول: كارت الإيراد + شبكة الإحصائيات
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth > 900;
+                  return wide
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 2, child: RevenueCard(revenue: revenue, growth: growth, isDark: isDark, periodLabel: periodLabel)),
+                            const SizedBox(width: 16),
+                            Expanded(flex: 3, child: DashboardStatGrid(s, isDark: isDark)),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            RevenueCard(revenue: revenue, growth: growth, isDark: isDark, periodLabel: periodLabel),
+                            const SizedBox(height: 16),
+                            DashboardStatGrid(s, isDark: isDark),
+                          ],
+                        );
+                },
+              ),
               SizedBox(height: 28.h),
-              Text(t.tr('orders_trend'), style: appStyle(18, FontWeight.w600, textPrimary)),
+              // التنبيهات
+              Text(t.tr('alerts'), style: appStyle(18, FontWeight.w600, textPrimary)),
               SizedBox(height: 12.h),
-              OrderTrendChart(trend, isDark: isDark),
+              DashboardAlerts(alerts: alerts, isDark: isDark),
               SizedBox(height: 28.h),
-              Text(t.tr('order_status_distribution'), style: appStyle(18, FontWeight.w600, textPrimary)),
-              SizedBox(height: 12.h),
-              DashboardStatusChips(statusCounts, isDark: isDark),
+              // الصف التاني: شارت المبيعات + توزيع الحالات (دائري)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth > 900;
+                  return wide
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: SalesBarChart(trend, isDark: isDark)),
+                            const SizedBox(width: 16),
+                            Expanded(child: OrderStatusPie(statusCounts, isDark: isDark)),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            SalesBarChart(trend, isDark: isDark),
+                            const SizedBox(height: 16),
+                            OrderStatusPie(statusCounts, isDark: isDark),
+                          ],
+                        );
+                },
+              ),
+              SizedBox(height: 28.h),
+              // النشاط الأخير + أعلى المنتجات
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final wide = constraints.maxWidth > 900;
+                  return wide
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(t.tr('recent_activity'), style: appStyle(18, FontWeight.w600, textPrimary)),
+                              SizedBox(height: 12.h),
+                              RecentActivityFeed(recentOrders: recentOrders, recentUsers: recentUsers, isDark: isDark),
+                            ])),
+                            const SizedBox(width: 16),
+                            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(t.tr('top_sellers'), style: appStyle(18, FontWeight.w600, textPrimary)),
+                              SizedBox(height: 12.h),
+                              TopSellersList(products: topProducts, isDark: isDark),
+                            ])),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(t.tr('recent_activity'), style: appStyle(18, FontWeight.w600, textPrimary)),
+                            SizedBox(height: 12.h),
+                            RecentActivityFeed(recentOrders: recentOrders, recentUsers: recentUsers, isDark: isDark),
+                            SizedBox(height: 28.h),
+                            Text(t.tr('top_sellers'), style: appStyle(18, FontWeight.w600, textPrimary)),
+                            SizedBox(height: 12.h),
+                            TopSellersList(products: topProducts, isDark: isDark),
+                          ],
+                        );
+                },
+              ),
               SizedBox(height: 28.h),
               Text(t.tr('products_by_category'), style: appStyle(18, FontWeight.w600, textPrimary)),
               SizedBox(height: 12.h),
@@ -105,6 +210,32 @@ class _AdminDashboardWebState extends State<AdminDashboardWeb> {
   void _changePeriod(BuildContext context, String period) {
     setState(() => _period = period);
     context.read<AdminDashboardCubit>().loadStats(period: period);
+  }
+
+  // تصدير إحصائيات الداشبورد كملف CSV وتحميله في المتصفح
+  void _exportCsv(BuildContext context, Map<String, dynamic> s) {
+    final statusCounts = Map<String, dynamic>.from(s['statusCounts'] ?? {});
+    final rows = <List<String>>[
+      ['Metric', 'Value'],
+      ['Users', '${s['users']}'],
+      ['Drivers', '${s['drivers']}'],
+      ['Orders', '${s['orders']}'],
+      ['Products', '${s['products']}'],
+      ['Revenue', '${s['revenue']}'],
+      ['Growth %', '${s['growth']}'],
+      ['', ''],
+      ['Order Status', 'Count'],
+      ...statusCounts.entries.map((e) => [e.key, '${e.value}']),
+    ];
+    final csv = rows.map((r) => r.map((c) => '"${c.replaceAll('"', "'")}"').join(',')).join('\n');
+    final bytes = Uint8List.fromList(csv.codeUnits);
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', 'dashboard_${s['period']}.csv')
+      ..click();
+    html.Url.revokeObjectUrl(url);
+    AdminToast.show(context, context.t.tr('exported'), type: AdminToastType.success);
   }
 }
 

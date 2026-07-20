@@ -49,25 +49,42 @@ class AdminRemoteDataSource {
   }
 
   Future<Map<String, dynamic>> getDashboardStats({String period = 'all'}) async {
-    // بنجيب عدد الصفوف لكل جدول (من غير limit عشان نعرف العدد الكلي)
+    // نحسب بداية الفترة الحالية والمقارنة (الفترة اللي قبلها)
+    DateTime from = DateTime(2000);
+    Duration span = const Duration(days: 36500);
+    if (period == 'daily') {
+      from = DateTime.now().subtract(const Duration(days: 1));
+      span = const Duration(days: 1);
+    } else if (period == 'weekly') {
+      from = DateTime.now().subtract(const Duration(days: 7));
+      span = const Duration(days: 7);
+    } else if (period == 'monthly') {
+      from = DateTime.now().subtract(const Duration(days: 30));
+      span = const Duration(days: 30);
+    }
+    final fromIso = from.toIso8601String();
+    // بداية الفترة السابقة (عشان نحسب نسبة النمو)
+    final prevFrom = from.subtract(span).toIso8601String();
+    final prevTo = fromIso;
+
+    // إحصائيات عامة (الأعداد الكلية مش مرتبطة بالفترة)
     final r1 = await _supabase.from('profiles').select('id');
     final r2 = await _supabase.from('drivers').select('id');
-    final r4 = await _supabase.from('products').select('id');
+    final r4 = await _supabase.from('products').select('id, is_top_seller, category');
     final users = r1.length;
     final drivers = r2.length;
     final products = r4.length;
-
-    // نحسب بداية الفترة حسب المدة المختارة
-    DateTime from = DateTime(2000);
-    if (period == 'daily') {
-      from = DateTime.now().subtract(const Duration(days: 1));
-    } else if (period == 'weekly') {
-      from = DateTime.now().subtract(const Duration(days: 7));
-    } else if (period == 'monthly') {
-      from = DateTime.now().subtract(const Duration(days: 30));
+    int activeProducts = 0;
+    int lowStock = 0;
+    int topSellers = 0;
+    final Map<String, int> byCategory = {};
+    for (final p in r4) {
+      final c = p['category']?.toString();
+      if (c != null && c.isNotEmpty) byCategory[c] = (byCategory[c] ?? 0) + 1;
+      if (p['is_top_seller'] == true) topSellers++;
     }
-    final fromIso = from.toIso8601String();
 
+    // طلبات الفترة الحالية
     final ordersData = await _supabase
         .from('orders')
         .select('id, total_price, status, created_at')
@@ -83,6 +100,21 @@ class AdminRemoteDataSource {
       statusCounts[s] = (statusCounts[s] ?? 0) + 1;
     }
 
+    // طلبات الفترة السابقة (عشان نحسب نسبة النمو في الإيراد)
+    final prevOrders = await _supabase
+        .from('orders')
+        .select('total_price, status')
+        .gte('created_at', prevFrom)
+        .lt('created_at', prevTo);
+    double prevRevenue = 0;
+    for (final o in prevOrders) {
+      if (o['status'] == 'delivered' && o['total_price'] is num) {
+        prevRevenue += (o['total_price'] as num).toDouble();
+      }
+    }
+    // نسبة النمو: (الحالي - السابق) / السابق * 100
+    final growth = (prevRevenue > 0) ? ((revenue - prevRevenue) / prevRevenue) * 100 : (revenue > 0 ? 100.0 : 0.0);
+
     // اتجاه الطلبات: عدد الطلبات لكل يوم في آخر 7 أيام
     final trendData = await _supabase
         .from('orders')
@@ -95,14 +127,40 @@ class AdminRemoteDataSource {
       if (d.isNotEmpty) trend[d] = (trend[d] ?? 0) + 1;
     }
 
-    // إحصائيات المنتجات: التوزيع حسب الفئة (الأعمدة status/qty لسه متضافش في الـ schema)
-    final productsData = await _supabase.from('products').select('category');
-    int activeProducts = 0;
-    int lowStock = 0;
-    final Map<String, int> byCategory = {};
-    for (final p in productsData) {
-      final c = p['category']?.toString();
-      if (c != null && c.isNotEmpty) byCategory[c] = (byCategory[c] ?? 0) + 1;
+    // أحدث النشاطات (آخر 5 طلبات + آخر 5 مستخدمين)
+    final recentOrders = await _supabase
+        .from('orders')
+        .select('id, status, total_price, created_at')
+        .order('created_at', ascending: false)
+        .limit(5);
+    final recentUsers = await _supabase
+        .from('profiles')
+        .select('id, name, email, created_at')
+        .order('created_at', ascending: false)
+        .limit(5);
+
+    // أعلى المنتجات مبيعاً (نجيب كل المنتجات ونرتب حسب is_top_seller ثم ناخد الأول)
+    final topProductsData = await _supabase
+        .from('products')
+        .select('id, name, price, is_top_seller, category')
+        .eq('is_top_seller', true)
+        .limit(5);
+
+    // تنبيهات: طلبات معلقة كتير + سائقين مش فعّالين
+    final pendingCount = statusCounts['pending'] ?? 0;
+    final inactiveDrivers = await _supabase
+        .from('drivers')
+        .select('id')
+        .neq('state', 'active');
+    final alerts = <Map<String, dynamic>>[];
+    if (pendingCount > 10) {
+      alerts.add({'type': 'pending', 'message': 'طلبات معلقة كتير: $pendingCount'});
+    }
+    if (inactiveDrivers.length > 0) {
+      alerts.add({'type': 'driver', 'message': 'سائقين مش فعّالين: ${inactiveDrivers.length}'});
+    }
+    if (lowStock > 0) {
+      alerts.add({'type': 'stock', 'message': 'منتجات مخزونها قليل: $lowStock'});
     }
 
     return {
@@ -112,10 +170,17 @@ class AdminRemoteDataSource {
       'products': products,
       'activeProducts': activeProducts,
       'lowStock': lowStock,
+      'topSellers': topSellers,
       'productByCategory': byCategory,
       'revenue': revenue,
+      'prevRevenue': prevRevenue,
+      'growth': growth,
       'statusCounts': statusCounts,
       'trend': trend,
+      'recentOrders': recentOrders,
+      'recentUsers': recentUsers,
+      'topProducts': topProductsData,
+      'alerts': alerts,
       'period': period,
     };
   }
