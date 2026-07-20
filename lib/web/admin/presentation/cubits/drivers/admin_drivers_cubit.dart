@@ -48,4 +48,16 @@ class AdminDriversCubit extends Cubit<AdminDriversState> {
       },
     );
   }
+
+  Future<void> deleteDriversBulk(List<String> ids) async {
+    final result = await _repository.deleteDriversBulk(ids);
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminDriversError(failure.errMessage));
+      },
+      (_) {
+        if (!isClosed) emit(AdminDriversBulkDeleteSuccess(ids.length));
+      },
+    );
+  }
 }

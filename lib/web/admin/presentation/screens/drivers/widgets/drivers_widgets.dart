@@ -24,13 +24,25 @@ class DriverStateBadge extends StatelessWidget {
   }
 }
 
-// جدول السائقين (مش معمول ليه actions لسه)
+// جدول السائقين
 class DriversTable extends StatelessWidget {
   final List<Map<String, dynamic>> drivers;
   final void Function(Map<String, dynamic> driver)? onActivate;
   final void Function(Map<String, dynamic> driver)? onOpen;
   final bool isCompact;
-  const DriversTable(this.drivers, {super.key, this.onActivate, this.onOpen, this.isCompact = false});
+  final bool isSelectionMode;
+  final Set<String> selectedIds;
+  final void Function(String id)? onToggleSelect;
+  const DriversTable(
+    this.drivers, {
+    super.key,
+    this.onActivate,
+    this.onOpen,
+    this.isCompact = false,
+    this.isSelectionMode = false,
+    this.selectedIds = const {},
+    this.onToggleSelect,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +50,7 @@ class DriversTable extends StatelessWidget {
     if (isCompact) {
       return Column(
         children: drivers.map((d) {
+          final id = d['id']?.toString() ?? '';
           final name = d['name']?.toString() ?? '—';
           final hasVehicle = d['vehicle_number']?.toString().isNotEmpty == true;
           return Container(
@@ -49,13 +62,23 @@ class DriversTable extends StatelessWidget {
               border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
             ),
             child: InkWell(
-              onTap: () => onOpen?.call(d),
+              onTap: () {
+                if (isSelectionMode) {
+                  onToggleSelect?.call(id);
+                } else {
+                  onOpen?.call(d);
+                }
+              },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      if (isSelectionMode)
+                        Checkbox(value: selectedIds.contains(id), onChanged: (_) => onToggleSelect?.call(id))
+                      else
+                        const SizedBox.shrink(),
                       Expanded(child: Text(name, style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
                       DriverStateBadge(d['state']?.toString()),
                     ],
@@ -100,12 +123,15 @@ class DriversTable extends StatelessWidget {
         child: DataTable(
           columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
           rows: drivers.map((d) {
+            final id = d['id']?.toString() ?? '';
             final name = d['name']?.toString() ?? '—';
             final hasVehicle = d['vehicle_number']?.toString().isNotEmpty == true;
             return DataRow(
-              onSelectChanged: (_) => onOpen?.call(d),
+              onSelectChanged: isSelectionMode ? (_) => onToggleSelect?.call(id) : (_) => onOpen?.call(d),
+              selected: isSelectionMode && selectedIds.contains(id),
               cells: [
-                DataCell(Text(name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
+                    onTap: isSelectionMode ? null : () => onOpen?.call(d)),
                 DataCell(Text(d['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(Text(d['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),

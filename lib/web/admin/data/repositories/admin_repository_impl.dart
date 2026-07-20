@@ -126,6 +126,16 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
+  Future<Either<Failure, void>> deleteDriversBulk(List<String> ids) async {
+    try {
+      await _dataSource.deleteDriversBulk(ids);
+      return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrders({int limit = 50, int offset = 0, String? status, String? search}) async {
     try {
       final cacheKey = 'orders_$status';

@@ -19,3 +19,8 @@ class AdminDriverUpdateSuccess extends AdminDriversState {
   final String id;
   AdminDriverUpdateSuccess(this.id);
 }
+
+class AdminDriversBulkDeleteSuccess extends AdminDriversState {
+  final int count;
+  AdminDriversBulkDeleteSuccess(this.count);
+}
