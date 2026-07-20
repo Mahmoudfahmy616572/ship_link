@@ -74,4 +74,5 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
   bool get canManage => state.canManage;
   bool get isViewer => state.isViewer;
   bool get canViewOnly => state.canViewOnly;
+  String get adminRole => state.adminRole;
 }
