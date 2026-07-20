@@ -62,48 +62,50 @@ class DriversTable extends StatelessWidget {
               border: Border.all(color: AdminThemeMode.border(AdminThemeMode.isDark.value)),
             ),
             child: InkWell(
-              onTap: () {
-                if (isSelectionMode) {
-                  onToggleSelect?.call(id);
-                } else {
-                  onOpen?.call(d);
-                }
-              },
-              child: Column(
+              onTap: isSelectionMode ? null : () => onOpen?.call(d),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (isSelectionMode)
-                        Checkbox(value: selectedIds.contains(id), onChanged: (_) => onToggleSelect?.call(id))
-                      else
-                        const SizedBox.shrink(),
-                      Expanded(child: Text(name, style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
-                      DriverStateBadge(d['state']?.toString()),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(d['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
-                  const SizedBox(height: 2),
-                  Text('${t.tr('phone_number')}: ${d['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
-                  if (hasVehicle && onActivate != null) ...[
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => onActivate!.call(d),
-                        icon: const Icon(Icons.check_circle_outline, size: 16),
-                        label: Text(t.tr('activate')),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.success,
-                          side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
+                  if (isSelectionMode)
+                    Checkbox(
+                      value: selectedIds.contains(id),
+                      onChanged: (_) => onToggleSelect?.call(id),
                     ),
-                  ] else if (!hasVehicle)
-                    Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(child: Text(name, style: appStyle(15, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+                            DriverStateBadge(d['state']?.toString()),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(d['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
+                        const SizedBox(height: 2),
+                        Text('${t.tr('phone_number')}: ${d['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
+                        if (hasVehicle && onActivate != null) ...[
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () => onActivate!.call(d),
+                              icon: const Icon(Icons.check_circle_outline, size: 16),
+                              label: Text(t.tr('activate')),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.success,
+                                side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ),
+                        ] else if (!hasVehicle)
+                          Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -111,7 +113,59 @@ class DriversTable extends StatelessWidget {
         }).toList(),
       );
     }
-    final columns = [t.tr('name'), t.tr('email'), t.tr('phone_number'), t.tr('vehicle_type'), t.tr('state'), t.tr('actions')];
+    final columnLabels = <String>[
+      if (isSelectionMode) '',
+      t.tr('name'),
+      t.tr('email'),
+      t.tr('phone_number'),
+      t.tr('vehicle_type'),
+      t.tr('state'),
+      t.tr('actions'),
+    ];
+    final dataRows = <DataRow>[];
+    for (final d in drivers) {
+      final id = d['id']?.toString() ?? '';
+      final name = d['name']?.toString() ?? '—';
+      final hasVehicle = d['vehicle_number']?.toString().isNotEmpty == true;
+      final rowCells = <DataCell>[];
+      if (isSelectionMode) {
+        rowCells.add(
+          DataCell(
+            Checkbox(
+              value: selectedIds.contains(id),
+              onChanged: (_) => onToggleSelect?.call(id),
+            ),
+          ),
+        );
+      }
+      rowCells.add(DataCell(Text(name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))));
+      rowCells.add(DataCell(Text(d['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))));
+      rowCells.add(DataCell(Text(d['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))));
+      rowCells.add(DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))));
+      rowCells.add(DataCell(DriverStateBadge(d['state']?.toString())));
+      final actionWidget = hasVehicle && onActivate != null
+          ? OutlinedButton.icon(
+              onPressed: () => onActivate!.call(d),
+              icon: const Icon(Icons.check_circle_outline, size: 16),
+              label: Text(t.tr('activate')),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.success,
+                side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            )
+          : hasVehicle
+              ? const SizedBox.shrink()
+              : Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled));
+      rowCells.add(DataCell(actionWidget));
+      dataRows.add(
+        DataRow(
+          onSelectChanged: isSelectionMode ? (_) => onToggleSelect?.call(id) : (_) => onOpen?.call(d),
+          selected: isSelectionMode && selectedIds.contains(id),
+          cells: rowCells,
+        ),
+      );
+    }
     return Container(
       decoration: BoxDecoration(
         color: AdminThemeMode.surface(AdminThemeMode.isDark.value),
@@ -121,40 +175,10 @@ class DriversTable extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: columns.map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))))).toList(),
-          rows: drivers.map((d) {
-            final id = d['id']?.toString() ?? '';
-            final name = d['name']?.toString() ?? '—';
-            final hasVehicle = d['vehicle_number']?.toString().isNotEmpty == true;
-            return DataRow(
-              onSelectChanged: isSelectionMode ? (_) => onToggleSelect?.call(id) : (_) => onOpen?.call(d),
-              selected: isSelectionMode && selectedIds.contains(id),
-              cells: [
-                DataCell(Text(name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
-                    onTap: isSelectionMode ? null : () => onOpen?.call(d)),
-                DataCell(Text(d['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
-                DataCell(Text(d['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
-                DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
-                DataCell(DriverStateBadge(d['state']?.toString())),
-                DataCell(
-                  hasVehicle && onActivate != null
-                      ? OutlinedButton.icon(
-                          onPressed: () => onActivate!.call(d),
-                          icon: const Icon(Icons.check_circle_outline, size: 16),
-                          label: Text(t.tr('activate')),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.success,
-                            side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                        )
-                      : hasVehicle
-                          ? const SizedBox.shrink()
-                          : Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
-                ),
-              ],
-            );
-          }).toList(),
+          columns: columnLabels
+              .map((c) => DataColumn(label: Text(c, style: appStyle(13, FontWeight.w600, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))))
+              .toList(),
+          rows: dataRows,
         ),
       ),
     );

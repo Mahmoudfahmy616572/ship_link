@@ -99,6 +99,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
         final drivers = (state is AdminDriversLoaded) ? state.drivers : <Map<String, dynamic>>[];
         final hasMore = (state is AdminDriversLoaded) ? state.hasMore : false;
 
+        final canManage = AdminAuthCubit.get(context).isSuperAdmin;
         return SingleChildScrollView(
           padding: EdgeInsets.all(24),
           child: Column(
@@ -108,29 +109,13 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AdminSectionTitle('Drivers', isDark: AdminThemeMode.isDark.value),
-                  if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
-                    TextButton.icon(
-                      onPressed: () => setState(() => _selectionMode = true),
-                      icon: const Icon(Icons.checklist, size: 18),
-                      label: Text(t.tr('select')),
-                    )
-                  else if (_selectionMode) ...[
-                    TextButton.icon(
-                      onPressed: () => setState(() {
-                        _selectedIds.clear();
-                        _selectionMode = false;
-                      }),
-                      icon: const Icon(Icons.close, size: 18),
-                      label: Text(t.tr('cancel')),
+                  if (_selectionMode && _selectedIds.isNotEmpty && canManage)
+                    ElevatedButton.icon(
+                      onPressed: _confirmBulkDelete,
+                      icon: const Icon(Icons.delete_outline, size: 18),
+                      label: Text('${t.tr('delete_selected')} (${_selectedIds.length})'),
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: Colors.white),
                     ),
-                    if (_selectedIds.isNotEmpty)
-                      ElevatedButton.icon(
-                        onPressed: _confirmBulkDelete,
-                        icon: const Icon(Icons.delete_outline, size: 18),
-                        label: Text('${t.tr('delete_selected')} (${_selectedIds.length})'),
-                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.error, foregroundColor: Colors.white),
-                      ),
-                  ],
                 ],
               ),
               SizedBox(height: 16.h),
@@ -151,7 +136,7 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
                   drivers,
                   isCompact: MediaQuery.of(context).size.width <= 900,
                   onOpen: widget.onOpen,
-                  isSelectionMode: _selectionMode,
+                  isSelectionMode: canManage,
                   selectedIds: _selectedIds,
                   onToggleSelect: (id) {
                     if (id.isEmpty) return;
