@@ -20,7 +20,11 @@ class AdminAuthCubit extends Cubit<AdminAuthState> {
         if (!isClosed) emit(AdminAuthFailure(failure.errMessage));
       },
       (admin) {
-        if (!isClosed) emit(AdminAuthSuccess(admin));
+        if (!isClosed) {
+          // ignore: avoid_print
+          print('DEBUG AUTH admin map = $admin');
+          emit(AdminAuthSuccess(admin));
+        }
       },
     );
   }
