@@ -182,6 +182,7 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                       items: navItems,
                       onTap: _select,
                       userName: admin['full_name']?.toString() ?? admin['email']?.toString() ?? '',
+                      userRole: 'ROLE: ${admin['role']}',
                       isDark: isDark,
                     ),
                     Expanded(child: _buildBody(titles, isDark)),
