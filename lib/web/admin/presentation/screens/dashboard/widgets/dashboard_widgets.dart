@@ -4,6 +4,7 @@ import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/web/admin/presentation/utils/admin_date_formatter.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode.dart';
 
@@ -257,6 +258,401 @@ class ProductCategoryList extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+// كارت الإيراد مع نسبة النمو مقارنة بالفترة السابقة
+class RevenueCard extends StatelessWidget {
+  final double revenue;
+  final double growth;
+  final bool isDark;
+  final String periodLabel;
+  const RevenueCard({super.key, required this.revenue, required this.growth, this.isDark = false, this.periodLabel = ''});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    final up = growth >= 0;
+    final growthColor = up ? AppColors.success : AppColors.error;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.account_balance_wallet_outlined, color: AppColors.success, size: 22),
+              const SizedBox(width: 8),
+              Text(t.tr('revenue'), style: appStyle(14, FontWeight.w500, textSecondary)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text('EGP ${revenue.toStringAsFixed(0)}', style: appStyle(28, FontWeight.w800, textPrimary)),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(up ? Icons.arrow_upward : Icons.arrow_downward, color: growthColor, size: 16),
+              const SizedBox(width: 4),
+              Text('${growth.abs().toStringAsFixed(1)}%', style: appStyle(14, FontWeight.w700, growthColor)),
+              const SizedBox(width: 6),
+              Text('${t.tr('vs_previous')} $periodLabel', style: appStyle(12, FontWeight.w400, textSecondary)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// شارت دائري لتوزيع حالات الطلبات
+class OrderStatusPie extends StatelessWidget {
+  final Map<String, dynamic> statusCounts;
+  final bool isDark;
+  const OrderStatusPie(this.statusCounts, {super.key, this.isDark = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    if (statusCounts.isEmpty) {
+      return Container(
+        height: 260,
+        decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+        child: Center(child: Text('—', style: appStyle(14, FontWeight.w400, textSecondary))),
+      );
+    }
+    final colors = {
+      'pending': AppColors.pending,
+      'confirmed': AppColors.primary,
+      'shipped': AppColors.info,
+      'delivered': AppColors.success,
+      'cancelled': AppColors.error,
+    };
+    final total = statusCounts.values.fold(0, (a, b) => a + (b as int));
+    final sections = statusCounts.entries.map((e) {
+      final color = colors[e.key] ?? const Color(0xFF9CA3AF);
+      return PieChartSectionData(
+        value: (e.value as int).toDouble(),
+        title: '${((e.value as int) / (total == 0 ? 1 : total) * 100).toStringAsFixed(0)}%',
+        color: color,
+        radius: 80,
+        titleStyle: appStyle(12, FontWeight.w700, Colors.white),
+      );
+    }).toList();
+    return Container(
+      height: 260,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: PieChart(
+              PieChartData(
+                sections: sections,
+                centerSpaceRadius: 40,
+                sectionsSpace: 2,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: statusCounts.entries.map((e) {
+                final color = colors[e.key] ?? const Color(0xFF9CA3AF);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Container(width: 10, height: 10, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3))),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(t.tr(e.key), style: appStyle(12, FontWeight.w500, textSecondary), overflow: TextOverflow.ellipsis)),
+                      Text('${e.value}', style: appStyle(12, FontWeight.w700, textPrimary)),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// شارت عمودي للمبيعات (آخر 7 أيام)
+class SalesBarChart extends StatelessWidget {
+  final Map<String, dynamic> trend;
+  final bool isDark;
+  const SalesBarChart(this.trend, {super.key, this.isDark = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    final now = DateTime.now();
+    final bars = <BarChartGroupData>[];
+    final labels = <String>[];
+    for (int i = 6; i >= 0; i--) {
+      final d = now.subtract(Duration(days: i));
+      final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+      final count = (trend[key] is int ? trend[key] as int : 0).toDouble();
+      bars.add(BarChartGroupData(x: 6 - i, barRods: [BarChartRodData(toY: count, color: AppColors.primary, width: 18, borderRadius: BorderRadius.circular(4))]));
+      labels.add('${d.day}/${d.month}');
+    }
+    return Container(
+      height: 240,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(t.tr('sales_last_7_days'), style: appStyle(15, FontWeight.w600, AdminThemeMode.textPrimary(isDark))),
+          const SizedBox(height: 12),
+          Expanded(
+            child: BarChart(
+              BarChartData(
+                gridData: FlGridData(show: true, drawVerticalLine: false, horizontalInterval: 1, getDrawingHorizontalLine: (v) => FlLine(color: border, strokeWidth: 1)),
+                titlesData: FlTitlesData(
+                  bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (v, _) {
+                    final idx = v.toInt();
+                    if (idx < 0 || idx >= labels.length) return const Text('');
+                    return Text(labels[idx], style: appStyle(10, FontWeight.w400, textSecondary));
+                  })),
+                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, interval: 1, getTitlesWidget: (v, _) => Text(v.toInt().toString(), style: appStyle(10, FontWeight.w400, textSecondary)))),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(show: false),
+                barGroups: bars,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// قائمة أحدث النشاطات (طلبات + مستخدمين)
+class RecentActivityFeed extends StatelessWidget {
+  final List<dynamic> recentOrders;
+  final List<dynamic> recentUsers;
+  final bool isDark;
+  const RecentActivityFeed({super.key, required this.recentOrders, required this.recentUsers, this.isDark = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    final items = <Widget>[];
+    for (final o in recentOrders.take(4)) {
+      final status = o['status']?.toString() ?? '';
+      items.add(_ActivityRow(
+        icon: Icons.receipt_long_rounded,
+        color: AppColors.info,
+        title: '${t.tr('order')} #${o['id']}',
+        subtitle: '${t.tr(status)} • EGP ${o['total_price'] ?? 0}',
+        time: AdminDateFormatter.formatRelative(o['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode),
+        isDark: isDark,
+      ));
+    }
+    for (final u in recentUsers.take(3)) {
+      items.add(_ActivityRow(
+        icon: Icons.person_add_alt_1_rounded,
+        color: AppColors.success,
+        title: u['name']?.toString() ?? u['email']?.toString() ?? 'User',
+        subtitle: t.tr('new_user'),
+        time: AdminDateFormatter.formatRelative(u['created_at']?.toString(), locale: Localizations.localeOf(context).languageCode),
+        isDark: isDark,
+      ));
+    }
+    if (items.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+        child: Center(child: Text('—', style: appStyle(14, FontWeight.w400, textSecondary))),
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+      child: Column(children: items),
+    );
+  }
+}
+
+class _ActivityRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  final String time;
+  final bool isDark;
+  const _ActivityRow({required this.icon, required this.color, required this.title, required this.subtitle, required this.time, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: appStyle(14, FontWeight.w600, textPrimary), overflow: TextOverflow.ellipsis),
+                Text(subtitle, style: appStyle(12, FontWeight.w400, textSecondary), overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+          Text(time, style: appStyle(11, FontWeight.w400, textSecondary)),
+        ],
+      ),
+    );
+  }
+}
+
+// تنبيهات (مخزون قليل / طلبات معلقة / سائقين مش فعّالين)
+class DashboardAlerts extends StatelessWidget {
+  final List<dynamic> alerts;
+  final bool isDark;
+  const DashboardAlerts({super.key, required this.alerts, this.isDark = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    if (alerts.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+        child: Row(
+          children: [
+            Icon(Icons.check_circle_outline, color: AppColors.success, size: 20),
+            const SizedBox(width: 10),
+            Text(t.tr('all_good'), style: appStyle(14, FontWeight.w500, textPrimary)),
+          ],
+        ),
+      );
+    }
+    final types = {
+      'pending': AppColors.warning,
+      'driver': AppColors.info,
+      'stock': AppColors.error,
+    };
+    final icons = {
+      'pending': Icons.hourglass_empty_rounded,
+      'driver': Icons.local_shipping_rounded,
+      'stock': Icons.inventory_2_rounded,
+    };
+    return Column(
+      children: alerts.map((a) {
+        final type = a['type']?.toString() ?? '';
+        final color = types[type] ?? AppColors.warning;
+        final icon = icons[type] ?? Icons.warning_amber_rounded;
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 10),
+              Expanded(child: Text(a['message']?.toString() ?? '', style: appStyle(14, FontWeight.w500, textPrimary))),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+// قائمة أعلى المنتجات مبيعاً
+class TopSellersList extends StatelessWidget {
+  final List<dynamic> products;
+  final bool isDark;
+  const TopSellersList({super.key, required this.products, this.isDark = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final surface = AdminThemeMode.surface(isDark);
+    final border = AdminThemeMode.border(isDark);
+    final textPrimary = AdminThemeMode.textPrimary(isDark);
+    final textSecondary = AdminThemeMode.textSecondary(isDark);
+    if (products.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+        child: Center(child: Text('—', style: appStyle(14, FontWeight.w400, textSecondary))),
+      );
+    }
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+      child: Column(
+        children: products.asMap().entries.map((e) {
+          final p = e.value;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 28, height: 28,
+                  decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)),
+                  child: Center(child: Text('${e.key + 1}', style: appStyle(14, FontWeight.w700, AppColors.primary))),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(p['name']?.toString() ?? '—', style: appStyle(14, FontWeight.w600, textPrimary), overflow: TextOverflow.ellipsis),
+                      Text(p['category']?.toString() ?? '', style: appStyle(12, FontWeight.w400, textSecondary), overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
+                ),
+                Text('EGP ${p['price'] ?? 0}', style: appStyle(14, FontWeight.w700, textPrimary)),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }
