@@ -43,6 +43,34 @@ class AdminUsersCubit extends Cubit<AdminUsersState> {
     );
   }
 
+  // إنشاء مستخدم جديد من الأدمن
+  Future<void> createUser(Map<String, dynamic> data) async {
+    if (!isClosed) emit(AdminUsersLoading());
+    final result = await _repository.createUser(data);
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminUsersError(failure.errMessage));
+      },
+      (user) {
+        if (!isClosed) emit(AdminUserCreateSuccess(user));
+      },
+    );
+  }
+
+  // تعديل بيانات مستخدم موجود
+  Future<void> updateUser({required String id, required Map<String, dynamic> data}) async {
+    if (!isClosed) emit(AdminUsersLoading());
+    final result = await _repository.updateUser(id: id, data: data);
+    result.fold(
+      (failure) {
+        if (!isClosed) emit(AdminUsersError(failure.errMessage));
+      },
+      (_) {
+        if (!isClosed) emit(AdminUserUpdateSuccess({'id': id, ...data}));
+      },
+    );
+  }
+
   Future<void> loadMoreUsers({String? search}) async {
     if (state is! AdminUsersLoaded) return;
     final loaded = state as AdminUsersLoaded;

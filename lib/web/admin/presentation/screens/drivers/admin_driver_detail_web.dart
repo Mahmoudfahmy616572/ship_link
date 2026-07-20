@@ -63,7 +63,7 @@ class AdminDriverDetailWeb extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          if (vehicleNumber.isNotEmpty)
+          if (vehicleNumber.isNotEmpty && onActivate != null)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(

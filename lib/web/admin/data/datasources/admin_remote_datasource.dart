@@ -139,6 +139,28 @@ class AdminRemoteDataSource {
     await _supabase.from('profiles').delete().eq('id', id);
   }
 
+  // إنشاء مستخدم جديد (نضيف في جدول profiles من غير auth - الأدمن بيديره)
+  Future<Map<String, dynamic>> createUser(Map<String, dynamic> data) async {
+    final row = <String, dynamic>{
+      'name': data['name'],
+      'email': data['email'],
+      'phone_number': data['phone_number'],
+      'role': data['role'] ?? 'user',
+    };
+    return await _supabase.from('profiles').insert(row).select().single();
+  }
+
+  // تعديل بيانات مستخدم موجود
+  Future<void> updateUser({required String id, required Map<String, dynamic> data}) async {
+    final allowed = <String, dynamic>{
+      if (data.containsKey('name')) 'name': data['name'],
+      if (data.containsKey('email')) 'email': data['email'],
+      if (data.containsKey('phone_number')) 'phone_number': data['phone_number'],
+      if (data.containsKey('role')) 'role': data['role'],
+    };
+    await _supabase.from('profiles').update(allowed).eq('id', id);
+  }
+
   Future<List<Map<String, dynamic>>> getDrivers({
     int limit = 50,
     int offset = 0,

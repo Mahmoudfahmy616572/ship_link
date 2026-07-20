@@ -64,12 +64,12 @@ class DriversTable extends StatelessWidget {
                   Text(d['email']?.toString() ?? '—', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
                   const SizedBox(height: 2),
                   Text('${t.tr('phone_number')}: ${d['phone_number']?.toString() ?? '—'}', style: appStyle(13, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
-                  if (hasVehicle) ...[
+                  if (hasVehicle && onActivate != null) ...[
                     const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () => onActivate?.call(d),
+                        onPressed: () => onActivate!.call(d),
                         icon: const Icon(Icons.check_circle_outline, size: 16),
                         label: Text(t.tr('activate')),
                         style: OutlinedButton.styleFrom(
@@ -79,7 +79,7 @@ class DriversTable extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ] else
+                  ] else if (!hasVehicle)
                     Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
                 ],
               ),
@@ -111,9 +111,9 @@ class DriversTable extends StatelessWidget {
                 DataCell(Text(d['vehicle_type']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(DriverStateBadge(d['state']?.toString())),
                 DataCell(
-                  hasVehicle
+                  hasVehicle && onActivate != null
                       ? OutlinedButton.icon(
-                          onPressed: () => onActivate?.call(d),
+                          onPressed: () => onActivate!.call(d),
                           icon: const Icon(Icons.check_circle_outline, size: 16),
                           label: Text(t.tr('activate')),
                           style: OutlinedButton.styleFrom(
@@ -122,7 +122,9 @@ class DriversTable extends StatelessWidget {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                         )
-                      : Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
+                      : hasVehicle
+                          ? const SizedBox.shrink()
+                          : Text(t.tr('incomplete'), style: appStyle(13, FontWeight.w500, AppColors.textDisabled)),
                 ),
               ],
             );

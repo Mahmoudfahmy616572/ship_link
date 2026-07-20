@@ -4,6 +4,7 @@ import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_side_nav.dart';
 import 'package:ship_link/web/admin/presentation/screens/dashboard/admin_dashboard_web.dart';
@@ -182,7 +183,6 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
                       items: navItems,
                       onTap: _select,
                       userName: admin['full_name']?.toString() ?? admin['email']?.toString() ?? '',
-                      userRole: 'ROLE: ${admin['role']}',
                       isDark: isDark,
                     ),
                     Expanded(child: _buildBody(titles, isDark)),
@@ -205,15 +205,28 @@ class _AdminScaffoldWebState extends State<AdminScaffoldWeb> {
             onOpenDetail: _openOrderDetail,
           )
         : _detailUser != null
-            ? AdminUserDetailWeb(user: _detailUser!, onBack: _closeUserDetail)
+            ? AdminUserDetailWeb(
+                user: _detailUser!,
+                onBack: _closeUserDetail,
+                onEdit: AdminAuthCubit.get(context).isSuperAdmin
+                    ? (u) {
+                        _closeUserDetail();
+                      }
+                    : null,
+              )
                 : _detailDriver != null
                     ? AdminDriverDetailWeb(
                         driver: _detailDriver!,
                         onBack: _closeDriverDetail,
-                        onActivate: (d) {
-                          // تفعيل الدرايفر
-                          // (نستخدم الكيوبت عن طريق الـ context تحت)
-                        },
+                        onActivate: AdminAuthCubit.get(context).isSuperAdmin
+                            ? (d) {
+                                // تفعيل الدرايفر
+                                context.read<AdminDriversCubit>().updateDriver(
+                                  id: d['id'].toString(),
+                                  fields: {'state': d['state']?.toString() ?? 'active'},
+                                );
+                              }
+                            : null,
                       )
                     : _detailProduct != null
                         ? AdminProductDetailWeb(

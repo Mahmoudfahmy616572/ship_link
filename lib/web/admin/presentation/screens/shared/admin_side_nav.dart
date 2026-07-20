@@ -9,7 +9,6 @@ class AdminSideNav extends StatelessWidget {
   final List<NavItem> items;
   final ValueChanged<int> onTap;
   final String userName;
-  final String userRole;
   final bool isDark;
 
   const AdminSideNav({
@@ -18,7 +17,6 @@ class AdminSideNav extends StatelessWidget {
     required this.items,
     required this.onTap,
     required this.userName,
-    this.userRole = '',
     this.isDark = false,
   });
 
@@ -99,16 +97,8 @@ class AdminSideNav extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(userName, style: appStyle(14, FontWeight.w500, textPrimary),
-                          overflow: TextOverflow.ellipsis),
-                      if (userRole.isNotEmpty)
-                        Text(userRole, style: appStyle(11, FontWeight.w600, AppColors.primary),
-                            overflow: TextOverflow.ellipsis),
-                    ],
-                  ),
+                  child: Text(userName, style: appStyle(14, FontWeight.w500, textPrimary),
+                      overflow: TextOverflow.ellipsis),
                 ),
               ],
             ),
