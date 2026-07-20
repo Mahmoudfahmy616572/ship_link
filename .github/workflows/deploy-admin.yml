@@ -47,6 +47,12 @@ jobs:
           if ! grep -q '<base ' build/web/index.html; then
             sed -i 's|<head>|<head><base href="/ship_link/admin/">|' build/web/index.html
           fi
+      # نكسر الـ cache بتاع الـ JS عشان المستخدم يشوف آخر نسخة فوراً
+      # بنضيف query param (commit sha) على main.dart.js جوه flutter_bootstrap.js
+      - name: Cache-bust JS with commit SHA
+        run: |
+          sed -i "s|main.dart.js|main.dart.js?v=${GITHUB_SHA}|g" build/web/flutter_bootstrap.js
+          echo "Patched flutter_bootstrap.js with version ${GITHUB_SHA}"
       - name: Deploy to gh-pages under /admin (keep other files)
         uses: peaceiris/actions-gh-pages@v4
         with:
