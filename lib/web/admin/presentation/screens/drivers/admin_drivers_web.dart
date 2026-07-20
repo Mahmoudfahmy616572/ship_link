@@ -5,6 +5,7 @@ import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cubit.dart';
+import 'package:ship_link/web/admin/presentation/cubits/admin_auth/admin_auth_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_stat_card.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
@@ -92,20 +93,22 @@ class _AdminDriversWebState extends State<AdminDriversWeb> {
                   drivers,
                   isCompact: MediaQuery.of(context).size.width <= 900,
                   onOpen: widget.onOpen,
-                onActivate: (d) async {
-                  final confirmed = await AdminConfirmDialog.show(
-                    context,
-                    title: context.t.tr('activate_driver_title'),
-                    message: context.t.tr('activate_driver_confirm'),
-                  );
-                  if (confirmed) {
-                    // نفعل السائق عن طريق تحديث حالة المركبة
-                    context.read<AdminDriversCubit>().updateDriver(
-                      id: d['id'].toString(),
-                      fields: {'state': d['state']?.toString() ?? 'active'},
-                    );
-                  }
-                },
+                onActivate: AdminAuthCubit.get(context).isSuperAdmin
+                    ? (d) async {
+                        final confirmed = await AdminConfirmDialog.show(
+                          context,
+                          title: context.t.tr('activate_driver_title'),
+                          message: context.t.tr('activate_driver_confirm'),
+                        );
+                        if (confirmed) {
+                          // نفعل السائق عن طريق تحديث حالة المركبة
+                          context.read<AdminDriversCubit>().updateDriver(
+                            id: d['id'].toString(),
+                            fields: {'state': d['state']?.toString() ?? 'active'},
+                          );
+                        }
+                      }
+                    : null,
               ),
                 if (hasMore)
                   Padding(

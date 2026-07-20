@@ -11,6 +11,7 @@ import 'package:ship_link/web/admin/presentation/screens/shared/admin_theme_mode
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_empty_state.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_toast.dart';
 import 'package:ship_link/web/admin/presentation/screens/users/widgets/users_widgets.dart';
+import 'package:ship_link/web/admin/presentation/screens/users/widgets/user_form_dialog.dart';
 
 // شاشة عرض كل المستخدمين في جدول
 class AdminUsersWeb extends StatefulWidget {
@@ -70,6 +71,21 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
     }
   }
 
+  // نفتح فورم إضافة/تعديل مستخدم (للأدمن بس)
+  Future<void> _openForm(BuildContext context, Map<String, dynamic>? user) async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (_) => UserCreateEditDialog(user: user),
+    );
+    if (result == null || !mounted) return;
+    final cubit = context.read<AdminUsersCubit>();
+    if (user != null) {
+      await cubit.updateUser(id: user['id'].toString(), data: result);
+    } else {
+      await cubit.createUser(result);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.t;
@@ -81,6 +97,12 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
             _selectedIds.remove(state.id);
             if (_selectedIds.isEmpty) _selectionMode = false;
           });
+          context.read<AdminUsersCubit>().loadUsers(search: _search.isEmpty ? null : _search);
+        } else if (state is AdminUserCreateSuccess) {
+          AdminToast.show(context, t.tr('user_created'), type: AdminToastType.success);
+          context.read<AdminUsersCubit>().loadUsers(search: _search.isEmpty ? null : _search);
+        } else if (state is AdminUserUpdateSuccess) {
+          AdminToast.show(context, t.tr('user_updated'), type: AdminToastType.success);
           context.read<AdminUsersCubit>().loadUsers(search: _search.isEmpty ? null : _search);
         } else if (state is AdminUsersError) {
           AdminToast.show(context, state.message, type: AdminToastType.error);
@@ -111,10 +133,21 @@ class _AdminUsersWebState extends State<AdminUsersWeb> {
                   children: [
                     AdminSectionTitle('Users', isDark: AdminThemeMode.isDark.value),
                     if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
-                      TextButton.icon(
-                        onPressed: () => setState(() => _selectionMode = true),
-                        icon: const Icon(Icons.checklist, size: 18),
-                        label: Text(t.tr('select')),
+                      Row(
+                        children: [
+                          TextButton.icon(
+                            onPressed: () => setState(() => _selectionMode = true),
+                            icon: const Icon(Icons.checklist, size: 18),
+                            label: Text(t.tr('select')),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton.icon(
+                            onPressed: () => _openForm(context, null),
+                            icon: const Icon(Icons.person_add, size: 18),
+                            label: Text(t.tr('add_user')),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                          ),
+                        ],
                       )
                     else if (_selectionMode) ...[
                       TextButton.icon(

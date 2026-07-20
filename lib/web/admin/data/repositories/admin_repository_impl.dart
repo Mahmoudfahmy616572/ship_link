@@ -71,10 +71,29 @@ class AdminRepositoryImpl extends AdminRepository {
   }
 
   @override
-  @override
   Future<Either<Failure, void>> deleteUser(String id) async {
     try {
       await _dataSource.deleteUser(id);
+      return right(null);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> createUser(Map<String, dynamic> data) async {
+    try {
+      final created = await _dataSource.createUser(data);
+      return right(created);
+    } catch (e) {
+      return left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateUser({required String id, required Map<String, dynamic> data}) async {
+    try {
+      await _dataSource.updateUser(id: id, data: data);
       return right(null);
     } catch (e) {
       return left(ServerFailure(e.toString()));

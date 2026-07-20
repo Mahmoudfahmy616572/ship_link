@@ -111,17 +111,6 @@ class _AdminProductsWebState extends State<AdminProductsWeb> {
                     Row(
                       children: [
                         Text(t.tr('products'), style: appStyle(22, FontWeight.w700, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(6)),
-                          child: Text('ROLE=${AdminAuthCubit.get(context).adminRole}', style: appStyle(12, FontWeight.w700, Colors.white)),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(6)),
-                          child: Text('SUPER=${AdminAuthCubit.get(context).isSuperAdmin}', style: appStyle(12, FontWeight.w700, Colors.white)),
-                        ),
                         const SizedBox(width: 12),
                     if (!_selectionMode && AdminAuthCubit.get(context).isSuperAdmin)
                       TextButton.icon(

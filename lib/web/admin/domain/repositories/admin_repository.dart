@@ -13,6 +13,8 @@ abstract class AdminRepository {
   Future<Either<Failure, Map<String, dynamic>>> getDashboardStats({String period = 'all'});
   Future<Either<Failure, List<Map<String, dynamic>>>> getUsers({int limit, int offset, String? search});
   Future<Either<Failure, void>> deleteUser(String id);
+  Future<Either<Failure, Map<String, dynamic>>> createUser(Map<String, dynamic> data);
+  Future<Either<Failure, void>> updateUser({required String id, required Map<String, dynamic> data});
   Future<Either<Failure, List<Map<String, dynamic>>>> getDrivers({int limit, int offset, String? search});
   Future<Either<Failure, void>> updateDriver({required String id, Map<String, dynamic> fields});
   Future<Either<Failure, List<Map<String, dynamic>>>> getOrders({int limit, int offset, String? status, String? search});
