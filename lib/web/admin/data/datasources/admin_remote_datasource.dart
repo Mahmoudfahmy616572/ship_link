@@ -299,7 +299,7 @@ class AdminRemoteDataSource {
     bool ascending = false,
   }) async {
     final base = _supabase.from('products').select(
-        'id, name, description, image, images, price, is_top_seller, category, created_at');
+        'id, name, description, image, images, price, is_top_seller, category, created_at, status, qty');
     dynamic filtered = base;
     if (search != null && search.isNotEmpty) {
       filtered = filtered.or('name.ilike.%$search%,category.ilike.%$search%,description.ilike.%$search%');

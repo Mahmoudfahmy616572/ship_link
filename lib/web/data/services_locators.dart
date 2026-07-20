@@ -66,9 +66,9 @@ void setupWebServiceLocator() {
 
   getIt.registerSingleton<AdminRepository>(AdminRepositoryImpl());
   getIt.registerSingleton<AdminAuthCubit>(AdminAuthCubit(getIt<AdminRepository>()));
-  getIt.registerFactory<AdminDashboardCubit>(() => AdminDashboardCubit(getIt<AdminRepository>()));
-  getIt.registerFactory<AdminUsersCubit>(() => AdminUsersCubit(getIt<AdminRepository>()));
-  getIt.registerFactory<AdminDriversCubit>(() => AdminDriversCubit(getIt<AdminRepository>()));
-  getIt.registerFactory<AdminOrdersCubit>(() => AdminOrdersCubit(getIt<AdminRepository>()));
-  getIt.registerFactory<AdminProductsCubit>(() => AdminProductsCubit(getIt<AdminRepository>()));
+  getIt.registerSingleton<AdminDashboardCubit>(AdminDashboardCubit(getIt<AdminRepository>()));
+  getIt.registerSingleton<AdminUsersCubit>(AdminUsersCubit(getIt<AdminRepository>()));
+  getIt.registerSingleton<AdminDriversCubit>(AdminDriversCubit(getIt<AdminRepository>()));
+  getIt.registerSingleton<AdminOrdersCubit>(AdminOrdersCubit(getIt<AdminRepository>()));
+  getIt.registerSingleton<AdminProductsCubit>(AdminProductsCubit(getIt<AdminRepository>()));
 }

@@ -114,11 +114,13 @@ class UsersTable extends StatelessWidget {
               onSelectChanged: isSelectionMode ? (_) => onToggleSelect?.call(id) : null,
               selected: isSelectionMode && selectedIds.contains(id),
               cells: [
-                DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(name.isEmpty ? '—' : name, style: appStyle(14, FontWeight.w500, AdminThemeMode.textPrimary(AdminThemeMode.isDark.value))),
+                    onTap: isSelectionMode ? null : () => onOpen?.call(u)),
                 DataCell(Text(u['email']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(Text(u['phone_number']?.toString() ?? '—', style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
                 DataCell(UserRoleBadge(u['role']?.toString() ?? 'user')),
-                DataCell(Text(joined, style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value)))),
+                DataCell(Text(joined, style: appStyle(14, FontWeight.w400, AdminThemeMode.textSecondary(AdminThemeMode.isDark.value))),
+                    onTap: isSelectionMode ? null : () => onOpen?.call(u)),
               ],
             );
           }).toList(),
