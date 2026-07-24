@@ -1,3 +1,4 @@
+import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:ship_link/web/data/models/allProducts/all_products.dart';
 import 'package:ship_link/web/presentation/layout/web_scaffold.dart';
@@ -30,6 +31,7 @@ import 'package:ship_link/web/presentation/screens/tracking/tracking_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_scaffold.dart';
 import 'package:ship_link/driver/presentation/screens/MainScreen/main_screen_driver.dart';
+import 'package:ship_link/driver/presentation/screens/DriverSignIn/signin_driver.dart';
 
 
 class WebPageRoute extends PageRouteBuilder {
@@ -102,5 +104,9 @@ Route<dynamic> onGenerateWebRoute(RouteSettings settings) {
   if (name == AdminLoginWeb.routName) return WebPageRoute(page: const AdminLoginWeb());
   if (name == AdminScaffoldWeb.routName) return WebPageRoute(page: const AdminScaffoldWeb());
   if (name == MainScreenDriver.routName) return WebPageRoute(page: const MainScreenDriver());
+  if (name == SignInDriver.routName) {
+    html.window.location.href = '${html.window.location.origin}/ship_link/driver/';
+    return WebPageRoute(page: const MainScreenDriver());
+  }
   return WebPageRoute(page: const NotFoundWeb());
 }
