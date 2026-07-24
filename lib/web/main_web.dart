@@ -36,6 +36,7 @@ import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubi
 import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
 import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
 import 'package:ship_link/driver/presentation/screens/MainScreen/main_screen_driver.dart';
+import 'package:ship_link/driver/presentation/screens/DriverSignIn/signin_driver.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -108,11 +109,13 @@ class WebApp extends StatelessWidget {
                 return child ?? const SizedBox.shrink();
               },
               onGenerateRoute: onGenerateWebRoute,
-              // لو المسار فيه admin نفتح لوجين الأدمن مباشرة، لو driver نفتح شاشة الدرايفر، غير كده السبلاش العادي
+              // لو المسار فيه admin نفتح لوجين الأدمن مباشرة، لو driver نفتح شاشة الدرايفر (لو فيه session)، غير كده لوجين الدرايفر
               initialRoute: (html.window.location.pathname ?? '').contains('admin')
                   ? AdminLoginWeb.routName
                   : (html.window.location.pathname ?? '').contains('driver')
-                      ? MainScreenDriver.routName
+                      ? (Supabase.instance.client.auth.currentSession != null
+                          ? MainScreenDriver.routName
+                          : SignInDriver.routName)
                       : SplashWeb.routName,
               debugShowCheckedModeBanner: false,
               theme: ThemeData(
