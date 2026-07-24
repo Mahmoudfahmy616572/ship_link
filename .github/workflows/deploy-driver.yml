@@ -1,0 +1,61 @@
+name: Deploy Driver Web to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/web/driver/**'
+      - 'lib/web/main_web.dart'
+      - 'lib/web/routs_web.dart'
+      - 'lib/web/data/services_locators.dart'
+      - 'lib/driver/data/models/**'
+      - 'lib/driver/data/datasources/**'
+      - '.github/workflows/deploy-driver.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-driver
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Debug secret presence
+        run: |
+          echo "SUPABASE_URL length: ${#SUPABASE_URL}"
+          echo "SUPABASE_ANON_KEY length: ${#SUPABASE_ANON_KEY}"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Build driver web
+        run: flutter build web --target lib/web/main_web.dart --release --base-href /ship_link/driver/ --no-wasm-dry-run --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}" --dart-define=GOOGLE_MAPS_API_KEY="${{ secrets.GOOGLE_MAPS_API_KEY }}"
+
+      - name: Patch index.html base href
+        run: |
+          if ! grep -q '<base ' build/web/index.html; then
+            sed -i 's|<head>|<head><base href="/ship_link/driver/">|' build/web/index.html
+          fi
+
+      - name: Cache-bust JS with commit SHA
+        run: |
+          sed -i "s|main.dart.js|main.dart.js?v=${GITHUB_SHA}|g" build/web/flutter_bootstrap.js
+          echo "Patched flutter_bootstrap.js with version ${GITHUB_SHA}"
+
+      - name: Deploy to gh-pages under /driver (keep other files)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          destination_dir: driver
+          keep_files: true
