@@ -54,8 +54,8 @@ class _NotificationBellState extends State<NotificationBell> {
           children: [
             SvgPicture.asset(
               'assets/icons/NotificationBell.svg',
-              height: 24.h,
-              width: 24.w,
+              height: 24,
+              width: 24,
               colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
             ),
             ValueListenableBuilder<int>(
@@ -63,17 +63,24 @@ class _NotificationBellState extends State<NotificationBell> {
               builder: (context, unread, _) {
                 if (unread <= 0) return const SizedBox.shrink();
                 return Positioned(
-                  right: -4.w,
-                  top: -4.h,
+                  right: -6,
+                  top: -6,
                   child: Container(
-                    padding: EdgeInsets.all(4.w),
+                    width: 18,
+                    height: 18,
+                    padding: const EdgeInsets.all(3),
                     decoration: const BoxDecoration(
                       color: Colors.red,
                       shape: BoxShape.circle,
                     ),
-                    child: Text(
-                      unread > 99 ? '99+' : '$unread',
-                      style: TextStyle(color: Colors.white, fontSize: 9.sp, fontWeight: FontWeight.bold),
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          unread > 99 ? '99+' : '$unread',
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ),
                   ),
                 );
