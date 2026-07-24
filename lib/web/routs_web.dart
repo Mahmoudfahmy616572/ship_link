@@ -32,6 +32,8 @@ import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.d
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_scaffold.dart';
 import 'package:ship_link/driver/presentation/screens/MainScreen/main_screen_driver.dart';
 import 'package:ship_link/driver/presentation/screens/DriverSignIn/signin_driver.dart';
+import 'package:ship_link/user/presentation/cubits/auth/cubit/auth_cubit.dart' as user_auth;
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 
 class WebPageRoute extends PageRouteBuilder {
@@ -103,7 +105,14 @@ Route<dynamic> onGenerateWebRoute(RouteSettings settings) {
   }
   if (name == AdminLoginWeb.routName) return WebPageRoute(page: const AdminLoginWeb());
   if (name == AdminScaffoldWeb.routName) return WebPageRoute(page: const AdminScaffoldWeb());
-  if (name == MainScreenDriver.routName) return WebPageRoute(page: const MainScreenDriver());
+  if (name == MainScreenDriver.routName) {
+    return WebPageRoute(
+      page: BlocProvider<user_auth.AuthCubit>(
+        create: (_) => user_auth.AuthCubit(),
+        child: const MainScreenDriver(),
+      ),
+    );
+  }
   if (name == SignInDriver.routName) {
     html.window.location.href = '${html.window.location.origin}/ship_link/driver/';
     return WebPageRoute(page: const MainScreenDriver());
