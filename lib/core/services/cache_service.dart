@@ -1,7 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CacheService {
@@ -9,62 +6,37 @@ class CacheService {
   factory CacheService() => _instance;
   CacheService._();
 
-  Database? _db;
-
-  Future<Database> get database async {
-    if (_db != null) return _db!;
-    _db = await _initDb();
-    return _db!;
-  }
-
-  Future<Database> _initDb() async {
-    final dbPath = await getDatabasesPath();
-    final path = p.join(dbPath, 'shiplink_cache.db');
-    return openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE cache (
-            key TEXT PRIMARY KEY,
-            data TEXT NOT NULL,
-            timestamp INTEGER NOT NULL
-          )
-        ''');
-      },
-    );
-  }
-
   Future<void> put(String key, dynamic data, {Duration ttl = const Duration(minutes: 30)}) async {
-    final db = await database;
-    await db.insert('cache', {
-      'key': key,
-      'data': jsonEncode(data),
-      'timestamp': DateTime.now().millisecondsSinceEpoch + ttl.inMilliseconds,
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('cache_$key', jsonEncode(data));
+    await prefs.setInt('cache_${key}_ts', DateTime.now().millisecondsSinceEpoch + ttl.inMilliseconds);
   }
 
   Future<dynamic> get(String key) async {
-    final db = await database;
-    final rows = await db.query('cache', where: 'key = ?', whereArgs: [key]);
-    if (rows.isEmpty) return null;
-    final row = rows.first;
-    final expiry = row['timestamp'] as int;
-    if (DateTime.now().millisecondsSinceEpoch > expiry) {
-      await db.delete('cache', where: 'key = ?', whereArgs: [key]);
+    final prefs = await SharedPreferences.getInstance();
+    final ts = prefs.getInt('cache_${key}_ts');
+    if (ts == null || DateTime.now().millisecondsSinceEpoch > ts) {
+      await prefs.remove('cache_$key');
+      await prefs.remove('cache_${key}_ts');
       return null;
     }
-    return jsonDecode(row['data'] as String);
+    final raw = prefs.getString('cache_$key');
+    if (raw == null) return null;
+    return jsonDecode(raw);
   }
 
   Future<void> remove(String key) async {
-    final db = await database;
-    await db.delete('cache', where: 'key = ?', whereArgs: [key]);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('cache_$key');
+    await prefs.remove('cache_${key}_ts');
   }
 
   Future<void> clear() async {
-    final db = await database;
-    await db.delete('cache');
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys().where((k) => k.startsWith('cache_')).toList();
+    for (final k in keys) {
+      await prefs.remove(k);
+    }
   }
 }
 
@@ -73,31 +45,32 @@ class CredentialsService {
   factory CredentialsService() => _instance;
   CredentialsService._();
 
-  final _storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-  );
-
   Future<void> save(String email, {String? password}) async {
-    await _storage.write(key: 'saved_email', value: email);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('saved_email', email);
     if (password != null) {
-      await _storage.write(key: 'saved_password', value: password);
+      await prefs.setString('saved_password', password);
     }
   }
 
   Future<String?> load() async {
-    return _storage.read(key: 'saved_email');
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('saved_email');
   }
 
   Future<String?> loadEmail() async {
-    return _storage.read(key: 'saved_email');
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('saved_email');
   }
 
   Future<String?> loadPassword() async {
-    return _storage.read(key: 'saved_password');
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('saved_password');
   }
 
   Future<void> clear() async {
-    await _storage.delete(key: 'saved_email');
-    await _storage.delete(key: 'saved_password');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('saved_email');
+    await prefs.remove('saved_password');
   }
 }
