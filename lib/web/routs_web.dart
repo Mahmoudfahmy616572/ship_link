@@ -114,8 +114,12 @@ Route<dynamic> onGenerateWebRoute(RouteSettings settings) {
     );
   }
   if (name == SignInDriver.routName) {
-    html.window.location.href = '${html.window.location.origin}/ship_link/driver/';
-    return WebPageRoute(page: const MainScreenDriver());
+    return WebPageRoute(
+      page: BlocProvider<user_auth.AuthCubit>(
+        create: (_) => user_auth.AuthCubit(),
+        child: const SignInDriver(),
+      ),
+    );
   }
   return WebPageRoute(page: const NotFoundWeb());
 }
