@@ -38,6 +38,12 @@ import 'package:ship_link/web/admin/presentation/cubits/drivers/admin_drivers_cu
 import 'package:ship_link/web/admin/presentation/cubits/orders/admin_orders_cubit.dart';
 import 'package:ship_link/web/admin/presentation/cubits/products/admin_products_cubit.dart';
 
+import 'package:ship_link/web/driver/data/driver_web_repository.dart';
+import 'package:ship_link/web/driver/cubits/get_orders/get_orders_web_cubit.dart';
+import 'package:ship_link/web/driver/cubits/get_accepted_orders/get_accepted_orders_web_cubit.dart';
+import 'package:ship_link/web/driver/cubits/get_userdriver_data/get_userdriver_data_web_cubit.dart';
+import 'package:ship_link/web/driver/cubits/accept_order/accept_order_web_cubit.dart';
+
 final getIt = GetIt.instance;
 void setupWebServiceLocator() {
   getIt.registerSingleton<HomeRepository>(HomeRepositoryImpl());
@@ -71,4 +77,10 @@ void setupWebServiceLocator() {
   getIt.registerSingleton<AdminDriversCubit>(AdminDriversCubit(getIt<AdminRepository>()));
   getIt.registerSingleton<AdminOrdersCubit>(AdminOrdersCubit(getIt<AdminRepository>()));
   getIt.registerSingleton<AdminProductsCubit>(AdminProductsCubit(getIt<AdminRepository>()));
+
+  getIt.registerSingleton<DriverWebRepositoryImpl>(DriverWebRepositoryImpl());
+  getIt.registerFactory<GetOrdersWebCubit>(() => GetOrdersWebCubit(getIt<DriverWebRepositoryImpl>()));
+  getIt.registerFactory<GetAcceptedOrdersWebCubit>(() => GetAcceptedOrdersWebCubit(getIt<DriverWebRepositoryImpl>()));
+  getIt.registerFactory<GetUserdriverDataWebCubit>(() => GetUserdriverDataWebCubit(getIt<DriverWebRepositoryImpl>()));
+  getIt.registerFactory<AcceptOrderWebCubit>(() => AcceptOrderWebCubit(getIt<DriverWebRepositoryImpl>()));
 }

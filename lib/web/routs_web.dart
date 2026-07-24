@@ -29,6 +29,8 @@ import 'package:ship_link/web/presentation/screens/chat/support_chat_web.dart';
 import 'package:ship_link/web/presentation/screens/tracking/tracking_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/login/admin_login_web.dart';
 import 'package:ship_link/web/admin/presentation/screens/shared/admin_scaffold.dart';
+import 'package:ship_link/web/driver/screens/driver_signin_web.dart';
+import 'package:ship_link/web/driver/screens/driver_main_web.dart';
 
 class WebPageRoute extends PageRouteBuilder {
   final Widget page;
@@ -99,5 +101,7 @@ Route<dynamic> onGenerateWebRoute(RouteSettings settings) {
   }
   if (name == AdminLoginWeb.routName) return WebPageRoute(page: const AdminLoginWeb());
   if (name == AdminScaffoldWeb.routName) return WebPageRoute(page: const AdminScaffoldWeb());
+  if (name == DriverSignInWeb.routName) return WebPageRoute(page: const DriverSignInWeb());
+  if (name == DriverMainScreen.routName) return WebPageRoute(page: const DriverMainScreen());
   return WebPageRoute(page: const NotFoundWeb());
 }
