@@ -8,8 +8,8 @@ on:
       - 'lib/web/main_web.dart'
       - 'lib/web/routs_web.dart'
       - 'lib/web/data/services_locators.dart'
-      - 'lib/driver/data/models/**'
-      - 'lib/driver/data/datasources/**'
+      - 'lib/core/**'
+      - 'lib/driver/**'
       - '.github/workflows/deploy-driver.yml'
   workflow_dispatch:
 
