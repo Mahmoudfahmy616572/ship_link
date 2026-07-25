@@ -203,7 +203,32 @@ class _ProfileAvatarState extends State<_ProfileAvatar> {
   void _pickImage() async {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) return;
-    final file = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 512, maxHeight: 512);
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.camera_alt, color: AppColors.cta),
+                title: Text(context.t.tr('camera')),
+                onTap: () => Navigator.pop(ctx, ImageSource.camera),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library, color: AppColors.cta),
+                title: Text(context.t.tr('gallery')),
+                onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (source == null) return;
+    final file = await ImagePicker().pickImage(source: source, maxWidth: 512, maxHeight: 512);
     if (file == null) return;
     try {
       final svc = ProfileImageService();

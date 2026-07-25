@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
@@ -131,6 +132,11 @@ class _ProductDetailsWebState extends State<ProductDetailsWeb> {
         foregroundColor: const Color(0xFF111827),
         elevation: 0.5,
         actions: [
+          IconButton(
+            onPressed: () => _shareProduct(context),
+            icon: const Icon(Icons.share_outlined),
+            tooltip: context.t.tr('share'),
+          ),
           Builder(builder: (context) {
             final pid = product.id ?? 0;
             final isFav = context.select<FavouriteCubit, bool>((c) => c.isFavourite(pid));
@@ -285,6 +291,18 @@ class _ProductDetailsWebState extends State<ProductDetailsWeb> {
   }
 
   Product get product => widget.product;
+
+  void _shareProduct(BuildContext context) {
+    final url = Uri.base.toString().split('?').first;
+    final link = '$url?product=${product.id}';
+    Clipboard.setData(ClipboardData(text: link));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.t.tr('link_copied')),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   Widget _buildReviewsSection() {
     return Column(

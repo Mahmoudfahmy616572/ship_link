@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/providers.dart';
+import 'package:ship_link/core/services/notification_preferences_service.dart';
 import 'package:ship_link/web/presentation/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/web/presentation/shared/hover_widget.dart';
@@ -19,6 +20,9 @@ class SettingsWeb extends StatefulWidget {
 class _SettingsWebState extends State<SettingsWeb> with SingleTickerProviderStateMixin {
   late AnimationController _animCtrl;
   late Animation<double> _fadeAnim;
+  final _prefService = NotificationPreferencesService();
+  NotificationPreferences _prefs = const NotificationPreferences();
+  bool _prefsLoading = true;
 
   @override
   void initState() {
@@ -26,6 +30,17 @@ class _SettingsWebState extends State<SettingsWeb> with SingleTickerProviderStat
     _animCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
     _fadeAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic);
     _animCtrl.forward();
+    _loadPrefs();
+  }
+
+  Future<void> _loadPrefs() async {
+    final p = await _prefService.load();
+    if (mounted) setState(() { _prefs = p; _prefsLoading = false; });
+  }
+
+  Future<void> _updatePref(NotificationPreferences updated) async {
+    setState(() => _prefs = updated);
+    await _prefService.save(updated);
   }
 
   @override
@@ -130,22 +145,31 @@ class _SettingsWebState extends State<SettingsWeb> with SingleTickerProviderStat
             SizedBox(height: 24),
             _sectionTitle(context, context.t.tr('notifications')),
             SizedBox(height: 8),
-            _card([
+            _prefsLoading
+                ? _card([Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(strokeWidth: 2)))])
+                : _card([
               _tile(context, context.t.tr('order_updates'), Icons.inventory_2_outlined, null, trailing: Switch(
-                value: true,
-                onChanged: (_) {},
+                value: _prefs.orderUpdates,
+                onChanged: (v) => _updatePref(NotificationPreferences(
+                  orderUpdates: v, chatMessages: _prefs.chatMessages, promotions: _prefs.promotions,
+                )),
                 activeColor: AppColors.primary,
               )),
               const _Divider(),
               _tile(context, context.t.tr('chat_messages'), Icons.chat_outlined, null, trailing: Switch(
-                value: true,
-                onChanged: (_) {},
+                value: _prefs.chatMessages,
+                onChanged: (v) => _updatePref(NotificationPreferences(
+                  orderUpdates: _prefs.orderUpdates, chatMessages: v, promotions: _prefs.promotions,
+                )),
                 activeColor: AppColors.primary,
               )),
               const _Divider(),
               _tile(context, context.t.tr('promotions'), Icons.discount_outlined, null, trailing: Switch(
-                value: false,
-                onChanged: (_) {},
+                value: _prefs.promotions,
+                onChanged: (v) => _updatePref(NotificationPreferences(
+                  orderUpdates: _prefs.orderUpdates, chatMessages: _prefs.chatMessages, promotions: v,
+                )),
+                activeColor: AppColors.primary,
               )),
             ]),
           ],
