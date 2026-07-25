@@ -21,6 +21,8 @@ class OrdersWeb extends StatefulWidget {
 }
 
 class _OrdersWebState extends State<OrdersWeb> {
+  String? _selectedStatus;
+
   @override
   void initState() {
     super.initState();
@@ -64,6 +66,9 @@ class _OrdersWebState extends State<OrdersWeb> {
     final state = context.watch<OrderHistoryCubit>().state;
     final loading = state is OrderHistoryLoading;
     final orders = state is OrderHistoryLoaded ? state.orders : <Map<String, dynamic>>[];
+    final filtered = _selectedStatus == null
+        ? orders
+        : orders.where((o) => (o['status'] as String? ?? '') == _selectedStatus).toList();
 
     if (loading) {
       return ListView.builder(
@@ -109,10 +114,38 @@ class _OrdersWebState extends State<OrdersWeb> {
             ),
           ),
         ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: SizedBox(
+            height: 36,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _buildFilterChip(context.t.tr('all'), null),
+                _buildFilterChip(context.t.tr('pending'), 'pending'),
+                _buildFilterChip(context.t.tr('shipped'), 'shipped'),
+                _buildFilterChip(context.t.tr('delivered'), 'delivered'),
+                _buildFilterChip(context.t.tr('cancelled'), 'cancelled'),
+              ],
+            ),
+          ),
+        ),
         Expanded(
-          child: ListView.builder(
+          child: filtered.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.receipt_long_outlined, size: 64, color: Color(0xFFD1D5DB)),
+                      SizedBox(height: 16),
+                      Text(context.t.tr('no_orders_yet'),
+                          style: appStyle(16, FontWeight.w500, const Color(0xFF9CA3AF))),
+                    ],
+                  ),
+                )
+              : ListView.builder(
             padding: EdgeInsets.all(16),
-            itemCount: orders.length,
+            itemCount: filtered.length,
       itemBuilder: (context, i) => TweenAnimationBuilder<double>(
         tween: Tween(begin: 0.0, end: 1.0),
         duration: Duration(milliseconds: 300 + (i * 100)),
@@ -120,12 +153,35 @@ class _OrdersWebState extends State<OrdersWeb> {
         builder: (context, value, child) => Opacity(opacity: value, child: Transform.translate(
           offset: Offset(0, 20 * (1 - value)), child: child,
         )),
-        child: _OrderCard(order: orders[i], statusColor: _statusColor(orders[i]['status'] as String? ?? '')),
+        child: _OrderCard(order: filtered[i], statusColor: _statusColor(filtered[i]['status'] as String? ?? '')),
       ),
             ),
           ),
         ],
       );
+  }
+
+  Widget _buildFilterChip(String label, String? status) {
+    final isSelected = _selectedStatus == status;
+    return Padding(
+      padding: EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedStatus = status),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : const Color(0xFFE5E7EB),
+            ),
+          ),
+          child: Center(
+            child: Text(label, style: appStyle(13, FontWeight.w500, isSelected ? Colors.white : const Color(0xFF6B7280))),
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -32,10 +32,10 @@ class ProfileEditCubit extends Cubit<ProfileEditState> {
     }
   }
 
-  Future<String?> pickImage() async {
+  Future<String?> pickImage({ImageSource? source}) async {
     final userId = _supabase.auth.currentUser?.id;
     if (userId == null) return null;
-    final file = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 512, maxHeight: 512);
+    final file = await ImagePicker().pickImage(source: source ?? ImageSource.gallery, maxWidth: 512, maxHeight: 512);
     if (file == null) return null;
     try {
       final svc = ProfileImageService();

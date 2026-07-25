@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
@@ -40,8 +41,33 @@ class _EditProfileWebState extends State<EditProfileWeb> with SingleTickerProvid
   }
 
   void _pickImage() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.camera_alt, color: AppColors.cta),
+                title: Text(context.t.tr('camera')),
+                onTap: () => Navigator.pop(ctx, ImageSource.camera),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library, color: AppColors.cta),
+                title: Text(context.t.tr('gallery')),
+                onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (source == null) return;
     final cubit = context.read<ProfileEditCubit>();
-    final url = await cubit.pickImage();
+    final url = await cubit.pickImage(source: source);
     if (url != null && mounted) {
       setState(() => _avatarUrl = url);
     }

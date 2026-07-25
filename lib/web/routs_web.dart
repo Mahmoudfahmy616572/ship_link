@@ -22,6 +22,7 @@ import 'package:ship_link/web/presentation/screens/welcome/welcome_web.dart';
 import 'package:ship_link/web/presentation/screens/otp/otp_web.dart';
 import 'package:ship_link/web/presentation/screens/create_account/create_account_web.dart';
 import 'package:ship_link/web/presentation/screens/reset_password/reset_password_web.dart';
+import 'package:ship_link/web/presentation/screens/reset_password/set_new_password_web.dart';
 import 'package:ship_link/web/presentation/screens/product_details/product_details_web.dart';
 import 'package:ship_link/web/presentation/screens/search/search_web.dart';
 import 'package:ship_link/web/presentation/screens/chat/chat_list_web.dart';
@@ -82,6 +83,7 @@ Route<dynamic> onGenerateWebRoute(RouteSettings settings) {
   }
   if (name == CreateAccountWeb.routName) return WebPageRoute(page: const CreateAccountWeb());
   if (name == ResetPasswordWeb.routName) return WebPageRoute(page: const ResetPasswordWeb());
+  if (name == SetNewPasswordWeb.routName) return WebPageRoute(page: const SetNewPasswordWeb());
   if (name == ProductDetailsWeb.routName) {
     final product = settings.arguments as Product;
     return WebPageRoute(page: ProductDetailsWeb(product: product));
