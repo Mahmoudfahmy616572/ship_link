@@ -495,8 +495,25 @@ CREATE INDEX IF NOT EXISTS idx_order_chat_order_id ON order_chat_messages(order_
 CREATE INDEX IF NOT EXISTS idx_order_chat_created_at ON order_chat_messages(created_at);
 
 -- Enable Realtime for order_chat_messages and notifications
-ALTER PUBLICATION supabase_realtime ADD TABLE order_chat_messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE notifications;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'order_chat_messages'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.order_chat_messages;
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'notifications'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+  END IF;
+END $$;
 
 -- Add data column to notifications for existing installations
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS data JSONB;
