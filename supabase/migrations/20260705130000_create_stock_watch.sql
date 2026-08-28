@@ -25,3 +25,4 @@ DROP POLICY IF EXISTS "Users can delete own watches" ON stock_watch;
 CREATE POLICY "Users can delete own watches" ON stock_watch
   FOR DELETE USING (auth.uid() = user_id);
 
+
