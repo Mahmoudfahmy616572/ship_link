@@ -152,6 +152,12 @@ CREATE TABLE IF NOT EXISTS orders (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Phase 1: delivery coordinates used by checkout / order_detail / driver app.
+-- Idempotent: safe to re-run; does not alter existing data.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_address TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_lat DOUBLE PRECISION;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_lng DOUBLE PRECISION;
+
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can view own orders" ON orders;
 CREATE POLICY "Users can view own orders" ON orders
@@ -223,7 +229,7 @@ CREATE POLICY "Users can read driver locations" ON driver_locations
 
 DROP POLICY IF EXISTS "Drivers can update own location" ON driver_locations;
 CREATE POLICY "Drivers can update own location" ON driver_locations
-  FOR ALL USING (auth.uid() = driver_id);
+  FOR ALL USING (auth.uid() = driver_id) WITH CHECK (auth.uid() = driver_id);
 
 -- 9. NOTIFICATIONS
 CREATE TABLE IF NOT EXISTS notifications (
@@ -249,7 +255,10 @@ CREATE POLICY "Users can update own notifications" ON notifications
 
 DROP POLICY IF EXISTS "Users can insert notifications" ON notifications;
 CREATE POLICY "Users can insert notifications" ON notifications
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (
+    auth.uid() = user_id
+    OR EXISTS (SELECT 1 FROM drivers WHERE drivers.id = auth.uid())
+  );
 
 DROP POLICY IF EXISTS "Users can delete own notifications" ON notifications;
 

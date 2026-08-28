@@ -26,12 +26,23 @@ CREATE POLICY "users_crud_own_addresses"
 -- 2. RLS for orders table (if not already enabled)
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
+-- Scoped policies only. NEVER use a blanket "allow_all_authenticated" policy:
+-- permissive RLS policies combine with OR, so a blanket authenticated policy
+-- would grant every signed-in user full CRUD on ALL orders.
 DROP POLICY IF EXISTS "allow_all_authenticated" ON orders;
-CREATE POLICY "allow_all_authenticated"
-  ON orders
-  FOR ALL
-  USING (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "users_view_own_orders"
+  ON orders FOR SELECT
+  USING (auth.uid() = user_id OR auth.uid() = driver_id);
+CREATE POLICY "users_insert_own_orders"
+  ON orders FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "users_update_own_orders"
+  ON orders FOR UPDATE
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "drivers_update_assigned_orders"
+  ON orders FOR UPDATE
+  USING (auth.uid() = driver_id OR driver_id IS NULL)
+  WITH CHECK (auth.uid() = driver_id);
 
 -- 3. notifications table (for push & in-app)
 CREATE TABLE IF NOT EXISTS notifications (
@@ -55,7 +66,10 @@ CREATE POLICY "users_read_own_notifications"
 CREATE POLICY "service_insert_notifications"
   ON notifications
   FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (
+    auth.uid() = user_id
+    OR EXISTS (SELECT 1 FROM drivers WHERE drivers.id = auth.uid())
+  );
 
 -- Add data column for existing installations
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS data JSONB;
