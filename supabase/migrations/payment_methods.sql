@@ -27,3 +27,4 @@ CREATE POLICY "Users can update their own payment methods"
 CREATE POLICY "Users can delete their own payment methods"
   ON payment_methods FOR DELETE
   USING (auth.uid() = user_id);
+
