@@ -562,6 +562,7 @@ CREATE TRIGGER trg_orders_updated_at
 
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260629191000_add_paymob_columns.sql
 -- ============================================================
@@ -569,6 +570,7 @@ CREATE TRIGGER trg_orders_updated_at
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS paymob_order_id BIGINT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
 CREATE INDEX IF NOT EXISTS idx_orders_paymob_order_id ON orders(paymob_order_id);
+
 
 
 
@@ -593,11 +595,13 @@ CREATE POLICY "Participants can delete own messages"
 
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260705120000_add_delivery_instructions.sql
 -- ============================================================
 
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_instructions TEXT DEFAULT '';
+
 
 
 
@@ -631,6 +635,7 @@ CREATE POLICY "Users can update own watches" ON stock_watch
 DROP POLICY IF EXISTS "Users can delete own watches" ON stock_watch;
 CREATE POLICY "Users can delete own watches" ON stock_watch
   FOR DELETE USING (auth.uid() = user_id);
+
 
 
 
@@ -668,6 +673,7 @@ END $$;
 
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260825000000_add_order_delivery_coords.sql
 -- ============================================================
@@ -679,6 +685,7 @@ END $$;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_address TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_lat DOUBLE PRECISION;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_lng DOUBLE PRECISION;
+
 
 
 
@@ -695,6 +702,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications (user_id);
 
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260829000001_add_push_sent.sql
 -- ============================================================
@@ -704,6 +712,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications (user_id);
 
 ALTER TABLE notifications
   ADD COLUMN IF NOT EXISTS push_sent BOOLEAN NOT NULL DEFAULT false;
+
 
 
 
@@ -733,6 +742,7 @@ CREATE INDEX IF NOT EXISTS driver_locations_updated_at_idx
 
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260829000003_tighten_notifications_insert_rls.sql
 -- ============================================================
@@ -757,6 +767,7 @@ CREATE POLICY "Users can insert notifications" ON notifications
 
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/payment_methods.sql
 -- ============================================================
@@ -775,20 +786,25 @@ CREATE TABLE IF NOT EXISTS payment_methods (
 -- RLS
 ALTER TABLE payment_methods ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own payment methods" ON payment_methods;
 CREATE POLICY "Users can view their own payment methods"
   ON payment_methods FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own payment methods" ON payment_methods;
 CREATE POLICY "Users can insert their own payment methods"
   ON payment_methods FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own payment methods" ON payment_methods;
 CREATE POLICY "Users can update their own payment methods"
   ON payment_methods FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own payment methods" ON payment_methods;
 CREATE POLICY "Users can delete their own payment methods"
   ON payment_methods FOR DELETE
   USING (auth.uid() = user_id);
+
 
 
