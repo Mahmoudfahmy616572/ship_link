@@ -656,8 +656,15 @@ UPDATE profiles SET phone_number = NULL WHERE id IN (
     FROM profiles WHERE phone_number IS NOT NULL AND phone_number != ''
   ) dup WHERE rn > 1
 );
-ALTER TABLE profiles ADD CONSTRAINT profiles_email_key UNIQUE (email);
-ALTER TABLE profiles ADD CONSTRAINT profiles_phone_number_key UNIQUE (phone_number);
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'profiles_email_key') THEN
+    ALTER TABLE profiles ADD CONSTRAINT profiles_email_key UNIQUE (email);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'profiles_phone_number_key') THEN
+    ALTER TABLE profiles ADD CONSTRAINT profiles_phone_number_key UNIQUE (phone_number);
+  END IF;
+END $$;
 
 
 
