@@ -76,3 +76,4 @@ ALTER TABLE notifications ADD COLUMN IF NOT EXISTS data JSONB;
 
 -- 4. add fcm_token column to profiles if not exists
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS fcm_token TEXT;
+

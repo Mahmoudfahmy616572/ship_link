@@ -561,6 +561,7 @@ CREATE TRIGGER trg_orders_updated_at
   EXECUTE FUNCTION update_updated_at();
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260629191000_add_paymob_columns.sql
 -- ============================================================
@@ -568,6 +569,7 @@ CREATE TRIGGER trg_orders_updated_at
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS paymob_order_id BIGINT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
 CREATE INDEX IF NOT EXISTS idx_orders_paymob_order_id ON orders(paymob_order_id);
+
 
 
 -- ============================================================
@@ -590,11 +592,13 @@ CREATE POLICY "Participants can delete own messages"
   USING (sender_id = auth.uid());
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260705120000_add_delivery_instructions.sql
 -- ============================================================
 
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_instructions TEXT DEFAULT '';
+
 
 
 -- ============================================================
@@ -612,17 +616,22 @@ CREATE TABLE IF NOT EXISTS stock_watch (
 
 ALTER TABLE stock_watch ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own watches" ON stock_watch;
 CREATE POLICY "Users can view own watches" ON stock_watch
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own watches" ON stock_watch;
 CREATE POLICY "Users can insert own watches" ON stock_watch
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own watches" ON stock_watch;
 CREATE POLICY "Users can update own watches" ON stock_watch
   FOR UPDATE USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own watches" ON stock_watch;
 CREATE POLICY "Users can delete own watches" ON stock_watch
   FOR DELETE USING (auth.uid() = user_id);
+
 
 
 -- ============================================================
@@ -651,6 +660,7 @@ ALTER TABLE profiles ADD CONSTRAINT profiles_email_key UNIQUE (email);
 ALTER TABLE profiles ADD CONSTRAINT profiles_phone_number_key UNIQUE (phone_number);
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260825000000_add_order_delivery_coords.sql
 -- ============================================================
@@ -662,6 +672,7 @@ ALTER TABLE profiles ADD CONSTRAINT profiles_phone_number_key UNIQUE (phone_numb
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_address TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_lat DOUBLE PRECISION;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_lng DOUBLE PRECISION;
+
 
 
 -- ============================================================
@@ -676,6 +687,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_driver_id ON orders (driver_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications (user_id);
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260829000001_add_push_sent.sql
 -- ============================================================
@@ -685,6 +697,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications (user_id);
 
 ALTER TABLE notifications
   ADD COLUMN IF NOT EXISTS push_sent BOOLEAN NOT NULL DEFAULT false;
+
 
 
 -- ============================================================
@@ -712,6 +725,7 @@ CREATE INDEX IF NOT EXISTS driver_locations_updated_at_idx
   ON driver_locations (updated_at);
 
 
+
 -- ============================================================
 -- FILE: supabase/migrations/20260829000003_tighten_notifications_insert_rls.sql
 -- ============================================================
@@ -727,11 +741,13 @@ CREATE INDEX IF NOT EXISTS driver_locations_updated_at_idx
 DROP POLICY IF EXISTS "Users can insert notifications" ON notifications;
 DROP POLICY IF EXISTS "service_insert_notifications" ON notifications;
 
+DROP POLICY IF EXISTS "Users can insert notifications" ON notifications;
 CREATE POLICY "Users can insert notifications" ON notifications
   FOR INSERT WITH CHECK (
     auth.uid() = user_id
     OR EXISTS (SELECT 1 FROM drivers WHERE drivers.id = auth.uid())
   );
+
 
 
 -- ============================================================
@@ -767,4 +783,5 @@ CREATE POLICY "Users can update their own payment methods"
 CREATE POLICY "Users can delete their own payment methods"
   ON payment_methods FOR DELETE
   USING (auth.uid() = user_id);
+
 

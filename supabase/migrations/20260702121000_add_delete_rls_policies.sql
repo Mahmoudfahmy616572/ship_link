@@ -12,3 +12,4 @@ DROP POLICY IF EXISTS "Participants can delete own messages" ON order_chat_messa
 CREATE POLICY "Participants can delete own messages"
   ON order_chat_messages FOR DELETE
   USING (sender_id = auth.uid());
+
