@@ -7,39 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:872096044047:android:feb0a6ce9404989e6fbf7a",
-        "android_client_info": {
-          "package_name": "com.shiplink.app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "872096044047-jkve53q4uuq8fqbsj144uuhi9h5344h7.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAOBDqUFz2usbjWdeKZg0hwssVNggVMX6Y"
-        },
-        {
-          "current_key": "AIzaSyDAf7ZLT_6Xhj7ZgABIdHsllz75DoF9_rM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "872096044047-jkve53q4uuq8fqbsj144uuhi9h5344h7.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:872096044047:android:ff2f0d91d46d4d706fbf7a",
+        "mobilesdk_app_id": "1:872096044047:android:70cbbda66311ae6e6fbf7a",
         "android_client_info": {
           "package_name": "com.shiplink.app.driver"
         }
@@ -71,7 +39,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:872096044047:android:ee707167779da45b6fbf7a",
+        "mobilesdk_app_id": "1:872096044047:android:cfc29f5f7ed238716fbf7a",
         "android_client_info": {
           "package_name": "com.shiplink.app.user"
         }
