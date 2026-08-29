@@ -1,4 +1,4 @@
-package com.example.ship_link
+package com.shiplink.app
 
 import android.os.Build
 import com.google.android.gms.common.GoogleApiAvailability
