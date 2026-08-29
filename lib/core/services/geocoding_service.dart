@@ -1,6 +1,11 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:ship_link/core/maps/maps.dart';
+import 'package:ship_link/core/maps/models/geocoding_result.dart';
+import 'package:ship_link/core/maps/models/map_coordinate.dart';
 
+/// Backward-compatible facade used by legacy callers (e.g. location picker).
+/// The actual logic now flows through the [GeocodingProvider] abstraction
+/// (`geocodingService`) — MapTiler primary with Nominatim fallback — so this
+/// thin shim keeps old callers working without provider-specific code.
 class AddressResult {
   final String fullAddress;
   final String governorate;
@@ -21,51 +26,16 @@ class AddressResult {
 
 class GeocodingService {
   static Future<AddressResult?> reverseGeocode(double lat, double lng) async {
-    try {
-      final uri = Uri.parse(
-        'https://nominatim.openstreetmap.org/reverse'
-        '?format=json&lat=$lat&lon=$lng&addressdetails=1',
-      );
-      final res = await http.get(uri, headers: {
-        'User-Agent': 'ShipLink/1.0',
-        'Accept-Language': 'ar', 
-      });
-      if (res.statusCode != 200) return null;
-      final json = jsonDecode(res.body) as Map<String, dynamic>;
-      final address = json['address'] as Map<String, dynamic>? ?? {};
-      final displayName = json['display_name'] as String? ?? '';
-
-      // Egyptian admin hierarchy: state=governorate, city, road
-      final governorate = address['state'] as String? ??
-          address['region'] as String? ??
-          '';
-      final city = address['city'] as String? ??
-          address['town'] as String? ??
-          address['village'] as String? ??
-          address['county'] as String? ??
-          '';
-      final road = address['road'] as String? ??
-          address['street'] as String? ??
-          '';
-
-      // Build a clean Egyptian address: Governorate, City, Street
-      final parts = <String>[
-        if (governorate.isNotEmpty) governorate,
-        if (city.isNotEmpty) city,
-        if (road.isNotEmpty) road,
-      ];
-      final cleanAddress = parts.isNotEmpty ? parts.join(', ') : displayName;
-
-      return AddressResult(
-        fullAddress: cleanAddress,
-        governorate: governorate,
-        city: city,
-        road: road,
-        lat: lat,
-        lng: lng,
-      );
-    } catch (_) {
-      return null;
-    }
+    final result =
+        await geocodingService.reverseGeocode(MapCoordinate(lat, lng));
+    if (result == null) return null;
+    return AddressResult(
+      fullAddress: result.formattedAddress,
+      governorate: result.governorate ?? '',
+      city: result.city ?? '',
+      road: '',
+      lat: lat,
+      lng: lng,
+    );
   }
 }

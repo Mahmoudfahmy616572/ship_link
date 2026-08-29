@@ -210,10 +210,13 @@ class _SideBarState extends State<SideBar> {
                           ),
                         ),
                         SizedBox(width: 6.w),
-                        Text(
-                          context.t.tr('developed_by'),
-                          style: appStyle(13, FontWeight.normal,
-                              AppColors.textPrimary.withOpacity(0.4)),
+                        Expanded(
+                          child: Text(
+                            context.t.tr('developed_by'),
+                            textAlign: TextAlign.center,
+                            style: appStyle(13, FontWeight.normal,
+                                AppColors.textPrimary.withOpacity(0.4)),
+                          ),
                         ),
                       ],
                     ),

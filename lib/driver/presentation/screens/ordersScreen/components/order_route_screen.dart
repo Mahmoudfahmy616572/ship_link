@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ship_link/core/services/directions_service.dart';
+import 'package:ship_link/core/maps/maps.dart';
 import 'package:ship_link/core/localization.dart';
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/user/presentation/screens/chat/order_chat_screen.dart';
 import 'package:ship_link/core/widgets/adaptive_map.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:ship_link/core/services/navigation/external_navigation_service.dart';
+import 'package:ship_link/core/services/navigation/navigation_request.dart';
+import 'package:ship_link/core/widgets/snackBar/snack_bar.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 
 class OrderRouteScreen extends StatefulWidget {
@@ -120,12 +122,9 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
     final dLng = _state.value.driverLng;
     if (dLat == null || dLng == null) return;
 
-    final service = DirectionsService();
-    final route = await service.getRoute(
-      originLat: dLat,
-      originLng: dLng,
-      destLat: widget.destLat,
-      destLng: widget.destLng,
+    final route = await routeService.getRoute(
+      origin: MapCoordinate(dLat, dLng),
+      destination: MapCoordinate(widget.destLat, widget.destLng),
     );
 
     if (!mounted) return;
@@ -135,7 +134,7 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
         polylines: [
           MapPolyline(
             id: 'route',
-            points: route.polylinePoints,
+            points: route.polylinePoints.map((c) => c.toMapLatLng()).toList(),
             color: const Color(0xFF2563EB),
             width: 5,
           ),
@@ -190,21 +189,18 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
     _state.value = _state.value.copyWith(markers: markers);
   }
 
-  Future<void> _openGoogleMaps() async {
+  Future<void> _navigateExternal() async {
     final dLat = _state.value.driverLat;
     final dLng = _state.value.driverLng;
-    if (dLat == null || dLng == null) {
-      final uri = Uri.parse('https://www.google.com/maps?q=${widget.destLat},${widget.destLng}');
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-      return;
-    }
-    final uri = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&origin=$dLat,$dLng&destination=${widget.destLat},${widget.destLng}&travelmode=driving',
+    final request = NavigationRequest(
+      origin: (dLat != null && dLng != null)
+          ? NavCoordinate(dLat, dLng)
+          : null,
+      destination: NavCoordinate(widget.destLat, widget.destLng),
     );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    final result = await ExternalNavigationService().navigate(request);
+    if (!result.success && mounted) {
+      CustomSnackBar.error(result.message ?? 'Navigation failed', context);
     }
   }
 
@@ -319,7 +315,7 @@ class _OrderRouteScreenState extends State<OrderRouteScreen> {
                   ),
                   SizedBox(width: 6.w),
                   GestureDetector(
-                    onTap: _openGoogleMaps,
+                    onTap: _navigateExternal,
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                       decoration: BoxDecoration(

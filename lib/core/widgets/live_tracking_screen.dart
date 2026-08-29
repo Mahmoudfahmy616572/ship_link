@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ship_link/core/localization.dart';
+import 'package:ship_link/core/models/driver_location.dart';
 import 'package:ship_link/core/services/supabase_service.dart';
 import 'package:ship_link/core/widgets/adaptive_map.dart';
 
@@ -27,19 +28,22 @@ class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
   void _setupTracking() {
     if (widget.driverId != null) {
       _supabase.getDriverLocation(widget.driverId!).listen((data) {
-        if (data.isNotEmpty && mounted) {
-          final lat = (data['latitude'] as num).toDouble();
-          final lng = (data['longitude'] as num).toDouble();
+        if (mounted) {
+          final loc = DriverLocation.tryParse(
+            data,
+            fallbackDriverId: widget.driverId,
+          );
+          if (loc == null) return; // ignore invalid/unsafe coordinates
           _markers.value = [
             MapMarker(
               id: 'driver',
-              latitude: lat,
-              longitude: lng,
+              latitude: loc.latitude,
+              longitude: loc.longitude,
               icon: buildDriverMarker(),
               label: context.t.tr('driver_location'),
             ),
           ];
-          _mapController?.animateTo(lat, lng);
+          _mapController?.animateTo(loc.latitude, loc.longitude);
         }
       });
     }

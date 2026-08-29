@@ -17,3 +17,5 @@ CREATE INDEX IF NOT EXISTS driver_locations_last_seen_idx
 
 CREATE INDEX IF NOT EXISTS driver_locations_updated_at_idx
   ON driver_locations (updated_at);
+
+

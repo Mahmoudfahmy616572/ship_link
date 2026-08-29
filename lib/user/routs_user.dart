@@ -32,7 +32,8 @@ import 'package:ship_link/user/presentation/screens/edit_profile/edit_profile_sc
 import 'package:ship_link/user/presentation/screens/order_detail/order_detail.dart';
 import 'package:ship_link/user/presentation/screens/signup/register/User/user.dart';
 import 'package:ship_link/user/presentation/screens/signup/sign_up.dart';
-import 'package:ship_link/user/presentation/screens/tracking/driver_tracking_screen.dart';
+import 'package:ship_link/user/presentation/screens/tracking/driver_tracking_screen.dart'
+    show DriverTrackingScreen, parseTrackingOrderId;
 import 'package:ship_link/core/widgets/set_new_password/set_new_password_screen.dart';
 final Map<String, WidgetBuilder> userRoutes = {
   Splash.routName: (context) => Splash(),
@@ -78,7 +79,10 @@ final Map<String, WidgetBuilder> userRoutes = {
   EditProfileScreen.routName: (context) => EditProfileScreen(),
   CheckOutPage.routName: (context) => CheckOutPage(),
   Chat.routName: (context) => Chat(),
-  DriverTrackingScreen.routName: (context) => DriverTrackingScreen(orderId: ''),
+  DriverTrackingScreen.routName: (context) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    return DriverTrackingScreen(orderId: parseTrackingOrderId(args) ?? '');
+  },
 };
 
 Route<dynamic>? onGenerateUserRoute(RouteSettings settings) {
