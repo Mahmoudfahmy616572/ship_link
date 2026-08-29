@@ -18,7 +18,7 @@ if (localPropertiesFile.exists()) {
 def mapsApiKey = localProperties.getProperty('MAPS_API_KEY', '')
 
 android {
-    namespace "com.example.ship_link"
+    namespace "com.shiplink.app"
     compileSdk 36
     ndkVersion "28.2.13676358"
 
@@ -45,20 +45,20 @@ android {
     productFlavors {
         user {
             dimension "app"
-            applicationId "com.example.ship_link.user"
+            applicationId "com.shiplink.app.user"
             versionNameSuffix "-user"
             resValue "string", "app_name", "ShipLink"
         }
         driver {
             dimension "app"
-            applicationId "com.example.ship_link.driver"
+            applicationId "com.shiplink.app.driver"
             versionNameSuffix "-driver"
             resValue "string", "app_name", "ShipLink Driver"
         }
     }
 
     defaultConfig {
-        applicationId "com.example.ship_link.user"
+        applicationId "com.shiplink.app.user"
         minSdkVersion flutter.minSdkVersion
         targetSdk flutter.targetSdkVersion
         versionCode flutter.versionCode

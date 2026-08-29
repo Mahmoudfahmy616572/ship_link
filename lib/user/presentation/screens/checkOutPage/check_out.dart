@@ -633,7 +633,7 @@ class _CheckOutPageState extends State<CheckOutPage>
         }
         // Pay with card (saved cards redirect to regular checkout for now)
         final paymentCubit = context.read<PaymentCubit>();
-        const appScheme = 'com.example.ship_link.user';
+        const appScheme = 'com.shiplink.app.user';
         await paymentCubit.checkout(
           totalPrice: _finalTotal.round(),
           orderId: orderId,

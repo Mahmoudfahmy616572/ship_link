@@ -51,7 +51,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                    android:scheme="com.example.ship_link.user"
+                    android:scheme="com.shiplink.app.user"
                     android:host="callback"/>
             </intent-filter>
             <intent-filter>
@@ -59,7 +59,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                    android:scheme="com.example.ship_link.driver"
+                    android:scheme="com.shiplink.app.driver"
                     android:host="callback"/>
             </intent-filter>
         </activity>

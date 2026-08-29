@@ -163,7 +163,7 @@
 -keep class com.google.android.play.core.** { *; }
 
 # Keep all model/data classes used for JSON serialization
--keep class com.example.ship_link.** { *; }
+-keep class com.shiplink.app.** { *; }
 
 # Remove logging in release
 -assumenosideeffects class android.util.Log {

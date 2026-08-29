@@ -46,7 +46,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       if (uid == null) return;
       final result = await supabase.functions.invoke(
         'paymob-add-card',
-        body: {'userId': uid, 'redirectUri': 'com.example.ship_link.user://add-card'},
+        body: {'userId': uid, 'redirectUri': 'com.shiplink.app.user://add-card'},
       );
       final data = (result as dynamic).data as Map<String, dynamic>;
       final url = data['url'] as String?;
