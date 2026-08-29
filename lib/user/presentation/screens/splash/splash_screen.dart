@@ -66,8 +66,11 @@ class _SplashState extends State<Splash> with SingleTickerProviderStateMixin {
   Future<void> _checkAuth() async {
     if (!mounted) return;
     try {
+      // Small delay to let Supabase fully restore session from storage
+      await Future.delayed(const Duration(milliseconds: 300));
       final session = Supabase.instance.client.auth.currentSession;
-      if (session != null) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (session != null && user != null) {
         Navigator.pushReplacementNamed(context, MainScreen.routName);
         return;
       }
