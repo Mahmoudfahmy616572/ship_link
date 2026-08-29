@@ -57,7 +57,10 @@ final Map<String, WidgetBuilder> userRoutes = {
   HomeScreen.routName: (context) => HomeScreen(),
   MainScreen.routName: (context) => MainScreen(),
   Order.routName: (context) => Order(),
-  OtpScreen.routName: (context) => OtpScreen(),
+  OtpScreen.routName: (context) {
+    final email = ModalRoute.of(context)?.settings.arguments as String? ?? '';
+    return OtpScreen(email: email);
+  },
   SignIn.routName: (context) => SignIn(),
   SignUp.routName: (context) => SignUp(),
   UserRegister.routName: (context) => UserRegister(),

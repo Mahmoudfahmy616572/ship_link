@@ -90,3 +90,31 @@ class UpdatePasswordFaild extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+// OTP verification states
+class OtpSendLoading extends AuthState {}
+
+class OtpSendSuccess extends AuthState {}
+
+class OtpSendFaild extends AuthState {
+  final String message;
+  OtpSendFaild([this.message = '']);
+  @override
+  List<Object?> get props => [message];
+}
+
+class OtpVerifyLoading extends AuthState {}
+
+class OtpVerifySuccess extends AuthState {
+  final String email;
+  OtpVerifySuccess(this.email);
+  @override
+  List<Object?> get props => [email];
+}
+
+class OtpVerifyFaild extends AuthState {
+  final String message;
+  OtpVerifyFaild([this.message = '']);
+  @override
+  List<Object?> get props => [message];
+}

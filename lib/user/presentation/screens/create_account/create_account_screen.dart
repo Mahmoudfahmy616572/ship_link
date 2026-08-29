@@ -3,14 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/localization.dart';
-import 'package:ship_link/core/services/cache_service.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 import 'package:ship_link/core/utils/validators.dart';
 import 'package:ship_link/core/widgets/auth_field.dart';
 import 'package:ship_link/core/widgets/snackBar/snack_bar.dart';
 import 'package:ship_link/user/presentation/cubits/auth/cubit/auth_cubit.dart';
 import 'package:ship_link/user/presentation/screens/login/login_screen.dart';
-import 'package:ship_link/user/presentation/screens/location_picker/location_picker.dart';
+import 'package:ship_link/user/presentation/screens/otp/otp_screen.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -58,7 +57,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       return;
     }
     setState(() => _submitting = true);
-    AuthCubit.get(context).signUp(
+    AuthCubit.get(context).sendRegistrationOtp(
       name: _nameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -125,11 +124,17 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       ),
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state is Registersuccess && mounted) {
+          if (state is OtpSendSuccess && mounted) {
             setState(() => _submitting = false);
-            CredentialsService().save(_emailController.text.trim());
-            Navigator.pushReplacementNamed(context, LocationPicker.routName);
-          } else if (state is Registerfaild && mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => OtpScreen(
+                  email: _emailController.text.trim(),
+                ),
+              ),
+            );
+          } else if (state is OtpSendFaild && mounted) {
             setState(() => _submitting = false);
             CustomSnackBar.error(
                 state.message.isNotEmpty
@@ -139,7 +144,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           }
         },
         builder: (context, state) {
-          final isLoading = state is RegisterLoading || _submitting;
+          final isLoading = state is OtpSendLoading || _submitting;
           return SafeArea(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(24.w),

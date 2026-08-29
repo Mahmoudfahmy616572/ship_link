@@ -5,6 +5,7 @@ import 'package:ship_link/user/presentation/cubits/auth/cubit/auth_stat.dart';
 export 'package:ship_link/user/presentation/cubits/auth/cubit/auth_stat.dart';
 import 'package:ship_link/core/services/cache_service.dart';
 import 'package:ship_link/core/services/referral_service.dart';
+import 'package:ship_link/core/services/brevo_otp_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import 'package:gotrue/gotrue.dart' as gotrue;
 
@@ -17,6 +18,11 @@ class AuthCubit extends Cubit<AuthState> {
   final _supabase = Supabase.instance.client;
   late final StreamSubscription<gotrue.AuthState> _authSub;
   bool _googleInProgress = false;
+
+  // Pending registration data (set before OTP, used after verification)
+  String? _pendingName;
+  String? _pendingEmail;
+  String? _pendingPassword;
 
   @override
   Future<void> close() {
@@ -184,6 +190,76 @@ class AuthCubit extends Cubit<AuthState> {
     token = '';
     await CacheService().clear();
     emit(InitialState());
+  }
+
+  // ============================================
+  // OTP verification (Brevo)
+  // ============================================
+
+  Future<void> sendRegistrationOtp({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    _pendingName = name;
+    _pendingEmail = email;
+    _pendingPassword = password;
+    emit(OtpSendLoading());
+    try {
+      await BrevoOtpService.instance.sendOtp(email);
+      emit(OtpSendSuccess());
+    } catch (e) {
+      print('AuthCubit.sendRegistrationOtp error: $e');
+      emit(OtpSendFaild(e.toString()));
+    }
+  }
+
+  void verifyRegistrationOtp(String code) {
+    final email = _pendingEmail;
+    if (email == null) {
+      emit(OtpVerifyFaild('No pending registration'));
+      return;
+    }
+    emit(OtpVerifyLoading());
+    final valid = BrevoOtpService.instance.verifyOtp(email, code);
+    if (valid) {
+      emit(OtpVerifySuccess(email));
+    } else {
+      emit(OtpVerifyFaild('Invalid or expired code'));
+    }
+  }
+
+  Future<void> resendRegistrationOtp() async {
+    final email = _pendingEmail;
+    if (email == null) {
+      emit(OtpSendFaild('No pending registration'));
+      return;
+    }
+    emit(OtpSendLoading());
+    try {
+      await BrevoOtpService.instance.sendOtp(email);
+      emit(OtpSendSuccess());
+    } catch (e) {
+      print('AuthCubit.resendRegistrationOtp error: $e');
+      emit(OtpSendFaild(e.toString()));
+    }
+  }
+
+  /// Completes registration after OTP verification — call from OTP screen.
+  Future<void> completeSignUpAfterOtp() async {
+    final name = _pendingName;
+    final email = _pendingEmail;
+    final password = _pendingPassword;
+    if (name == null || email == null || password == null) {
+      emit(Registerfaild('No pending registration data'));
+      return;
+    }
+    // Delegate to the existing signUp which handles Supabase + profile upsert.
+    await signUp(name: name, email: email, password: password);
+    // Clean up pending data.
+    _pendingName = null;
+    _pendingEmail = null;
+    _pendingPassword = null;
   }
 
   // ============================================

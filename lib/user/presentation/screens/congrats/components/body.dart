@@ -27,7 +27,7 @@ class Body extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.only(left: 20.w, right: 20.w),
-      child: Column(children: [
+      child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.08,
         ),
@@ -102,7 +102,7 @@ class Body extends StatelessWidget {
             Navigator.pushReplacementNamed(context, MainScreen.routName);
           },
         )
-      ]),
+      ])),
     );
   }
 }
