@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipLink - Privacy Policy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.7; color: #333; background: #f9fafb; }
+        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 2rem; color: #1a1a2e; margin-bottom: 8px; }
+        .subtitle { color: #666; margin-bottom: 32px; font-size: 0.95rem; }
+        h2 { font-size: 1.25rem; color: #1a1a2e; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e5e7eb; }
+        p, li { margin-bottom: 10px; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 6px; }
+        .highlight { background: #fff3cd; padding: 12px 16px; border-radius: 8px; border-left: 4px solid #ffc107; margin: 16px 0; font-size: 0.95rem; }
+        .contact { background: #e8f5e9; padding: 16px; border-radius: 8px; margin-top: 24px; }
+        .contact a { color: #2e7d32; }
+        footer { text-align: center; color: #999; font-size: 0.85rem; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; }
+        .lang-toggle { display: inline-block; padding: 6px 16px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; margin-bottom: 20px; font-size: 0.9rem; background: #fff; }
+        .lang-toggle:hover { background: #f0f0f0; }
+        [dir="rtl"] { text-align: right; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="en">
+    <span class="lang-toggle" onclick="toggleLang()">العربية</span>
+    <h1>ShipLink — Privacy Policy</h1>
+    <p class="subtitle">Last updated: August 29, 2026</p>
+
+    <p>ShipLink ("we", "us", "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application ("App").</p>
+
+    <h2>1. Information We Collect</h2>
+    <p>We collect the following types of information:</p>
+    <ul>
+        <li><strong>Personal Information:</strong> Name, email address, phone number, and delivery addresses you provide when creating an account.</li>
+        <li><strong>Location Data:</strong> Real-time GPS location is collected for drivers to enable order tracking and delivery routing. Users who place orders may share their delivery address.</li>
+        <li><strong>Payment Information:</strong> We use Paymob for payment processing. We store a tokenized reference and the last four digits of your card. We do <strong>not</strong> store full card numbers, CVV, or expiry dates.</li>
+        <li><strong>Device Information:</strong> Device model, operating system version, and unique device identifiers for push notifications and analytics.</li>
+        <li><strong>Order Data:</strong> Order history, items ordered, prices, and delivery status.</li>
+        <li><strong>Communications:</strong> Chat messages between users and drivers within the App.</li>
+    </ul>
+
+    <h2>2. How We Use Your Information</h2>
+    <ul>
+        <li>To provide and maintain the App's services (order placement, delivery tracking, payments).</li>
+        <li>To enable real-time location tracking for delivery drivers.</li>
+        <li>To process payments securely through Paymob.</li>
+        <li>To send push notifications about order status and updates.</li>
+        <li>To communicate with you regarding your orders or account.</li>
+        <li>To improve and optimize the App.</li>
+        <li>To comply with legal obligations.</li>
+    </ul>
+
+    <h2>3. How We Share Your Information</h2>
+    <p>We do not sell your personal data. We share information only with:</p>
+    <ul>
+        <li><strong>Supabase:</strong> Our backend infrastructure provider (database, authentication, and real-time services).</li>
+        <li><strong>Paymob:</strong> Payment processing (card data is tokenized; we never see full card details).</li>
+        <li><strong>Google Maps / External Navigation:</strong> When a driver initiates navigation, the delivery address is shared with the selected navigation app (Google Maps, Waze, or Apple Maps).</li>
+        <li><strong>Firebase (Google):</strong> For analytics and push notification delivery (FCM).</li>
+        <li><strong>Legal Authorities:</strong> When required by law or to protect our rights.</li>
+    </ul>
+
+    <h2>4. Location Data</h2>
+    <div class="highlight">
+        Drivers: Your real-time GPS location is shared with customers who have an active order, so they can track delivery progress. Location data is only shared during an active delivery and is not stored after the order is completed.
+    </div>
+    <p>Location data is used for:</p>
+    <ul>
+        <li>Real-time delivery tracking by the customer.</li>
+        <li>Optimizing delivery routes.</li>
+        <li>Improving service quality and delivery estimates.</li>
+    </ul>
+
+    <h2>5. Data Retention</h2>
+    <p>We retain your information for as long as your account is active or as needed to provide services. Specifically:</p>
+    <ul>
+        <li><strong>Account data:</strong> Retained while your account is active. You may request deletion at any time.</li>
+        <li><strong>Order history:</strong> Retained for 2 years for record-keeping and dispute resolution.</li>
+        <li><strong>Location data:</strong> Not stored after the delivery is completed.</li>
+        <li><strong>Payment tokens:</strong> Retained as long as you keep a saved payment method.</li>
+    </ul>
+
+    <h2>6. Your Rights</h2>
+    <p>You have the right to:</p>
+    <ul>
+        <li><strong>Access</strong> your personal data.</li>
+        <li><strong>Correct</strong> inaccurate data.</li>
+        <li><strong>Delete</strong> your account and associated data.</li>
+        <li><strong>Opt out</strong> of push notifications via your device settings.</li>
+        <li><strong>Revoke</strong> location access via your device settings.</li>
+    </ul>
+
+    <h2>7. Data Security</h2>
+    <p>We implement industry-standard security measures including:</p>
+    <ul>
+        <li>Encryption of data in transit (TLS/SSL).</li>
+        <li>Row-level security (RLS) policies on all database tables.</li>
+        <li>Tokenized payment processing (card data never stored on our servers).</li>
+        <li>Secure authentication via Supabase Auth.</li>
+    </ul>
+
+    <h2>8. Children's Privacy</h2>
+    <p>The App is not intended for users under the age of 13. We do not knowingly collect data from children.</p>
+
+    <h2>9. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the App and updating the "Last updated" date.</p>
+
+    <h2>10. Contact Us</h2>
+    <div class="contact">
+        <p>If you have questions about this Privacy Policy, please contact us at:</p>
+        <p>📧 <a href="mailto:support@shiplink.app">support@shiplink.app</a></p>
+    </div>
+
+    <footer>
+        © 2026 ShipLink. All rights reserved.
+    </footer>
+</div>
+
+<div class="container" id="ar" dir="rtl" style="display:none;">
+    <span class="lang-toggle" onclick="toggleLang()">English</span>
+    <h1>ŝipLink — سياسة الخصوصية</h1>
+    <p class="subtitle">آخر تحديث: 29 أغسطس 2026</p>
+
+    <p>نحن في ShipLink ("نحن") ملتزمون بحماية خصوصيتك. تشرح سياسة الخصوصية هذه كيفية جمع معلوماتك واستخدامها والإفصاح عنها وحمايتها عند استخدام تطبيقنا ("التطبيق").</p>
+
+    <h2>1. المعلومات التي نجمعها</h2>
+    <ul>
+        <li><strong>المعلومات الشخصية:</strong> الاسم عنوان البريد الإلكتروني رقم الهاتف والعناوين التي تقدمها عند إنشاء حساب.</li>
+        <li><strong>بيانات الموقع:</strong> يتم جمع الموقع الفعلي عبر GPS للسائقين لتمكين تتبع الطلبات وتوجيه التوصيل. قد يشارك المستخدمون عنوان التوصيل الخاص بهم.</li>
+        <li><strong>معلومات الدفع:</strong> نستخدم Paymob لمعالجة المدفوعات. نحتفظ برمز البطاقة وأربعة أرقام الأخيرة فقط. <strong>لا</strong> نخزّن أرقام البطاقة الكاملة أو CVV أو تاريخ الانتهاء.</li>
+        <li><strong>معلومات الجهاز:</strong> طراز الجهاز وإصدار نظام التشغيل ومعرفات الجهاز الفريدة للإشعارات والتحليلات.</li>
+        <li><strong>بيانات الطلبات:</strong> سجل الطلبات والعناوين والأسعار وحالة التوصيل.</li>
+        <li><strong>الرسائل:</strong> رسائل الدردشة بين المستخدمين والسائقين داخل التطبيق.</li>
+    </ul>
+
+    <h2>2. كيف نستخدم معلوماتك</h2>
+    <ul>
+        <li>لتوفير وصيانة خدمات التطبيق ( الطلبات تتبع التوصيل المدفوعات).</li>
+        <li>لموقع تتبع الموقع الفعلي لسائقين التوصيل.</li>
+        <li>لمعالج المدفوعات بشكل آمن عبر Paymob.</li>
+        <li>لإرسال إشعارات عن حالة الطلبات والتحديثات.</li>
+        <li>للتواصل معك بخصوص طلباتك أو حسابك.</li>
+        <li>لتحسين وتطوير التطبيق.</li>
+        <li>للامتثال للالتزامات القانونية.</li>
+    </ul>
+
+    <h2>3. كيف نشارك معلوماتك</h2>
+    <p>لا نبيع بياناتك الشخصية. نشارك المعلومات فقط مع:</p>
+    <ul>
+        <li><strong>Supabase:</strong> مزود بنية التحتية للخلفية (قاعدة البيانات والتوثيق والخدمات).</li>
+        <li><strong>Paymob:</strong> معالجة المدفوعات.</li>
+        <li><strong>Google Maps / الملاحة الخارجية:</strong> عند بدء السائق الملاحة.</li>
+        <li><strong>Firebase (Google):</strong> للتحليلات وإشعارات.</li>
+        <li><strong>الجهات القانونية:</strong> عند الطلب القانوني.</li>
+    </ul>
+
+    <h2>4. بيانات الموقع</h2>
+    <div class="highlight">
+        السائقون: يتم مشاركة موقعك الفعلي مع الزبائن الذين لديهم طلب نشط حتى يتمكنوا من تتبع التوصيل. لا يتم تخزين بيانات الموقع بعد اكتمال التوصيل.
+    </div>
+
+    <h2>5. الاحتفاظ بالبيانات</h2>
+    <ul>
+        <li><strong>بيانات الحساب:</strong> نحتفظ بها طالما حسابك نشط.</li>
+        <li><strong>سجل الطلبات:</strong> نحتفظ بها لمدة عامين.</li>
+        <li><strong>بيانات الموقع:</strong> لا يتم تخزينها بعد اكتمال التوصيل.</li>
+        <li><strong>رموز الدفع:</strong> نحتفظ بها طالما تحتفظ بوسيلة دفع محفوظة.</li>
+    </ul>
+
+    <h2>6. حقوقك</h2>
+    <ul>
+        <li><strong>الوصول</strong> إلى بياناتك الشخصية.</li>
+        <li><strong>تصحيح</strong> البيانات غير الدقيقة.</li>
+        <li><strong>حذف</strong> حسابك والبيانات المرتبطة.</li>
+        <li><strong>تعطيل</strong> الإشعارات من إعدادات جهازك.</li>
+        <li><strong>إلغاء</strong> إذن الموقع من إعدادات جهازك.</li>
+    </ul>
+
+    <h2>7. أمان البيانات</h2>
+    <ul>
+        <li>تشفير البيانات أثناء النقل (TLS/SSL).</li>
+        <li>سياسات أمان على مستوى الصفوف (RLS) لجميع جداول قاعدة البيانات.</li>
+        <li>معالجة مدفوعات مرمّزة.</li>
+        <li>توثيق آمن عبر Supabase Auth.</li>
+    </ul>
+
+    <h2>8. خصوصية الأطفال</h2>
+    <p>التطبيق غير مخصص للمستخدمين تحت سن 13. لا نجمع بيانات من الأطفال.</p>
+
+    <h2>9. التغييرات على هذه السياسة</h2>
+    <p>قد نقوم بتحديث سياسة الخصوصية هذه من وقت لآخر. سنُبلغك بأي تغييرات.</p>
+
+    <h2>10. تواصل معنا</h2>
+    <div class="contact">
+        <p>إذا كانت لديك أي أسئلة حول سياسة الخصوصية هذه:</p>
+        <p>📧 <a href="mailto:support@shiplink.app">support@shiplink.app</a></p>
+    </div>
+
+    <footer>
+        © 2026 ShipLink. جميع الحقوق محفوظة.
+    </footer>
+</div>
+
+<script>
+    function toggleLang() {
+        const en = document.getElementById('en');
+        const ar = document.getElementById('ar');
+        if (en.style.display === 'none') {
+            en.style.display = 'block';
+            ar.style.display = 'none';
+        } else {
+            en.style.display = 'none';
+            ar.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
