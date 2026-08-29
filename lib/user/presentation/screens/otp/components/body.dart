@@ -1,313 +1,298 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:ship_link/core/constants/colors.dart';
 import 'package:ship_link/core/localization.dart';
-import 'package:ship_link/user/presentation/screens/MainScreen/main_screen.dart';
-
-import 'package:ship_link/core/widgets/app_style.dart';
-import 'package:ship_link/user/presentation/widgets/button_sign.dart';
-import 'package:ship_link/user/presentation/screens/otp/components/expired_time.dart';
+import 'package:ship_link/core/widgets/snackBar/snack_bar.dart';
+import 'package:ship_link/user/presentation/cubits/auth/cubit/auth_cubit.dart';
+import 'package:ship_link/user/presentation/screens/location_picker/location_picker.dart';
 import 'package:ship_link/core/utils/sizer.dart';
 
-final otpInputDecoration = InputDecoration(
-  filled: true,
-  fillColor: Colors.white,
-  contentPadding: EdgeInsets.symmetric(vertical: 15.h),
-  enabledBorder: _outlineInputBorder(),
-  focusedBorder: _outlineInputBorder(),
-  border: _outlineInputBorder(),
-);
-
-OutlineInputBorder _outlineInputBorder() {
-  return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(11.r), borderSide: BorderSide.none);
-}
-
 class Body extends StatefulWidget {
-  const Body({super.key});
+  const Body({super.key, required this.email});
+  final String email;
 
   @override
   State<Body> createState() => _BodyState();
 }
 
 class _BodyState extends State<Body> {
-  late FocusNode pin2focusNode;
-  late FocusNode pin3focusNode;
-  late FocusNode pin4focusNode;
+  final List<TextEditingController> _controllers =
+      List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  Timer? _timer;
+  int _remaining = 0;
+  bool _submitting = false;
+
   @override
   void initState() {
     super.initState();
-    pin2focusNode = FocusNode();
-    pin3focusNode = FocusNode();
-    pin4focusNode = FocusNode();
+    _startTimer();
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
-    pin2focusNode.dispose();
-    pin3focusNode.dispose();
-    pin4focusNode.dispose();
   }
 
-  void nextField({required String value, required FocusNode focusNode}) {
-    if (value.length == 1) {
-      focusNode.requestFocus();
+  void _startTimer() {
+    _remaining = 300; // 5 minutes
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) return;
+      setState(() {
+        _remaining--;
+        if (_remaining <= 0) {
+          t.cancel();
+        }
+      });
+    });
+  }
+
+  String get _otpCode => _controllers.map((c) => c.text).join();
+
+  void _onChanged(String value, int index) {
+    if (value.length == 1 && index < 5) {
+      _focusNodes[index + 1].requestFocus();
     }
+    if (value.isEmpty && index > 0) {
+      _focusNodes[index - 1].requestFocus();
+    }
+    // Auto-submit when all 6 digits entered
+    if (_otpCode.length == 6 && !_submitting) {
+      _submit();
+    }
+  }
+
+  void _submit() {
+    final code = _otpCode;
+    if (code.length < 6) {
+      CustomSnackBar.info('Please enter all 6 digits', context);
+      return;
+    }
+    setState(() => _submitting = true);
+    AuthCubit.get(context).verifyRegistrationOtp(code);
+  }
+
+  void _resend() {
+    AuthCubit.get(context).resendRegistrationOtp();
+    _startTimer();
+    for (final c in _controllers) {
+      c.clear();
+    }
+    _focusNodes[0].requestFocus();
+  }
+
+  String get _timerText {
+    final m = (_remaining ~/ 60).toString().padLeft(2, '0');
+    final s = (_remaining % 60).toString().padLeft(2, '0');
+    return '$m:$s';
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-          child: TextButton(
-        onPressed: () => showDialog<String>(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-            content: SizedBox(
-              width: 380.w,
-              height: 400.h,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Stack(children: [
-                    SizedBox(
-                        width: 125.w,
-                        height: 170.h,
-                        child: Image.asset("assets/images/iphone.png")),
-                    Positioned(
-                      right: -1,
-                      top: 50,
-                      child: SvgPicture.asset("assets/icons/checkIcon.svg"),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF111827)),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is OtpVerifySuccess && mounted) {
+            setState(() => _submitting = false);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const LocationPicker()),
+              (route) => false,
+            );
+          } else if (state is OtpVerifyFaild && mounted) {
+            setState(() => _submitting = false);
+            CustomSnackBar.error(state.message, context);
+            for (final c in _controllers) {
+              c.clear();
+            }
+            _focusNodes[0].requestFocus();
+          } else if (state is OtpSendSuccess && mounted) {
+            CustomSnackBar.success('Code resent successfully', context);
+          } else if (state is OtpSendFaild && mounted) {
+            CustomSnackBar.error(state.message, context);
+          } else if (state is Registersuccess && mounted) {
+            setState(() => _submitting = false);
+          } else if (state is Registerfaild && mounted) {
+            setState(() => _submitting = false);
+            CustomSnackBar.error(state.message, context);
+          }
+        },
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Column(
+              children: [
+                SizedBox(height: 40.h),
+                // Icon
+                Container(
+                  width: 80.w,
+                  height: 80.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.cta.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.mark_email_read_outlined,
+                      size: 40, color: AppColors.cta),
+                ),
+                SizedBox(height: 24.h),
+                Text(
+                  context.t.tr('verification'),
+                  style: GoogleFonts.inter(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF111827),
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                Text(
+                  context.t.tr('otp_verification'),
+                  style: GoogleFonts.inter(
+                    fontSize: 16.sp,
+                    color: const Color(0xFF6B7280),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8.h),
+                Text.rich(
+                  TextSpan(
+                    text: '${context.t.tr('enter_otp')} ',
+                    style: GoogleFonts.inter(
+                      fontSize: 14.sp,
+                      color: const Color(0xFF6B7280),
                     ),
-                  ]),
-                  SizedBox(
-                    height: 15.h,
+                    children: [
+                      TextSpan(
+                        text: widget.email,
+                        style: GoogleFonts.inter(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF111827),
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    context.t.tr('password_update_success'),
-                    style: appStyle(30, FontWeight.bold, Colors.black),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                  ),
-                  Text(
-                    context.t.tr('password_updated_message'),
-                    style: appStyle(17, FontWeight.normal, Colors.black),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MainScreen()));
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 40.h,
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(9)),
-                    child: Center(
-                      child: Text(
-                        context.t.tr('back_to_home'),
-                        style: appStyle(20, FontWeight.w600, Colors.white),
+                ),
+                SizedBox(height: 40.h),
+                // OTP Fields
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(6, (i) {
+                    return SizedBox(
+                      width: 48.w,
+                      height: 56.h,
+                      child: TextFormField(
+                        controller: _controllers[i],
+                        focusNode: _focusNodes[i],
+                        keyboardType: TextInputType.number,
                         textAlign: TextAlign.center,
+                        maxLength: 1,
+                        style: GoogleFonts.inter(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        decoration: InputDecoration(
+                          counterText: '',
+                          filled: true,
+                          fillColor: const Color(0xFFF9FAFB),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFE5E7EB), width: 1.5),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: const BorderSide(
+                                color: Color(0xFFE5E7EB), width: 1.5),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                            borderSide: BorderSide(
+                                color: AppColors.cta, width: 1.5),
+                          ),
+                        ),
+                        onChanged: (v) => _onChanged(v, i),
+                      ),
+                    );
+                  }),
+                ),
+                SizedBox(height: 32.h),
+                // Submit button
+                SizedBox(
+                  width: double.infinity,
+                  height: 56.h,
+                  child: ElevatedButton(
+                    onPressed: _submitting ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.cta,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                      textStyle: GoogleFonts.inter(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      elevation: 0,
+                    ),
+                    child: _submitting
+                        ? SizedBox(
+                            width: 24.w,
+                            height: 24.h,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : Text(context.t.tr('submit')),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+                // Timer + Resend
+                if (_remaining > 0)
+                  Text(
+                    '${context.t.tr('resend_code_in')} $_timerText',
+                    style: GoogleFonts.inter(
+                      fontSize: 14.sp,
+                      color: const Color(0xFF6B7280),
+                    ),
+                  )
+                else
+                  GestureDetector(
+                    onTap: _resend,
+                    child: Text(
+                      context.t.tr('resend'),
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.cta,
                       ),
                     ),
-                  )),
-            ],
-          ),
-        ),
-        child: Column(
-          children: [
-            SizedBox(
-              height: 30.h,
-            ),
-            Image.asset("assets/images/otp_logo.png"),
-            Column(
-              children: [
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 15.w, vertical: 20.h),
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.67,
-                  decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image:
-                              AssetImage("assets/images/background_image.webp"),
-                          colorFilter: ColorFilter.mode(
-                              Colors.black, BlendMode.softLight),
-                          fit: BoxFit.cover),
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30))),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Column(
-                            children: [
-                              Text(
-                                context.t.tr('verification'),
-                                style: appStyle(
-                                  35,
-                                  FontWeight.bold,
-                                  const Color(0xFFEFEFEF),
-                                ),
-                              ),
-                              SizedBox(
-height: 40.h,
-                              ),
-                              Text(
-                                context.t.tr('otp_verification'),
-                                style: appStyle(
-                                  18,
-                                  FontWeight.w500,
-                                  const Color(0xFFEFEFEF),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 8.h,
-                              ),
-                              Text.rich(
-                                TextSpan(
-                                    text: context.t.tr('enter_otp'),
-                                    style: const TextStyle(color: Colors.white),
-                                    children: [
-                                      TextSpan(
-                                        text: '- +201897650001',
-                                        style: appStyle(
-                                            14, FontWeight.w600, Colors.black),
-                                      )
-                                    ]),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 25.h,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 25.w),
-                          child: otpForm(),
-                        ),
-                        SizedBox(
-                          height: 20.h,
-                        ),
-                        expiredTime(context),
-                        SizedBox(
-                          height: 15.h,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              context.t.tr('dont_receive_code'),
-                              style:
-                                  appStyle(15, FontWeight.w400, Colors.white),
-                            ),
-                            Text(context.t.tr('resend'),
-                                style:
-                                    appStyle(15, FontWeight.w600, Colors.white))
-                          ],
-                        ),
-                        SizedBox(
-                          height: 15.h,
-                        ),
-                        GestureDetector(
-                          // onTap: () {
-                          //   Navigator.push(
-                          //       context,
-                          //       MaterialPageRoute(
-                          //           builder: (context) => const PopUpMsg()));
-                          // },
-                          child: BuildButton(
-                            text: context.t.tr('submit'),
-                            color: Colors.white,
-                          ),
-                        ),
-                      ]),
-                ),
+                  ),
+                SizedBox(height: 24.h),
               ],
             ),
-          ],
-        ),
-      )),
-    );
-  }
-
-  Row otpForm() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        SizedBox(
-          width: 60.w,
-          child: TextFormField(
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            obscureText: true,
-            style: TextStyle(fontSize: 20.sp),
-            textAlign: TextAlign.center,
-            decoration: otpInputDecoration,
-            onChanged: (value) {
-              nextField(value: value, focusNode: pin2focusNode);
-            },
           ),
         ),
-        SizedBox(
-          width: 60.w,
-          child: TextFormField(
-            focusNode: pin2focusNode,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            obscureText: true,
-            style: TextStyle(fontSize: 20.sp),
-            textAlign: TextAlign.center,
-            decoration: otpInputDecoration,
-            onChanged: (value) {
-              nextField(value: value, focusNode: pin3focusNode);
-            },
-          ),
-        ),
-        SizedBox(
-          width: 60.w,
-          child: TextFormField(
-            focusNode: pin3focusNode,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            obscureText: true,
-            style: TextStyle(fontSize: 20.sp),
-            textAlign: TextAlign.center,
-            decoration: otpInputDecoration,
-            onChanged: (value) {
-              nextField(value: value, focusNode: pin4focusNode);
-            },
-          ),
-        ),
-        SizedBox(
-          width: 60.w,
-          child: TextFormField(
-            focusNode: pin4focusNode,
-            autofocus: true,
-            keyboardType: TextInputType.number,
-            obscureText: true,
-            style: TextStyle(fontSize: 20.sp),
-            textAlign: TextAlign.center,
-            decoration: otpInputDecoration,
-            onChanged: (value) {
-              pin4focusNode.unfocus();
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

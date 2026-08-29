@@ -31,9 +31,11 @@ class BuildCategoryMainRow extends StatelessWidget {
               boxShadow: [BoxShadow(color: AppColors.cardShadow, blurRadius: 6, offset: const Offset(0, 3))],
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
+                Flexible(
+                  child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
                   child: AspectRatio(
                     aspectRatio: 1.1,
@@ -60,6 +62,7 @@ class BuildCategoryMainRow extends StatelessWidget {
                       ],
                     ),
                   ),
+                ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(8.w, 8.h, 8.w, 4.h),

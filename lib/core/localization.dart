@@ -355,6 +355,7 @@ class AppLocalizations {
       'enter_otp': 'Enter the OTP sent to ',
       'dont_receive_code': "Don't receive code? ",
       'resend': 'Re-send',
+      'resend_code_in': 'Resend code in ',
       'submit': 'Submit',
       'password_update_success': 'Password Update \nSuccessfully',
       'password_updated_message':
@@ -1095,6 +1096,7 @@ class AppLocalizations {
       'enter_otp': 'أدخل الرقم المرسل إلى ',
       'dont_receive_code': 'لم تستلم الرمز؟ ',
       'resend': 'إعادة إرسال',
+      'resend_code_in': 'إعادة إرسال الرمز خلال ',
       'submit': 'إرسال',
       'password_update_success': 'تم تحديث كلمة المرور\nبنجاح',
       'password_updated_message': 'تم تحديث كلمة المرور\nبنجاح',

@@ -236,24 +236,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ],
             ),
             SizedBox(height: 24.h),
-            Row(
-              children: [
-                Expanded(
-                  child: _socialButton(
-                    iconPath: 'assets/icons/googel icon.svg',
-                    label: context.t.tr('google'),
-                    onTap: () => AuthCubit.get(context).signInWithGoogle(),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: _socialButton(
-                    iconPath: 'assets/icons/apple icon.svg',
-                    label: context.t.tr('apple'),
-                    onTap: () {},
-                  ),
-                ),
-              ],
+            _socialButton(
+              iconPath: 'assets/icons/googel icon.svg',
+              label: context.t.tr('google'),
+              onTap: () => AuthCubit.get(context).signInWithGoogle(),
             ),
           ],
         );
