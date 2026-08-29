@@ -235,6 +235,9 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
       body: BlocListener<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is OtpVerifySuccess && mounted) {
+            // OTP verified — now complete the Supabase registration
+            AuthCubit.get(context).completeSignUpAfterOtp();
+          } else if (state is Registersuccess && mounted) {
             setState(() => _submitting = false);
             Navigator.pushAndRemoveUntil(
               context,
@@ -253,8 +256,6 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
             CustomSnackBar.success('Code resent successfully', context);
           } else if (state is OtpSendFaild && mounted) {
             CustomSnackBar.error(state.message, context);
-          } else if (state is Registersuccess && mounted) {
-            setState(() => _submitting = false);
           } else if (state is Registerfaild && mounted) {
             setState(() => _submitting = false);
             CustomSnackBar.error(state.message, context);
