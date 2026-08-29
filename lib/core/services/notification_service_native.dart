@@ -150,7 +150,7 @@ class NotificationService {
     try {
       if (_fcm == null) throw 'FCM unavailable';
       final token = await _fcm!.getToken();
-      debugPrint('FCM token at init: ${token ?? 'null'}');
+      debugPrint('FCM token obtained at init');
       if (token != null) await _saveToken(token);
       _fcm!.onTokenRefresh.listen(_saveToken);
       FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
@@ -176,7 +176,7 @@ class NotificationService {
         if (_fcm != null) {
           try {
             final token = await _fcm!.getToken();
-            debugPrint('FCM token in auth listener: ${token ?? 'null'}');
+            debugPrint('FCM token obtained in auth listener');
             if (token != null) await _saveToken(token);
           } catch (e) {
             debugPrint('FCM token fetch in auth listener failed: $e');

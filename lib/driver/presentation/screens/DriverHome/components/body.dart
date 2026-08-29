@@ -139,12 +139,21 @@ class _BodyState extends State<Body> with AutomaticKeepAliveClientMixin {
                     return GestureDetector(
                       onTap: () async {
                         final newValue = !isOnline;
+                        final bool ok;
                         if (newValue) {
-                          await _locationService.start();
+                          ok = await _locationService.start();
+                          if (!ok && mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('تعذر بدء المشاركة — تحقق من صلاحية الموقع وإتاحة GPS'),
+                              ),
+                            );
+                          }
                         } else {
                           await _locationService.stop();
+                          ok = true;
                         }
-                        if (mounted) _isOnline.value = newValue;
+                        if (mounted) _isOnline.value = ok;
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),

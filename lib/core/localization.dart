@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class AppLocalizations {
   final Locale locale;
@@ -735,6 +735,18 @@ class AppLocalizations {
       'cancel_order_title': 'Cancel Order',
       'cancel_order_confirm': 'Are you sure you want to cancel this order? This cannot be undone.',
       'status_updated': 'Order status updated',
+      'waiting_for_driver': 'Waiting for a driver...',
+      'tracking_live': 'Driver assigned — tracking live',
+      'tracking_stale': 'Driver location may be outdated',
+      'tracking_reconnecting': 'Connection lost — reconnecting...',
+      'recenter': 'Recenter',
+      'route_unavailable_note': 'Route unavailable — showing driver position only.',
+      'order_status_label': 'Order Status',
+      'straight_line_note': 'Straight-line estimate',
+      'no_driver_yet': 'No driver assigned yet',
+      'tracking_you': 'You',
+      'tracking_delivery': 'Delivery',
+      'tracking_pickup': 'Pickup',
     },
     'ar': {
       'app_name': 'ShipLink',
@@ -1472,6 +1484,18 @@ class AppLocalizations {
       'cancel_order_title': 'إلغاء الطلب',
       'cancel_order_confirm': 'هل أنت متأكد من إلغاء هذا الطلب؟ لا يمكن التراجع.',
       'status_updated': 'تم تحديث حالة الطلب',
+      'waiting_for_driver': 'في انتظار تعيين سائق...',
+      'tracking_live': 'تم تعيين السائق — تتبع مباشر',
+      'tracking_stale': 'قد يكون موقع السائق قديمًا',
+      'tracking_reconnecting': 'انقطع الاتصال — جارٍ إعادة المحاولة...',
+      'recenter': 'توسيط',
+      'route_unavailable_note': 'المسار غير متاح — يتم عرض موقع السائق فقط.',
+      'order_status_label': 'حالة الطلب',
+      'straight_line_note': 'تقدير بالمسافة المستقيمة',
+      'no_driver_yet': 'لم يتم تعيين سائق بعد',
+      'tracking_you': 'أنت',
+      'tracking_delivery': 'التوصيل',
+      'tracking_pickup': 'الاستلام',
     },
   };
 

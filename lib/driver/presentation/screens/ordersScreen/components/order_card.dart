@@ -10,8 +10,25 @@ import 'package:ship_link/driver/presentation/screens/ordersScreen/components/or
 import 'package:ship_link/core/widgets/app_style.dart';
 import 'package:ship_link/core/widgets/snackBar/snack_bar.dart';
 import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/core/services/navigation/external_navigation_service.dart';
+import 'package:ship_link/core/services/navigation/navigation_request.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ship_link/driver/presentation/screens/qr_scanner/qr_scanner_screen.dart';
+
+Future<void> _navigateToDelivery(BuildContext context, dynamic order) async {
+  final lat = order.deliveryLat;
+  final lng = order.deliveryLng;
+  final double? dLat =
+      lat is num ? lat.toDouble() : double.tryParse(lat?.toString() ?? '');
+  final double? dLng =
+      lng is num ? lng.toDouble() : double.tryParse(lng?.toString() ?? '');
+  if (dLat == null || dLng == null) return;
+  final request = NavigationRequest(destination: NavCoordinate(dLat, dLng));
+  final result = await ExternalNavigationService().navigate(request);
+  if (!result.success && context.mounted) {
+    CustomSnackBar.error(result.message ?? 'Navigation failed', context);
+  }
+}
 
 class OrdersCard extends StatefulWidget {
   final dynamic order;
@@ -164,7 +181,7 @@ class _OrdersCardState extends State<OrdersCard> {
                   child: SizedBox(
                     height: 38.h,
                     child: OutlinedButton.icon(
-                      onPressed: () => _openInMaps(order),
+                      onPressed: () => _navigate(order),
                       icon: const Icon(Icons.navigation, size: 16),
                       label: Text(context.t.tr('open_in_maps'),
                           style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600)),
@@ -294,15 +311,7 @@ class _OrdersCardState extends State<OrdersCard> {
     );
   }
 
-  Future<void> _openInMaps(dynamic order) async {
-    final lat = order.deliveryLat;
-    final lng = order.deliveryLng;
-    if (lat == null || lng == null) return;
-    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
+  Future<void> _navigate(dynamic order) => _navigateToDelivery(context, order);
 
   Widget _paymentBadge(String method) {
     if (method == 'card') {
@@ -504,15 +513,7 @@ class _AcceptedCardState extends State<AcceptedCard> {
     );
   }
 
-  Future<void> _openAcceptedInMaps(dynamic order) async {
-    final lat = order.deliveryLat;
-    final lng = order.deliveryLng;
-    if (lat == null || lng == null) return;
-    final uri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
+  Future<void> _openAcceptedInMaps(dynamic order) => _navigateToDelivery(context, order);
 
   Color _statusColor(String? status) {
     switch (status?.toLowerCase()) {

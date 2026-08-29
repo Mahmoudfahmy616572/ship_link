@@ -9,6 +9,21 @@ GetTopSeller getTopSellerFromJson(String str) =>
 
 String getTopSellerToJson(GetTopSeller data) => json.encode(data.toJson());
 
+int? _toInt(dynamic v) {
+  if (v == null) return null;
+  if (v is bool) return v ? 1 : 0;
+  if (v is num) return v.toInt();
+  if (v is String) return int.tryParse(v);
+  return null;
+}
+
+double? _toDouble(dynamic v) {
+  if (v == null) return null;
+  if (v is num) return v.toDouble();
+  if (v is String) return double.tryParse(v);
+  return null;
+}
+
 class GetTopSeller {
   List<TopSeller>? topSellers;
 
@@ -76,13 +91,13 @@ class TopSeller {
         name: json["name"],
         description: json["description"],
         image: json["image"],
-        price: (json["price"] as num?)?.toDouble(),
-        isOffer: json["is_offer"],
-        newPrice: (json["new_price"] as num?)?.toDouble(),
-        qty: json["qty"],
-        status: json["status"],
-        popular: json["popular"],
-        providerId: json["provider_id"],
+        price: _toDouble(json["price"]),
+        isOffer: _toInt(json["is_offer"]),
+        newPrice: _toDouble(json["new_price"]),
+        qty: _toInt(json["qty"]),
+        status: _toInt(json["status"]),
+        popular: _toInt(json["popular"]),
+        providerId: _toInt(json["provider_id"]),
         category: json["category"],
         createdAt: json["created_at"] == null ? null : DateTime.tryParse(json["created_at"]),
         updatedAt: json["updated_at"] == null ? null : DateTime.tryParse(json["updated_at"]),

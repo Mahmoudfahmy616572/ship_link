@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ship_link/core/utils/sizer.dart';
+import 'package:ship_link/core/constants/colors.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as fl;
 import 'package:google_maps_flutter/google_maps_flutter.dart' as gm;
 import 'package:geolocator/geolocator.dart';
+import 'package:ship_link/core/maps/renderer/maptiler_config.dart';
 import 'package:ship_link/core/services/map_service.dart';
 
 class MapMarker {
@@ -34,12 +36,16 @@ class MapPolyline {
   final List<MapLatLng> points;
   final Color color;
   final double width;
+  final Color? casingColor;
+  final double casingWidth;
 
   const MapPolyline({
     required this.id,
     required this.points,
     this.color = Colors.blue,
     this.width = 3,
+    this.casingColor,
+    this.casingWidth = 0,
   });
 }
 
@@ -118,8 +124,8 @@ class _AdaptiveMapState extends State<AdaptiveMap> {
   }
 
   Future<void> _checkAvailability() async {
-    final available = await MapService.useGoogleMaps;
-    _useGoogle.value = available;
+    final provider = await MapService.activeProvider;
+    _useGoogle.value = provider == MapProviderType.google;
   }
 
   @override
@@ -157,14 +163,26 @@ class _AdaptiveMapState extends State<AdaptiveMap> {
   }
 
   Set<gm.Polyline> _googlePolylineSet() {
-    return widget.polylines.map((p) {
-      return gm.Polyline(
+    final set = <gm.Polyline>{};
+    for (final p in widget.polylines) {
+      if (p.casingColor != null && p.casingWidth > 0) {
+        set.add(gm.Polyline(
+          polylineId: gm.PolylineId('${p.id}_casing'),
+          points: p.points.map((pt) => gm.LatLng(pt.latitude, pt.longitude)).toList(),
+          color: p.casingColor!,
+          width: p.casingWidth.toInt(),
+          zIndex: 1,
+        ));
+      }
+      set.add(gm.Polyline(
         polylineId: gm.PolylineId(p.id),
         points: p.points.map((pt) => gm.LatLng(pt.latitude, pt.longitude)).toList(),
         color: p.color,
         width: p.width.toInt(),
-      );
-    }).toSet();
+        zIndex: 2,
+      ));
+    }
+    return set;
   }
 
   Set<gm.Marker> _googleMarkers() {
@@ -179,6 +197,7 @@ class _AdaptiveMapState extends State<AdaptiveMap> {
   }
 
   Widget _buildFlutterMap() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final markers = _flutterMarkers().toList();
     if (widget.showMyLocation && _userPosition.value != null) {
       markers.add(
@@ -210,11 +229,16 @@ class _AdaptiveMapState extends State<AdaptiveMap> {
           ),
           children: [
             TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              urlTemplate: MapTilerConfig.activeTileTemplate(dark: isDark),
               userAgentPackageName: 'com.ship_link',
             ),
             PolylineLayer(polylines: _flutterPolylines()),
             MarkerLayer(markers: markers),
+            RichAttributionWidget(
+              attributions: [
+                TextSourceAttribution(MapTilerConfig.activeAttribution),
+              ],
+            ),
           ],
         ),
         if (widget.showMyLocationButton)
@@ -238,13 +262,22 @@ class _AdaptiveMapState extends State<AdaptiveMap> {
   }
 
   List<Polyline> _flutterPolylines() {
-    return widget.polylines.map((p) {
-      return Polyline(
+    final list = <Polyline>[];
+    for (final p in widget.polylines) {
+      if (p.casingColor != null && p.casingWidth > 0) {
+        list.add(Polyline(
+          points: p.points.map((pt) => fl.LatLng(pt.latitude, pt.longitude)).toList(),
+          color: p.casingColor!,
+          strokeWidth: p.casingWidth,
+        ));
+      }
+      list.add(Polyline(
         points: p.points.map((pt) => fl.LatLng(pt.latitude, pt.longitude)).toList(),
         color: p.color,
         strokeWidth: p.width,
-      );
-    }).toList();
+      ));
+    }
+    return list;
   }
 
   List<Marker> _flutterMarkers() {
@@ -281,30 +314,50 @@ class _AdaptiveMapState extends State<AdaptiveMap> {
   }
 }
 
-Widget buildDriverMarker({Color color = Colors.blue}) {
+Widget buildDriverMarker({Color color = AppColors.driverMarker, double size = 40}) {
   return Container(
-    width: 40.w,
-    height: 40.h,
+    width: size.w,
+    height: size.h,
     decoration: BoxDecoration(
       color: color,
       shape: BoxShape.circle,
       border: Border.all(color: Colors.white, width: 3),
-      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+      boxShadow: const [
+        BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
+      ],
     ),
     child: const Icon(Icons.directions_car, color: Colors.white, size: 22),
   );
 }
 
-Widget buildDestinationMarker() {
+Widget buildDestinationMarker({Color color = AppColors.deliveredMarker, double size = 36}) {
   return Container(
-    width: 36.w,
-    height: 36.h,
+    width: size.w,
+    height: size.h,
     decoration: BoxDecoration(
-      color: const Color(0xFFEF4444),
+      color: color,
       shape: BoxShape.circle,
       border: Border.all(color: Colors.white, width: 3.w),
-      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+      boxShadow: const [
+        BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
+      ],
     ),
-    child: const Icon(Icons.location_on, color: Colors.white, size: 20),
+    child: const Icon(Icons.flag, color: Colors.white, size: 20),
+  );
+}
+
+Widget buildOriginMarker({Color color = AppColors.customerMarker, double size = 34}) {
+  return Container(
+    width: size.w,
+    height: size.h,
+    decoration: BoxDecoration(
+      color: color,
+      shape: BoxShape.circle,
+      border: Border.all(color: Colors.white, width: 3.w),
+      boxShadow: const [
+        BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2)),
+      ],
+    ),
+    child: const Icon(Icons.person_pin, color: Colors.white, size: 20),
   );
 }

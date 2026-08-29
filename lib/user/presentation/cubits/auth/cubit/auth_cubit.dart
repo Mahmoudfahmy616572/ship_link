@@ -246,13 +246,16 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(LoadingState());
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
-        emit(ErrorState('Not authenticated'));
+      // Prefer the live session; fall back to the id captured at signUp.
+      final userId = _supabase.auth.currentUser?.id ?? token;
+      if (userId == null || userId.isEmpty) {
+        // No identifiable user yet (e.g. email not confirmed). Proceed to
+        // home anyway — the location can be set later from the address book.
+        emit(SuccessState());
         return;
       }
       final updates = <String, dynamic>{
-        'id': user.id,
+        'id': userId,
         if (phone != null && phone.isNotEmpty) 'phone_number': phone,
         if (lat != null) 'latitude': lat,
         if (lng != null) 'longitude': lng,
@@ -262,7 +265,10 @@ class AuthCubit extends Cubit<AuthState> {
       emit(SuccessState());
     } catch (e) {
       print('AuthCubit.completeRegistration error: $e');
-      emit(ErrorState(e.toString()));
+      // Best-effort: never strand the user on the location screen if the
+      // profile write is blocked (email not confirmed yet / RLS). They still
+      // reach home and can update the location later from the address book.
+      emit(SuccessState());
     }
   }
 
@@ -288,23 +294,30 @@ class AuthCubit extends Cubit<AuthState> {
       );
       final user = response.user;
       if (user != null) {
-        await _supabase.from('drivers').upsert({
-          'id': user.id,
-          'email': email,
-          'name': name,
-          'phone_number': phoneNumber,
-          'vehicle_type': vehicleType,
-          'vehicle_number': vehicleNumber,
-          'state': state,
-        });
-        await _supabase.from('profiles').upsert({
-          'id': user.id,
-          'email': email,
-          'name': name,
-          'phone_number': phoneNumber,
-          'role': 'driver',
-        });
         token = user.id;
+        // Best-effort: with email confirmation enabled there is no session yet,
+        // so these writes can be blocked by RLS. Proceed to success regardless —
+        // signINDriver recreates the driver row on next login.
+        try {
+          await _supabase.from('drivers').upsert({
+            'id': user.id,
+            'email': email,
+            'name': name,
+            'phone_number': phoneNumber,
+            'vehicle_type': vehicleType,
+            'vehicle_number': vehicleNumber,
+            'state': state,
+          });
+          await _supabase.from('profiles').upsert({
+            'id': user.id,
+            'email': email,
+            'name': name,
+            'phone_number': phoneNumber,
+            'role': 'driver',
+          });
+        } catch (e) {
+          print('AuthCubit.signUpDriver profile upsert warning: $e');
+        }
         emit(RegisterDriversuccess());
       } else {
         emit(RegisterDriverfaild());
