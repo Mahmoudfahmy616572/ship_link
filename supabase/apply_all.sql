@@ -169,6 +169,13 @@ DROP POLICY IF EXISTS "Users can view own orders" ON orders;
 CREATE POLICY "Users can view own orders" ON orders
   FOR SELECT USING (auth.uid() = user_id OR auth.uid() = driver_id);
 
+DROP POLICY IF EXISTS "Drivers can view available orders" ON orders;
+CREATE POLICY "Drivers can view available orders" ON orders
+  FOR SELECT USING (
+    driver_id IS NULL
+    AND EXISTS (SELECT 1 FROM drivers WHERE id = auth.uid())
+  );
+
 DROP POLICY IF EXISTS "Users can insert orders" ON orders;
 CREATE POLICY "Users can insert orders" ON orders
   FOR INSERT WITH CHECK (auth.uid() = user_id);

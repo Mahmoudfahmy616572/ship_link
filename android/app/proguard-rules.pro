@@ -92,6 +92,11 @@
 -keep class be.tramckrijte.workmanager.** { *; }
 -dontwarn be.tramckrijte.workmanager.**
 
+# AndroidX WorkManager
+-keep class androidx.work.impl.WorkDatabase_Impl { *; }
+-keep class androidx.work.impl.** { *; }
+-dontwarn androidx.work.**
+
 # Flutter Slidable
 -keep class com.letsgo.** { *; }
 -dontwarn com.letsgo.**
