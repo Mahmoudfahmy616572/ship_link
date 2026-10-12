@@ -19,11 +19,22 @@ flutter build web --target lib/web/main_web.dart --release
 flutter build web --target lib/web/main_web.dart --profile
 ```
 
+> Android builds should pass `--dart-define-from-file=.env` (template: `.env.example`).
+> Without it the app falls back to the hard-coded defaults in `lib/core/config.dart`
+> (and the MapTiler key is empty → OpenStreetMap tiles). Web CI injects the same
+> values via `--dart-define` in `.github/workflows/deploy-*.yml`.
+
+Play Store bundles:
+```bash
+flutter build appbundle --flavor user   -t lib/user/main_user.dart   --release --dart-define-from-file=.env
+flutter build appbundle --flavor driver -t lib/driver/main_driver.dart --release --dart-define-from-file=.env
+```
+
 ## Key Architecture
 
 - **State**: Cubits (no Provider/Bloc where avoidable); Web uses ChangeNotifier+Provider (avoids importing packages with flutter_secure_storage)
 - **Routing**: GoRouter with `shellRoute` for bottom nav; Web uses `onGenerateRoute` + `PageRouteBuilder` fade transitions
-- **Localization**: `easy_localization` with `context.t.tr('key')`; Web uses custom `AppLocalizations.delegate` + `context.t` extension (falls back to English if delegate not yet loaded)
+- **Localization**: custom `AppLocalizations` in `lib/core/localization.dart` with the `context.t.tr('key')` extension (falls back to English if the delegate is not loaded yet). The package `easy_localization` is **NOT** used — do not add it.
 - **Backend**: Supabase (auth + postgres + functions)
 - **Notifications**: `flutter_local_notifications` + polling every 10s on `notifications` table; FCM via Edge Function `send_push` (fallback: `FcmPushService` with service account)
 
@@ -36,7 +47,9 @@ flutter build web --target lib/web/main_web.dart --profile
 
 ## Database Migrations
 
-All-in-one: `complete_supabase_schema.sql` — run in Supabase SQL Editor.
+All-in-one: `supabase/apply_all.sql` — run in Supabase SQL Editor, then
+`supabase/sql/admin_supabase_schema.sql` (the `admins` table is **not** inside
+`apply_all.sql`). Full order + the per-file list: [`supabase/sql/README.md`](supabase/sql/README.md).
 
 ## When FCM Background Notifications Don't Work
 
