@@ -32,7 +32,7 @@ class BrevoOtpService {
     );
 
     final body = jsonEncode({
-      'sender': {'name': 'ShipLink', 'email': 'noreply@shiplink.app'},
+      'sender': {'name': 'ShipLink', 'email': 'shiplink.app1@gmail.com'},
       'to': [
         {'email': email}
       ],
