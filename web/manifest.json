@@ -1,11 +1,11 @@
 {
-    "name": "ship_link",
-    "short_name": "ship_link",
+    "name": "ShipLink - Shop & Delivery",
+    "short_name": "ShipLink",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "ShipLink - e-commerce & delivery platform: browse products, track your order live and manage deliveries.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
