@@ -836,14 +836,14 @@ class _ProfileAvatarState extends State<_ProfileAvatar> {
                           fit: BoxFit.cover,
                           errorWidget: (_, __, ___) => Center(
                             child: Text(
-                              widget.name[0].toUpperCase(),
+                              (widget.name.isNotEmpty ? widget.name[0] : '?').toUpperCase(),
                               style: appStyle(36, FontWeight.w700, Colors.white),
                             ),
                           ),
                         ),
                       )
                     : Text(
-                        widget.name[0].toUpperCase(),
+                        (widget.name.isNotEmpty ? widget.name[0] : '?').toUpperCase(),
                         style: appStyle(36, FontWeight.w700, Colors.white),
                       ),
               );

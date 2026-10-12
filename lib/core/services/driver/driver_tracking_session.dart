@@ -247,6 +247,9 @@ class DriverTrackingSession {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
+    if (permission == LocationPermission.denied) return false;
+    // whileInUse is sufficient because we run a foreground service which
+    // keeps location tracking alive even when the app is backgrounded.
     return permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse;
   }
