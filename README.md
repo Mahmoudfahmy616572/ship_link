@@ -153,3 +153,11 @@ npx supabase functions deploy send_push                       --project-ref <ref
 * [`AGENTS.md`](AGENTS.md) — build commands, architecture rules, known pitfalls
 * [`supabase/sql/README.md`](supabase/sql/README.md) — database setup order
 * [`FCM_SETUP.md`](FCM_SETUP.md) — Firebase Cloud Messaging wiring
+
+## ⚖️ License
+
+© Mahmoud Fahmy. All rights reserved — see [`LICENSE`](LICENSE). The source is public for
+review and evaluation only; copying it into another product is not permitted.
+
+White-labelling, licensing or acquisition: **mahmoudfahmeyy@gmail.com**
+
