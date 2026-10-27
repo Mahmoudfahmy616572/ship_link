@@ -1,9 +1,10 @@
 ﻿import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 void main() async {
   const url = 'https://aqxiziqybgtvrdfhmmoc.supabase.co';
-  const key = '***REMOVED***';
+  final key = Platform.environment['SUPABASE_SERVICE_ROLE'] ?? '';
 
   // Try /sql endpoint (Supabase's raw SQL API)
   final sql = '''

@@ -1,8 +1,9 @@
 ﻿import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 void main() async {
-  const key = '***REMOVED***';
+  final key = Platform.environment['SUPABASE_SERVICE_ROLE'] ?? '';
   final resp = await http.get(
     Uri.parse('https://aqxiziqybgtvrdfhmmoc.supabase.co/rest/v1/products?select=count'),
     headers: {'apikey': key, 'Authorization': 'Bearer $key', 'Accept': 'application/json'},

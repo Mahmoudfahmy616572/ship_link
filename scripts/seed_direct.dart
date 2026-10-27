@@ -1,11 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
 void main() async {
   const supabaseUrl = 'https://aqxiziqybgtvrdfhmmoc.supabase.co';
-  const serviceRoleKey =
-      '***REMOVED***';
+  final serviceRoleKey = Platform.environment['SUPABASE_SERVICE_ROLE'] ?? '';
 
   // First try a minimal insert to discover valid columns
   print('Testing insert with minimal columns...');

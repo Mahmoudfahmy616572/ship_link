@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 void main() async {
-  final key = '***REMOVED***';
+  final key = Platform.environment['SUPABASE_SERVICE_ROLE'] ?? '';
 
   // Clear cache entries via a simple function call (we'll use a stored procedure approach)
   // Instead, let's just verify data & tell user to clear app cache

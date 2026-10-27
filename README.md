@@ -4,13 +4,16 @@
 Flutter codebase** that ships **5 targets**: an Android User app, an Android Driver app,
 a responsive Web store, a Driver web app, and an Admin panel.
 
-| Target | Entry point | Published at |
+| Target | Entry point | Where it runs |
 |---|---|---|
-| User app (Android) | `lib/user/main_user.dart` (flavor `user`) | Play Store — `com.shiplink.app.user` |
-| Driver app (Android) | `lib/driver/main_driver.dart` (flavor `driver`) | Play Store — `com.shiplink.app.driver` |
+| User app (Android) | `lib/user/main_user.dart` (flavor `user`) | Signed APK — `com.shiplink.app.user` |
+| Driver app (Android) | `lib/driver/main_driver.dart` (flavor `driver`) | Signed APK — `com.shiplink.app.driver` |
 | Web store | `lib/web/main_web.dart` | `/ship_link/` |
 | Driver web | `lib/web/main_web.dart` | `/ship_link/driver/` |
 | Admin panel | `lib/web/main_web.dart` | `/ship_link/admin/` |
+
+> The Android builds are distributed as signed release APKs for now (download links below);
+> the Google Play listing is not live yet.
 
 > The web entry (`lib/web/main_web.dart`) branches on the URL path: `admin` → admin login,
 > `driver` → driver sign-in, otherwise → storefront. All three web builds come from the

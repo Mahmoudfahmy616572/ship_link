@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 void main() async {
   const projectRef = 'aqxiziqybgtvrdfhmmoc';
-  const serviceRoleKey =
-      '***REMOVED***';
+  final serviceRoleKey = Platform.environment['SUPABASE_SERVICE_ROLE'] ?? '';
 
   // Try Management API
   print('Trying Management API with service_role key...');
