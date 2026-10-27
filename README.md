@@ -142,9 +142,11 @@ npx supabase functions deploy send_push                       --project-ref <ref
 
 ## 📸 Project Preview
 
-| Storefront | Live tracking | Order management |
+![ShipLink — storefront, live tracking and order management](docs/screens/shiplink-cover.webp)
+
+| Web store | Driver web | Admin panel |
 | :---: | :---: | :---: |
-| *[Add screenshot]* | *[Add screenshot]* | *[Add screenshot]* |
+| [Open](https://mahmoudfahmy616572.github.io/ship_link/) | [Open](https://mahmoudfahmy616572.github.io/ship_link/driver/) | [Open](https://mahmoudfahmy616572.github.io/ship_link/admin/) |
 
 ## 🧭 Project Docs
 
